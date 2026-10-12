@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 21. Аффилированный маркетинг</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #022c22; color: #d1fae5; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #064e3b; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #10b981; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #064e3b 0%, #059669 60%, #34d399 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* ECOSYSTEM DIAGRAM */
+        .eco-card { background: #ecfdf5; border: 2px solid #a7f3d0; border-radius: 14px; padding: 20px 24px; }
+        .eco-card .eco-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 14px; }
+        .eco-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .eco-block { flex: 1; text-align: center; border-radius: 10px; padding: 14px 10px; color: white; }
+        .eco-block.advertiser { background: linear-gradient(135deg, #0c4a6e, #0284c7); }
+        .eco-block.platform { background: linear-gradient(135deg, #7c2d12, #ea580c); }
+        .eco-block.affiliate { background: linear-gradient(135deg, #14532d, #16a34a); }
+        .eco-block.user { background: linear-gradient(135deg, #581c87, #9333ea); }
+        .eco-block .eco-icon { font-size: 22px; margin-bottom: 4px; }
+        .eco-block .eco-name { font-size: 12px; font-weight: bold; margin-bottom: 3px; }
+        .eco-block .eco-desc { font-size: 9.5px; opacity: 0.9; line-height: 1.3; }
+        .eco-arrow { font-size: 22px; color: #059669; font-weight: bold; }
+
+        /* CPA MODELS */
+        .models-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .model-card { border-radius: 12px; padding: 14px 10px; text-align: center; }
+        .model-card.cpa { background: #dbeafe; border: 2px solid #60a5fa; }
+        .model-card.cpl { background: #fef3c7; border: 2px solid #fbbf24; }
+        .model-card.cps { background: #dcfce7; border: 2px solid #4ade80; }
+        .model-card.cpc { background: #fae8ff; border: 2px solid #d946ef; }
+        .model-card .model-icon { font-size: 22px; margin-bottom: 5px; }
+        .model-card .model-name { font-size: 13px; font-weight: 900; margin-bottom: 3px; }
+        .model-card.cpa .model-name { color: #1d4ed8; }
+        .model-card.cpl .model-name { color: #b45309; }
+        .model-card.cps .model-name { color: #15803d; }
+        .model-card.cpc .model-name { color: #a21caf; }
+        .model-card .model-full { font-size: 9.5px; color: #475569; margin-bottom: 4px; line-height: 1.3; }
+        .model-card .model-desc { font-size: 10px; color: #1e293b; line-height: 1.35; font-weight: 500; }
+
+        /* SVG FLOW DIAGRAM */
+        .chart-card { background: #ffffff; border: 2px solid #a7f3d0; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* MARKET TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #064e3b; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #ecfdf5; }
+        .metrics-table .price { color: #059669; font-weight: bold; }
+        .metrics-table .high { color: #b45309; font-weight: bold; }
+        .metrics-table .cat { color: #064e3b; font-weight: bold; }
+
+        /* RISK CARD */
+        .risk-card { background: #fef2f2; border: 2px solid #fecaca; border-radius: 14px; padding: 18px 22px; }
+        .risk-card .risk-title { font-size: 14px; font-weight: bold; color: #991b1b; margin-bottom: 12px; }
+        .risk-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .risk-item { flex: 1; min-width: 140px; background: white; border-radius: 10px; padding: 12px; border: 1.5px solid #fecaca; }
+        .risk-item .risk-icon { font-size: 20px; margin-bottom: 5px; }
+        .risk-item .risk-name { font-size: 11.5px; font-weight: bold; color: #991b1b; margin-bottom: 4px; }
+        .risk-item .risk-desc { font-size: 10px; color: #475569; line-height: 1.4; }
+
+        /* ROUND UP SVG */
+        .svg-card { background: #ffffff; border: 2px solid #a7f3d0; border-radius: 14px; padding: 18px 22px; }
+        .svg-card .svg-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .svg-card .svg-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #10b981; }
+        .rt-btn:hover { background: #059669; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #6ee7b7; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #065f46; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #d1fae5; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #6ee7b7; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #065f46; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #064e3b; color: #6ee7b7; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #6ee7b7; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #10b981; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #10b981; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #6ee7b7; font-size: 13px; min-width: 80px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #6ee7b7; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #10b981; color: #022c22; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #6ee7b7; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 21. Аффилированный маркетинг
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🤝</div>
+                <div class="hero-data">
+                    <div class="hero-number">$17 млрд</div>
+                    <div class="hero-label">Мировой рынок аффилиат-маркетинга (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">+15%</div>
+                    <div class="hero-label">Рост год к году</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">74%</div>
+                    <div class="hero-label">Брендов увеличивают бюджеты</div>
+                </div>
+            </div>
+
+            <!-- ECOSYSTEM -->
+            <div class="eco-card">
+                <div class="eco-title">🌐 Экосистема аффилированного маркетинга: четыре участника</div>
+                <div class="eco-row">
+                    <div class="eco-block advertiser">
+                        <div class="eco-icon">🏢</div>
+                        <div class="eco-name">Рекламодатель</div>
+                        <div class="eco-desc">Владелец товара или услуги. Устанавливает правила и платит за результат</div>
+                    </div>
+                    <div class="eco-arrow">↔️</div>
+                    <div class="eco-block platform">
+                        <div class="eco-icon">⚙️</div>
+                        <div class="eco-name">Платформа</div>
+                        <div class="eco-desc">Техническая инфраструктура, трекинг, антифрод. Например: Soloway</div>
+                    </div>
+                    <div class="eco-arrow">↔️</div>
+                    <div class="eco-block affiliate">
+                        <div class="eco-icon">📣</div>
+                        <div class="eco-name">Аффилиат</div>
+                        <div class="eco-desc">Партнёр, размещающий рекламу для генерации трафика</div>
+                    </div>
+                    <div class="eco-arrow">↔️</div>
+                    <div class="eco-block user">
+                        <div class="eco-icon">👤</div>
+                        <div class="eco-name">Пользователь</div>
+                        <div class="eco-desc">Совершает целевое действие: клик, лид, покупка</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CPA MODELS -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 10px;">💰 Четыре модели оплаты за результат</div>
+                <div class="models-grid">
+                    <div class="model-card cpa">
+                        <div class="model-icon">🎯</div>
+                        <div class="model-name">CPA</div>
+                        <div class="model-full">Cost Per Action</div>
+                        <div class="model-desc">Оплата за полезное действие: анкета, регистрация</div>
+                    </div>
+                    <div class="model-card cpl">
+                        <div class="model-icon">📧</div>
+                        <div class="model-name">CPL</div>
+                        <div class="model-full">Cost Per Lead</div>
+                        <div class="model-desc">Оплата за лид: оставленные контакты</div>
+                    </div>
+                    <div class="model-card cps">
+                        <div class="model-icon">💳</div>
+                        <div class="model-name">CPS</div>
+                        <div class="model-full">Cost Per Sale</div>
+                        <div class="model-desc">Оплата за продажу: только по факту покупки</div>
+                    </div>
+                    <div class="model-card cpc">
+                        <div class="model-icon">🖱️</div>
+                        <div class="model-name">CPC</div>
+                        <div class="model-full">Cost Per Click</div>
+                        <div class="model-desc">Оплата за клик: базовая модель</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG FLOW DIAGRAM -->
+            <div class="chart-card">
+                <div class="chart-title">🔗 Схема взаимодействия аффилиата и рекламодателя <span>6 шагов + выпадение</span></div>
+                <svg viewBox="0 0 600 300" style="width: 100%; height: auto;">
+                    <!-- Сайт аффилиата -->
+                    <rect x="30" y="20" width="130" height="70" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                    <text x="95" y="42" font-size="11" fill="#14532d" text-anchor="middle" font-weight="bold">Сайт аффилиата</text>
+                    <text x="95" y="58" font-size="9" fill="#475569" text-anchor="middle">Размещена</text>
+                    <text x="95" y="72" font-size="9" fill="#475569" text-anchor="middle">рекламная ссылка</text>
+
+                    <!-- Шаг 1 -->
+                    <circle cx="95" cy="105" r="10" fill="#10b981"/>
+                    <text x="95" y="109" font-size="10" fill="white" text-anchor="middle" font-weight="bold">1</text>
+                    <text x="130" y="108" font-size="9" fill="#064e3b" font-weight="bold">Посетитель кликает</text>
+
+                    <!-- Сайт рекламодателя -->
+                    <rect x="235" y="20" width="130" height="70" rx="10" fill="#dbeafe" stroke="#0284c7" stroke-width="2"/>
+                    <text x="300" y="42" font-size="11" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Сайт рекламодателя</text>
+                    <text x="300" y="58" font-size="9" fill="#475569" text-anchor="middle">Клик-защита</text>
+                    <text x="300" y="72" font-size="9" fill="#475569" text-anchor="middle">фиксирует переход</text>
+
+                    <!-- Стрелка -->
+                    <line x1="160" y1="55" x2="230" y2="55" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+                    <defs>
+                        <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                        </marker>
+                        <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Выпадение 1 -->
+                    <text x="170" y="110" font-size="8" fill="#dc2626" font-weight="bold">Если не кликнул —</text>
+                    <text x="170" y="120" font-size="8" fill="#dc2626">выпадение из системы</text>
+
+                    <!-- Шаг 2: регистрация -->
+                    <circle cx="300" cy="105" r="10" fill="#10b981"/>
+                    <text x="300" y="109" font-size="10" fill="white" text-anchor="middle" font-weight="bold">2</text>
+                    <text x="335" y="108" font-size="9" fill="#064e3b" font-weight="bold">Предлагают оставить email</text>
+
+                    <!-- Шаг 3: лид -->
+                    <rect x="30" y="140" width="130" height="55" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="95" y="160" font-size="11" fill="#78350f" text-anchor="middle" font-weight="bold">💰 Лид засчитан</text>
+                    <text x="95" y="176" font-size="9" fill="#475569" text-anchor="middle">Аффилиату</text>
+                    <text x="95" y="188" font-size="9" fill="#475569" text-anchor="middle">выплачено вознаграждение</text>
+
+                    <!-- Шаг 4: продажа -->
+                    <rect x="235" y="140" width="130" height="55" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                    <text x="300" y="160" font-size="11" fill="#14532d" text-anchor="middle" font-weight="bold">💳 Продажа</text>
+                    <text x="300" y="176" font-size="9" fill="#475569" text-anchor="middle">Аффилиату выплачено</text>
+                    <text x="300" y="188" font-size="9" fill="#475569" text-anchor="middle">по факту продажи</text>
+
+                    <!-- Стрелки от шага 2 вниз -->
+                    <line x1="280" y1="115" x2="200" y2="155" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+                    <line x1="320" y1="115" x2="300" y2="135" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+                    <!-- Выпадение 2 -->
+                    <text x="170" y="175" font-size="8" fill="#dc2626" font-weight="bold">Некачественный лид</text>
+                    <text x="170" y="185" font-size="8" fill="#dc2626">(неверные данные)</text>
+
+                    <!-- Шаг 5: возврат -->
+                    <rect x="420" y="140" width="150" height="55" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                    <text x="495" y="160" font-size="11" fill="#991b1b" text-anchor="middle" font-weight="bold">❌ Возврат товара</text>
+                    <text x="495" y="176" font-size="9" fill="#475569" text-anchor="middle">Выпадение из системы</text>
+                    <text x="495" y="188" font-size="9" fill="#475569" text-anchor="middle">Вознаграждение отменяется</text>
+
+                    <!-- Стрелка продажи к возврату -->
+                    <line x1="365" y1="167" x2="415" y2="167" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+                    <!-- Шаг 6: самостоятельная реклама аффилиата -->
+                    <rect x="30" y="225" width="355" height="55" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" stroke-dasharray="6 3"/>
+                    <text x="207" y="245" font-size="11" fill="#14532d" text-anchor="middle" font-weight="bold">🔄 Аффилиат может сам платить за размещение рекламы</text>
+                    <text x="207" y="262" font-size="9" fill="#475569" text-anchor="middle">Инвестирует в трафик на свой сайт, чтобы увеличить доход от партнёрской программы</text>
+
+                    <!-- Легенда -->
+                    <text x="30" y="298" font-size="9" fill="#64748b" font-weight="bold">🟢 Выплата вознаграждения   🔴 Выпадение из системы</text>
+                </svg>
+            </div>
+
+            <!-- MARKET TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 8px;">📊 Ключевые метрики мирового рынка аффилиат-маркетинга (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Объём мирового рынка</td>
+                            <td class="price">$17 млрд</td>
+                            <td class="high">+15%</td>
+                            <td>impact.com</td>
+                        </tr>
+                        <tr>
+                            <td>Прогноз к 2027 году</td>
+                            <td>$27,78 млрд</td>
+                            <td class="high">CAGR 27,8%</td>
+                            <td>Statista</td>
+                        </tr>
+                        <tr>
+                            <td>Бренды, увеличивающие бюджеты</td>
+                            <td class="price">74%</td>
+                            <td class="high">растёт</td>
+                            <td>impact.com</td>
+                        </tr>
+                        <tr>
+                            <td>Инвестиции в партнёрства с создателями</td>
+                            <td>$12 млрд</td>
+                            <td class="high">+20%</td>
+                            <td>impact.com</td>
+                        </tr>
+                        <tr>
+                            <td>Средний ROAS партнёрских программ</td>
+                            <td>12:1</td>
+                            <td class="price">стабильно</td>
+                            <td>Post Affiliate Pro</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RISK CARD -->
+            <div class="risk-card">
+                <div class="risk-title">⚠️ Как не стать жертвой мошенничества: 4 ключевых риска</div>
+                <div class="risk-row">
+                    <div class="risk-item">
+                        <div class="risk-icon">🎭</div>
+                        <div class="risk-name">Фрод лидов</div>
+                        <div class="risk-desc">Искусственные регистрации и заявки без реального интереса к продукту</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-icon">👆</div>
+                        <div class="risk-name">Накрутка кликов</div>
+                        <div class="risk-desc">Боты и фейковые клики для получения вознаграждения за CPC</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-icon">📉</div>
+                        <div class="risk-name">Cookie stuffing</div>
+                        <div class="risk-desc">Незаконная установка cookie без ведома пользователя для присвоения продажи</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-icon">🔁</div>
+                        <div class="risk-name">Возвраты</div>
+                        <div class="risk-desc">Покупатели возвращают товар — аффилиату приходится возвращать вознаграждение</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG MARKET GROWTH -->
+            <div class="svg-card">
+                <div class="svg-title">📈 Рост мирового рынка аффилиат-маркетинга <span>2024 → 2027</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <polygon points="90,125 220,110 350,85 480,50 580,20 580,140 90,140"
+                             fill="url(#gradAff)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="gradAff" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <polyline points="90,125 220,110 350,85 480,50 580,20"
+                              fill="none" stroke="#10b981" stroke-width="3" stroke-linejoin="round"/>
+
+                    <circle cx="90" cy="125" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="110" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="85" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="50" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="20" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <text x="90" y="118" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">14,8</text>
+                    <text x="220" y="103" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">17,0</text>
+                    <text x="350" y="78" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">20,4</text>
+                    <text x="480" y="43" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">23,9</text>
+                    <text x="580" y="13" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">27,8</text>
+
+                    <text x="90" y="155" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="220" y="155" font-size="10" fill="#475569" text-anchor="middle">2025</text>
+                    <text x="350" y="155" font-size="10" fill="#475569" text-anchor="middle">2026</text>
+                    <text x="480" y="155" font-size="10" fill="#475569" text-anchor="middle">2027</text>
+                    <text x="580" y="155" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2028</text>
+
+                    <text x="555" y="30" font-size="10" fill="#e11d48" text-anchor="end" font-weight="bold">CAGR 27,8%</text>
+                    <text x="555" y="43" font-size="9" fill="#64748b" text-anchor="end">$ млрд</text>
+                </svg>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Что такое аффилиат-маркетинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Модели оплаты CPA/CPL/CPS</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Как избежать фрода</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 21 из 26
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #022c22; padding: 20px 20px 10px 20px; border-bottom: 1px solid #065f46; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Мы начинаем новую часть курса, посвящённую партнёрским программам, поведенческой рекламе и технологиям доставки рекламы. Сегодня мы разберём аффилированный маркетинг — модель, при которой партнёр получает вознаграждение за целевые действия, совершённые привлечёнными пользователями.</p>
+
+            <div class="action-hint">Обратите внимание студентов на экосистему из четырёх участников.</div>
+
+            <h3>📌 Что такое аффилированный маркетинг</h3>
+
+            <p>Аффилированный маркетинг — это модель, при которой партнёр (аффилиат) получает вознаграждение за целевые действия, совершённые привлечёнными пользователями. Ключевые модели оплаты: <strong>CPA</strong> (Cost Per Action — оплата за действие), <strong>CPL</strong> (Cost Per Lead — оплата за лид), <strong>CPS</strong> (Cost Per Sale — оплата за продажу).</p>
+
+            <p>Примеры партнёрских программ: Ozon.ru, Mamba. Аффилиат может быть как владельцем тематического сайта, так и блогером или владельцем мобильного приложения.</p>
+
+            <h3>📌 Экосистема аффилированного маркетинга</h3>
+
+            <p>В экосистеме четыре ключевых участника. <strong>Рекламодатель</strong> — компания, продающая товар или услугу. Она устанавливает правила программы и платит за результат. <strong>Платформа</strong> — сервис, обеспечивающий техническую инфраструктуру, трекинг и антифрод. Например, Soloway, Wikimart. <strong>Аффилиат</strong> — партнёр, размещающий рекламу на своём сайте для генерации трафика. <strong>Пользователь</strong> — потенциальный покупатель, совершающий целевое действие.</p>
+
+            <div class="action-hint">Обратите внимание студентов на схему взаимодействия.</div>
+
+            <h3>📌 Схема взаимодействия аффилиата и рекламодателя</h3>
+
+            <p>Разберём пошаговую схему. <strong>Шаг 1:</strong> аффилиат размещает рекламную ссылку на своём сайте. Посетитель кликает по рекламной ссылке и переходит на сайт рекламодателя. <strong>Шаг 2:</strong> система клик-защиты фиксирует переход. Если пользователь не кликает — выпадение из системы. <strong>Шаг 3:</strong> пользователю предлагается оставить координаты (email). При регистрации лид засчитывается, аффилиату выплачивается вознаграждение по факту генерации лида. <strong>Шаг 4:</strong> если потенциальный покупатель совершает покупку — аффилиату выплачивается вознаграждение по факту продажи. <strong>Шаг 5:</strong> если некачественный лид (неверная информация) или возврат товара — выпадение из системы.</p>
+
+            <p>Важно: аффилиат может сам платить за размещение рекламы для генерации трафика на свой сайт. Это увеличивает его доход, но и повышает риски.</p>
+
+            <h3>📌 Сервисы с оплатой за результат</h3>
+
+            <p>Компании на российском рынке: Soloway, Wikimart и другие. Они предлагают участие в программе аффилированного маркетинга с оплатой за результат. Модели: CPA (оплата за полезные действия), CPL (оплата за лид), CPS (оплата за продажу).</p>
+
+            <h3>📌 Масштаб рынка в 2025 году</h3>
+
+            <p>Мировой рынок аффилированного маркетинга достиг <span class="stat-inline">$17 млрд</span> к концу 2025 года. Прогноз к 2027 году — $27,78 млрд при среднегодовых темпах роста 27,8%. <span class="stat-inline">74%</span> брендов увеличивают бюджеты на партнёрский маркетинг из-за роста стоимости других каналов. Инвестиции в партнёрства с создателями контента достигли $12 млрд.</p>
+
+            <p>Средний ROAS партнёрских программ — 12:1. Это означает, что на каждый вложенный доллар приходится 12 долларов выручки. Это один из самых высоких показателей среди всех каналов digital-маркетинга.</p>
+
+            <div class="action-hint">Обратите внимание студентов на блок рисков.</div>
+
+            <h3>📌 Как не стать жертвой мошенничества</h3>
+
+            <p>Четыре ключевых риска. <strong>Фрод лидов</strong> — искусственные регистрации и заявки без реального интереса к продукту. <strong>Накрутка кликов</strong> — боты и фейковые клики для получения вознаграждения за CPC. <strong>Cookie stuffing</strong> — незаконная установка cookie без ведома пользователя для присвоения продажи. <strong>Возвраты</strong> — покупатели возвращают товар, а аффилиату приходится возвращать вознаграждение.</p>
+
+            <p>Как защититься? Использовать антифрод-системы и постбэки для верификации. Контролировать качество трафика: анализировать источники, геолокацию, поведение пользователей. Устанавливать чёткие правила возврата вознаграждения.</p>
+
+            <h3>📌 Тренды 2025–2026</h3>
+
+            <p>Несколько ключевых трендов. <strong>Интеграция с AI-платформами</strong> — автоматизация подбора партнёров и оптимизации кампаний. <strong>Работа с микро-инфлюенсерами</strong> — переход от крупных блогеров к нишевым с более высокой вовлечённостью. <strong>Развитие first-party data</strong> — использование собственных данных для повышения точности трекинга. <strong>Рост доли CPS-моделей</strong> — рекламодатели всё чаще предпочитают оплату за продажу, а не за клик.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали аффилированный маркетинг. Ключевые выводы:</p>
+
+            <ul>
+                <li>Аффилированный маркетинг — модель, при которой партнёр получает вознаграждение за целевые действия.</li>
+                <li>Четыре участника: рекламодатель, платформа, аффилиат, пользователь.</li>
+                <li>Четыре модели оплаты: CPA, CPL, CPS, CPC.</li>
+                <li>Схема взаимодействия: клик → клик-защита → лид → продажа (или выпадение).</li>
+                <li>Мировой рынок — $17 млрд, прогноз $27,78 млрд к 2027 году.</li>
+                <li>74% брендов увеличивают бюджеты. Средний ROAS — 12:1.</li>
+                <li>Ключевые риски: фрод лидов, накрутка кликов, cookie stuffing, возвраты.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём поведенческую рекламу и ретаргетинг. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPA</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Action</div>
+                            <div class="gloss-def">Модель оплаты за целевое действие: регистрацию, заявку, подписку</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPL</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Lead</div>
+                            <div class="gloss-def">Модель оплаты за лид — контактные данные потенциального клиента</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Sale</div>
+                            <div class="gloss-def">Модель оплаты за продажу — вознаграждение только по факту покупки</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Click</div>
+                            <div class="gloss-def">Модель оплаты за клик по рекламному объявлению</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Mille</div>
+                            <div class="gloss-def">Стоимость за тысячу показов рекламного объявления</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROAS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Ad Spend</div>
+                            <div class="gloss-def">Возврат на рекламные расходы — отношение выручки к затратам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Аффилиат</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Affiliate</div>
+                            <div class="gloss-def">Партнёр, размещающий рекламу для генерации трафика и получения вознаграждения</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Постбэк</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Postback</div>
+                            <div class="gloss-def">Технология передачи данных о конверсии от рекламодателя к партнёрской платформе</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Фрод</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Fraud</div>
+                            <div class="gloss-def">Мошенничество: искусственные лиды, накрутка кликов, cookie stuffing</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Cookie Stuffing</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cookie Stuffing</div>
+                            <div class="gloss-def">Незаконная установка cookie без ведома пользователя для присвоения продажи</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок аффилиат-маркетинга</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">impact.com: Global State of Affiliate Marketing Report — $17 млрд, 74% брендов увеличивают бюджеты. — <a href="https://impact.com" target="_blank">Impact.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Statista: Affiliate Marketing Market Size Worldwide 2024–2027. — <a href="https://www.statista.com" target="_blank">Statista.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">РБК: как облачные платформы меняют рынок партнёрского маркетинга. — <a href="https://www.rbc.ru" target="_blank">RBC.ru</a> <span class="src-date">23.06.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤝 Модели и платформы</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Post Affiliate Pro: Affiliate Marketing Benchmarks 2025 — средний ROAS 12:1. — <a href="https://www.postaffiliatepro.com" target="_blank">PostAffiliatePro.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Soloway: обзор партнёрских программ и CPA-сетей в России. — <a href="https://soloway.ru" target="_blank">Soloway.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Admitad: тренды партнёрского маркетинга в 2026 году. — <a href="https://www.admitad.com" target="_blank">Admitad.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🛡️ Защита от фрода</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Fraudlogix: The State of Affiliate Fraud 2025 — типы, методы выявления. — <a href="https://fraudlogix.com" target="_blank">Fraudlogix.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">AppsFlyer: Fraud Prevention in Affiliate Marketing — постбэки и антифрод. — <a href="https://www.appsflyer.com" target="_blank">AppsFlyer.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

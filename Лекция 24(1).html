@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 24. Как работает RTB</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #082f49; color: #e0f2fe; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #0c4a6e; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #0ea5e9; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 60%, #06b6d4 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(14, 116, 144, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 36px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11.5px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* TIMER ANIMATION */
+        .timer-card { background: #ecfeff; border: 2px solid #a5f3fc; border-radius: 14px; padding: 20px 24px; }
+        .timer-card .timer-title { font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 14px; }
+        .timer-bar { display: flex; height: 34px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .timer-seg { display: flex; align-items: center; justify-content: center; color: white; font-size: 10.5px; font-weight: bold; flex-direction: column; padding: 0 8px; text-align: center; line-height: 1.2; }
+        .timer-seg.s1 { background: linear-gradient(90deg, #0c4a6e, #0e7490); flex: 2; }
+        .timer-seg.s2 { background: linear-gradient(90deg, #0284c7, #0ea5e9); flex: 2; }
+        .timer-seg.s3 { background: linear-gradient(90deg, #06b6d4, #22d3ee); flex: 2; }
+        .timer-seg.s4 { background: linear-gradient(90deg, #10b981, #34d399); flex: 1.5; }
+        .timer-seg.s5 { background: linear-gradient(90deg, #f59e0b, #fbbf24); flex: 2.5; }
+        .timer-seg small { font-size: 8.5px; opacity: 0.9; font-weight: 400; }
+        .timer-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: #64748b; font-weight: 600; }
+
+        /* SVG AUCTION SCHEMA */
+        .chart-card { background: #ffffff; border: 2px solid #a5f3fc; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(14, 116, 144, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* PARTICIPANTS GRID */
+        .participants-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .part-card { border-radius: 12px; padding: 14px 16px; }
+        .part-card.ssp { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #3b82f6; }
+        .part-card.dsp { background: linear-gradient(135deg, #fdf4ff, #fae8ff); border: 2px solid #a855f7; }
+        .part-card.dmp { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .part-card.data { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #16a34a; }
+        .part-card .part-icon { font-size: 22px; margin-bottom: 6px; }
+        .part-card .part-name { font-size: 13px; font-weight: 900; color: #0c4a6e; margin-bottom: 4px; }
+        .part-card .part-full { font-size: 10.5px; color: #475569; font-style: italic; margin-bottom: 6px; }
+        .part-card .part-desc { font-size: 10.5px; color: #1e293b; line-height: 1.4; }
+        .part-card .part-companies { font-size: 10px; color: #7c3aed; margin-top: 6px; font-weight: 600; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #0c4a6e; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #ecfeff; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .mid { color: #f59e0b; font-weight: bold; }
+        .metrics-table .cat { color: #0c4a6e; font-weight: bold; }
+
+        /* BENEFITS GRID */
+        .benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .benefit-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px 12px; text-align: center; }
+        .benefit-card .ben-icon { font-size: 22px; margin-bottom: 6px; }
+        .benefit-card .ben-name { font-size: 11.5px; font-weight: bold; color: #0c4a6e; margin-bottom: 4px; }
+        .benefit-card .ben-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+
+        /* SVG MARKET GROWTH */
+        .svg-card { background: #ffffff; border: 2px solid #a5f3fc; border-radius: 14px; padding: 18px 22px; }
+        .svg-card .svg-title { font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .svg-card .svg-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #0ea5e9; }
+        .rt-btn:hover { background: #0284c7; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #7dd3fc; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #0c4a6e; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e0f2fe; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #7dd3fc; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #0c4a6e; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #0c4a6e; color: #7dd3fc; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #0ea5e9; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #0ea5e9; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #7dd3fc; font-size: 13px; min-width: 100px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #0ea5e9; color: #082f49; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #7dd3fc; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 24. Как работает RTB
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">⚡</div>
+                <div class="hero-data">
+                    <div class="hero-number">100 мс</div>
+                    <div class="hero-label">Полный цикл аукциона</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">&gt; 90%</div>
+                    <div class="hero-label">Digital-рекламы продаётся программно</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">$1,3 трлн</div>
+                    <div class="hero-label">Рынок programmatic к 2027</div>
+                </div>
+            </div>
+
+            <!-- TIMER ANIMATION -->
+            <div class="timer-card">
+                <div class="timer-title">⏱️ Таймлайн RTB-аукциона: 100 миллисекунд от запроса до показа</div>
+                <div class="timer-bar">
+                    <div class="timer-seg s1">Запрос<small>0–10 мс</small></div>
+                    <div class="timer-seg s2">Cookie<small>10–20 мс</small></div>
+                    <div class="timer-seg s3">Bid Request<small>20–40 мс</small></div>
+                    <div class="timer-seg s4">Ставки<small>40–80 мс</small></div>
+                    <div class="timer-seg s5">Показ<small>80–100 мс</small></div>
+                </div>
+                <div class="timer-labels">
+                    <span>Пользователь заходит</span>
+                    <span>Считывание ID</span>
+                    <span>Аукцион</span>
+                    <span>Определение победителя</span>
+                </div>
+            </div>
+
+            <!-- SVG AUCTION SCHEMA -->
+            <div class="chart-card">
+                <div class="chart-title">🎯 Схема RTB-аукциона: 10 шагов от запроса до показа <span>Реал-тайм</span></div>
+                <svg viewBox="0 0 600 340" style="width: 100%; height: auto;">
+                    <!-- Пользователь -->
+                    <circle cx="45" cy="60" r="22" fill="#0c4a6e" stroke="#0ea5e9" stroke-width="2.5"/>
+                    <text x="45" y="65" font-size="20" text-anchor="middle">👤</text>
+                    <text x="45" y="98" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">Пользователь</text>
+
+                    <!-- Издатель -->
+                    <rect x="115" y="30" width="115" height="60" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="172" y="52" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Издатель</text>
+                    <text x="172" y="68" font-size="9" fill="#475569" text-anchor="middle">Паблишер</text>
+                    <text x="172" y="82" font-size="9" fill="#475569" text-anchor="middle">(сайт)</text>
+
+                    <defs>
+                        <marker id="arrowTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9"/>
+                        </marker>
+                        <marker id="arrowViolet2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#a855f7"/>
+                        </marker>
+                        <marker id="arrowGreen2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Стрелки к издателю -->
+                    <line x1="70" y1="55" x2="110" y2="55" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowTeal)"/>
+                    <text x="90" y="48" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">1</text>
+
+                    <!-- SSP -->
+                    <rect x="270" y="30" width="115" height="60" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="327" y="52" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="bold">SSP</text>
+                    <text x="327" y="68" font-size="9" fill="#475569" text-anchor="middle">Supply-Side</text>
+                    <text x="327" y="82" font-size="9" fill="#475569" text-anchor="middle">Platform</text>
+
+                    <line x1="235" y1="60" x2="265" y2="60" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowTeal)"/>
+                    <text x="250" y="53" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">5</text>
+
+                    <!-- DSP -->
+                    <rect x="425" y="30" width="115" height="60" rx="8" fill="#fdf4ff" stroke="#a855f7" stroke-width="2"/>
+                    <text x="482" y="52" font-size="10" fill="#6b21a8" text-anchor="middle" font-weight="bold">DSP</text>
+                    <text x="482" y="68" font-size="9" fill="#475569" text-anchor="middle">Demand-Side</text>
+                    <text x="482" y="82" font-size="9" fill="#475569" text-anchor="middle">Platform</text>
+
+                    <line x1="390" y1="60" x2="420" y2="60" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowTeal)"/>
+                    <text x="405" y="53" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">7</text>
+
+                    <!-- Bid Request блок -->
+                    <rect x="30" y="120" width="540" height="55" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="300" y="140" font-size="11" fill="#78350f" text-anchor="middle" font-weight="bold">📤 Bid Request — запрос на ставки от SSP ко всем DSP</text>
+                    <text x="300" y="158" font-size="9" fill="#475569" text-anchor="middle">Передаётся: URL страницы, размер слота, cookie-ID, геолокация, тип устройства</text>
+
+                    <line x1="327" y1="90" x2="327" y2="118" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowTeal)"/>
+                    <text x="340" y="108" font-size="9" fill="#78350f" font-weight="bold">6</text>
+
+                    <!-- Ответы DSP -->
+                    <rect x="30" y="190" width="540" height="60" rx="10" fill="#dcfce7" stroke="#10b981" stroke-width="2"/>
+                    <text x="300" y="210" font-size="11" fill="#14532d" text-anchor="middle" font-weight="bold">📥 Ответы DSP — ставки в реальном времени</text>
+                    <text x="300" y="228" font-size="9" fill="#475569" text-anchor="middle">DSP A: 145 ₽ · DSP B: 132 ₽ · DSP C: 98 ₽ · DSP D: 60 ₽</text>
+                    <text x="300" y="243" font-size="9" fill="#059669" text-anchor="middle" font-weight="bold">Побеждает DSP с наибольшей ставкой и подходящей аудиторией</text>
+
+                    <line x1="482" y1="90" x2="482" y2="188" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen2)"/>
+                    <text x="497" y="140" font-size="9" fill="#14532d" font-weight="bold">8</text>
+
+                    <!-- Победитель -->
+                    <rect x="180" y="270" width="240" height="55" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="300" y="290" font-size="11" fill="#0c4a6e" text-anchor="middle" font-weight="bold">🏆 Победитель показан пользователю</text>
+                    <text x="300" y="308" font-size="9" fill="#475569" text-anchor="middle">Событие фиксируется в базе всех участников аукциона</text>
+
+                    <line x1="327" y1="250" x2="327" y2="268" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowTeal)"/>
+                    <text x="340" y="263" font-size="9" fill="#0c4a6e" font-weight="bold">9, 10</text>
+                </svg>
+            </div>
+
+            <!-- PARTICIPANTS -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">👥 Четыре участника экосистемы RTB</div>
+                <div class="participants-grid">
+                    <div class="part-card ssp">
+                        <div class="part-icon">📤</div>
+                        <div class="part-name">SSP</div>
+                        <div class="part-full">Supply-Side Platform</div>
+                        <div class="part-desc">Платформа со стороны предложения — управляет рекламными ресурсами издателей, выставляет инвентарь на аукцион</div>
+                        <div class="part-companies">Яндекс, Google, Begun, AdFox</div>
+                    </div>
+                    <div class="part-card dsp">
+                        <div class="part-icon">📥</div>
+                        <div class="part-name">DSP</div>
+                        <div class="part-full">Demand-Side Platform</div>
+                        <div class="part-desc">Платформа со стороны спроса — автоматизирует закупку рекламы для рекламодателей, делает ставки на аукционе</div>
+                        <div class="part-companies">Яндекс.Директ, Google DV360, Getintent</div>
+                    </div>
+                    <div class="part-card dmp">
+                        <div class="part-icon">📊</div>
+                        <div class="part-name">DMP</div>
+                        <div class="part-full">Data Management Platform</div>
+                        <div class="part-desc">Брокер данных — взаимодействует с издателями и рекламодателями, определяет оптимальную цену для каждого показа</div>
+                        <div class="part-companies">Soloway, Begun, DataMind</div>
+                    </div>
+                    <div class="part-card data">
+                        <div class="part-icon">🗄️</div>
+                        <div class="part-name">Поставщики данных</div>
+                        <div class="part-full">Data Providers</div>
+                        <div class="part-desc">Сбор и продажа анонимных данных о пользователях: потребительский опыт, интересы, спрос</div>
+                        <div class="part-companies">AdRiver, RuTarget, Criteo</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BENEFITS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">✅ Преимущества RTB для трёх сторон</div>
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="ben-icon">🏢</div>
+                        <div class="ben-name">Рекламодатели</div>
+                        <div class="ben-desc">Точный таргетинг, оплата только за нужную аудиторию, прозрачность ставок</div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="ben-icon">📰</div>
+                        <div class="ben-name">Издатели</div>
+                        <div class="ben-desc">Максимизация дохода от площадей, автоматизация продаж, доступ к глобальному спросу</div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="ben-icon">👤</div>
+                        <div class="ben-name">Пользователи</div>
+                        <div class="ben-desc">Более релевантная реклама, меньше навязчивости, лучшее соответствие интересам</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 8px;">📊 Ключевые метрики programmatic-рынка (2025–2026)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Доля programmatic в digital-рекламе</td>
+                            <td class="high">&gt; 90%</td>
+                            <td class="cat">растёт</td>
+                            <td>IAB Europe</td>
+                        </tr>
+                        <tr>
+                            <td>Рынок programmatic к 2027</td>
+                            <td class="high">$1,3 трлн</td>
+                            <td class="cat">CAGR 15,6%</td>
+                            <td>Business Research</td>
+                        </tr>
+                        <tr>
+                            <td>Доля CTV в RTB-аукционах</td>
+                            <td>28%</td>
+                            <td class="cat">+8 п.п.</td>
+                            <td>Magnite</td>
+                        </tr>
+                        <tr>
+                            <td>Средняя ставка CPM в RTB</td>
+                            <td>$1,50–$4,00</td>
+                            <td class="cat">стабильно</td>
+                            <td>PubMatic</td>
+                        </tr>
+                        <tr>
+                            <td>Точность прогноза CTR с AI</td>
+                            <td class="high">+47%</td>
+                            <td class="cat">растёт</td>
+                            <td>Google Ads</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SVG PROGRAMMATIC GROWTH -->
+            <div class="svg-card">
+                <div class="svg-title">📈 Рост programmatic-рекламы в мире <span>2022 → 2027</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <polygon points="90,120 220,105 350,80 480,50 580,25 580,140 90,140"
+                             fill="url(#gradRTB)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="gradRTB" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#0ea5e9"/>
+                            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <polyline points="90,120 220,105 350,80 480,50 580,25"
+                              fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linejoin="round"/>
+
+                    <circle cx="90" cy="120" r="5" fill="#0ea5e9" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="105" r="5" fill="#0ea5e9" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="80" r="5" fill="#0ea5e9" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="50" r="5" fill="#0ea5e9" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="25" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <text x="90" y="113" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">$630</text>
+                    <text x="220" y="98" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">$725</text>
+                    <text x="350" y="73" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">$880</text>
+                    <text x="480" y="43" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">$1 060</text>
+                    <text x="580" y="18" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">$1 300</text>
+
+                    <text x="90" y="158" font-size="10" fill="#475569" text-anchor="middle">2022</text>
+                    <text x="220" y="158" font-size="10" fill="#475569" text-anchor="middle">2023</text>
+                    <text x="350" y="158" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="480" y="158" font-size="10" fill="#475569" text-anchor="middle">2025</text>
+                    <text x="580" y="158" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2027</text>
+
+                    <text x="555" y="38" font-size="10" fill="#e11d48" text-anchor="end" font-weight="bold">CAGR 15,6%</text>
+                    <text x="555" y="51" font-size="9" fill="#64748b" text-anchor="end">$ млрд</text>
+                </svg>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Что такое RTB</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: SSP, DSP, DMP</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Аукцион в реальном времени</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 24 из 26
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #082f49; padding: 20px 20px 10px 20px; border-bottom: 1px solid #0c4a6e; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали, как работает Ad Server. Сегодня мы поговорим о следующем эволюционном шаге — RTB (Real-Time Bidding), аукционе в реальном времени. Эта технология стала фундаментом современного programmatic-маркетинга.</p>
+
+            <div class="action-hint">Обратите внимание студентов на таймлайн RTB-аукциона.</div>
+
+            <h3>📌 Что такое RTB и зачем он нужен</h3>
+
+            <p>Эффект от показа рекламы разным пользователям различен. Продавцу автомобиля важно показать рекламу человеку, который ищет машину. Если о пользователе ничего не известно — большая ставка не имеет смысла. Но если известно, что он ищет автомобиль, а плюс к этому покупает дорогие авиабилеты — картина складывается: это вероятный покупатель, за показ ему можно заплатить дорого.</p>
+
+            <p>RTB — это технология, которая позволяет организовать аукцион и сделать ставки практически в реальном времени, за миллисекунды в момент загрузки веб-страницы. Издатель помещает потенциальный показ на аукцион, рекламодатели делают ставки, чтобы показать рекламу конкретному пользователю. Победитель — тот, кто заплатил больше и кому имеет смысл бороться за данного посетителя.</p>
+
+            <p>Технология появилась сравнительно недавно, но набирает популярность, в том числе в России. Сегодня более 90% digital-рекламы в мире продаётся программно.</p>
+
+            <div class="action-hint">Обратите внимание студентов на таймлайн в 100 миллисекунд.</div>
+
+            <h3>📌 Таймлайн аукциона: 100 миллисекунд</h3>
+
+            <p>Весь процесс занимает около 100 миллисекунд. Первые 10 миллисекунд — запрос пользователя и загрузка страницы. Следующие 10 миллисекунд — считывание cookie-ID из браузера. Затем 20 миллисекунд — отправка Bid Request от SSP ко всем DSP. Далее 40 миллисекунд — DSP делают ставки и отправляют ответы. Последние 20 миллисекунд — определение победителя и показ рекламы.</p>
+
+            <p>Если хотя бы один из этапов затянется, аукцион не состоится, и пользователь увидит пустое место вместо рекламы. Поэтому скорость — критический фактор.</p>
+
+            <div class="action-hint">Перейдите к участникам экосистемы RTB.</div>
+
+            <h3>📌 Четыре участника экосистемы RTB</h3>
+
+            <p><strong>SSP (Supply-Side Platform)</strong> — платформа со стороны предложения. Управляет рекламными ресурсами издателей, выставляет инвентарь на аукцион. Компании: Яндекс, Google, Begun, AdFox.</p>
+
+            <p><strong>DSP (Demand-Side Platform)</strong> — платформа со стороны спроса. Автоматизирует закупку рекламы для рекламодателей, делает ставки на аукционе. Компании: Яндекс.Директ, Google DV360, Getintent.</p>
+
+            <p><strong>DMP (Data Management Platform)</strong> — брокеры данных. Взаимодействуют с издателями и рекламодателями, определяют оптимальную цену для каждого показа. Чем больше информации о пользователе — тем точнее решение. Компании: Soloway, Begun, DataMind.</p>
+
+            <p><strong>Поставщики данных</strong> — организации и сервисы, занятые сбором и продажей анонимных данных о пользователях интернета, их потребительском опыте и спросе. Компании: AdRiver, RuTarget, Criteo.</p>
+
+            <div class="action-hint">Перейдите к детальной схеме аукциона.</div>
+
+            <h3>📌 Схема RTB-аукциона: 10 шагов</h3>
+
+            <p>Разберём пошагово. <strong>Шаг 1:</strong> пользователь заходит на сайт издателя. <strong>Шаг 2:</strong> издатель передаёт запрос в SSP. <strong>Шаг 3–4:</strong> SSP считывает cookie-ID пользователя. <strong>Шаг 5:</strong> SSP инициирует аукцион, отправляя Bid Request всем подключённым DSP. <strong>Шаг 6:</strong> Bid Request содержит URL страницы, размер слота, cookie-ID, геолокацию, тип устройства. <strong>Шаг 7:</strong> DSP получают запрос. <strong>Шаг 8:</strong> DSP делают ставки в реальном времени. Например, DSP A ставит 145 ₽, DSP B — 132 ₽, DSP C — 98 ₽. <strong>Шаг 9:</strong> SSP выбирает победившую заявку. <strong>Шаг 10:</strong> победитель показывает рекламу пользователю, событие фиксируется в базе всех участников.</p>
+
+            <div class="action-hint">Перейдите к преимуществам RTB.</div>
+
+            <h3>📌 Преимущества для трёх сторон</h3>
+
+            <p><strong>Рекламодатели</strong> получают точный таргетинг, оплату только за нужную аудиторию и прозрачность ставок. <strong>Издатели</strong> максимизируют доход от рекламных площадей, автоматизируют продажи и получают доступ к глобальному спросу. <strong>Пользователи</strong> — более релевантная реклама, меньше навязчивости, лучшее соответствие интересам.</p>
+
+            <h3>📌 Тренды 2025–2026</h3>
+
+            <p>Несколько ключевых трендов. <strong>Privacy Sandbox в Google Chrome</strong> — замена сторонних cookie на Topics API, что меняет всю механику RTB. <strong>Интеграция AI в RTB-аукционы</strong> — прогнозирование CTR и оптимизация ставок. Точность прогноза CTR с AI выросла на 47%. <strong>Рост доли CTV (Connected TV)</strong> — реклама на Smart TV достигает 28% RTB-аукционов. <strong>Рост programmatic до $1,3 трлн к 2027</strong> при CAGR 15,6%.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали, как работает RTB. Ключевые выводы:</p>
+
+            <ul>
+                <li>RTB — аукцион в реальном времени, занимает 100 миллисекунд.</li>
+                <li>Четыре участника: SSP, DSP, DMP, поставщики данных.</li>
+                <li>Схема из 10 шагов: от запроса пользователя до показа победителя.</li>
+                <li>Преимущества для рекламодателей, издателей и пользователей.</li>
+                <li>Более 90% digital-рекламы продаётся программно.</li>
+                <li>Рынок programmatic к 2027 — $1,3 трлн, CAGR 15,6%.</li>
+                <li>Ключевые тренды: Privacy Sandbox, AI, CTV.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём рекламу на мобильных платформах и видеорекламу. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">RTB</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Real-Time Bidding</div>
+                            <div class="gloss-def">Аукцион рекламных показов в реальном времени</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SSP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Supply-Side Platform</div>
+                            <div class="gloss-def">Платформа со стороны предложения — управляет рекламными ресурсами издателей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">DSP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Demand-Side Platform</div>
+                            <div class="gloss-def">Платформа со стороны спроса — автоматизирует закупку рекламы</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">DMP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Data Management Platform</div>
+                            <div class="gloss-def">Платформа управления данными — сегментирует аудиторию</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Bid Request</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Bid Request</div>
+                            <div class="gloss-def">Запрос на ставки, отправляемый SSP ко всем DSP</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Bid Response</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Bid Response</div>
+                            <div class="gloss-def">Ответ DSP со ставкой и креативом</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Programmatic</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Programmatic Advertising</div>
+                            <div class="gloss-def">Автоматизированная закупка рекламы через аукционы</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Connected TV</div>
+                            <div class="gloss-def">Подключённое телевидение — Smart TV с доступом к интернету</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Mille</div>
+                            <div class="gloss-def">Стоимость за 1000 показов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Privacy Sandbox</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Privacy Sandbox</div>
+                            <div class="gloss-def">Инициатива Google по замене сторонних cookie на приватные API</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚡ RTB и programmatic</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">IAB Europe: Programmatic Market Report 2025 — >90% digital-рекламы продаётся программно. — <a href="https://iabeurope.eu" target="_blank">IABEurope.eu</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Business Research Insights: Programmatic Advertising Market — $1,3 трлн к 2027. — <a href="https://www.businessresearchinsights.com" target="_blank">BusinessResearchInsights.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Magnite: State of CTV and RTB 2025 — доля CTV в RTB-аукционах 28%. — <a href="https://www.magnite.com" target="_blank">Magnite.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏢 Платформы и участники</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Яндекс: документация по DSP, SSP и RTB-аукциону. — <a href="https://yandex.ru/adv" target="_blank">Yandex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Soloway: как работает DMP-платформа в России. — <a href="https://soloway.ru" target="_blank">Soloway.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">AdRiver: обзор RTB-технологий в российском сегменте. — <a href="https://adriver.ru" target="_blank">AdRiver.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 AI и Privacy Sandbox</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Google Ads: AI-Powered Bidding in RTB — +47% точности прогноза CTR. — <a href="https://ads.google.com" target="_blank">Ads.Google.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Google Privacy Sandbox: Topics API — замена сторонних cookie. — <a href="https://privacysandbox.com" target="_blank">PrivacySandbox.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">PubMatic: Quarterly Mobile Index 2025 — средние CPM в RTB. — <a href="https://pubmatic.com" target="_blank">PubMatic.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

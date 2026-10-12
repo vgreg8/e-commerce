@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс «Интернет-маркетинг» — Содержание</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        /* ШАПКА */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #3b82f6 100%);
+            color: white;
+            padding: 40px 60px;
+            box-shadow: 0 10px 30px rgba(30, 58, 95, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: 30%;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .header-content { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; }
+        .header h1 {
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            font-size: 15px;
+            opacity: 0.92;
+            margin-bottom: 20px;
+            max-width: 800px;
+        }
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .header-stat {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 14px 22px;
+            backdrop-filter: blur(10px);
+        }
+        .header-stat .hs-num {
+            font-size: 24px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+        .header-stat .hs-label {
+            font-size: 11px;
+            opacity: 0.85;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-top: 4px;
+        }
+
+        /* КОНТЕЙНЕР */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 60px 80px;
+        }
+
+        /* ПАНЕЛЬ НАВИГАЦИИ */
+        .nav-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(30, 58, 95, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 240px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+        }
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            opacity: 0.6;
+        }
+        .nav-btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #475569;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-btn:hover {
+            border-color: #3b82f6;
+            color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .nav-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        /* БЛОКИ */
+        .block {
+            margin-bottom: 40px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .block-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 3px solid;
+        }
+        .block-header .block-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+        .block-header .block-title-wrap {
+            flex: 1;
+        }
+        .block-header .block-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.4px;
+            margin-bottom: 3px;
+        }
+        .block-header .block-subtitle {
+            font-size: 12.5px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .block-header .block-count {
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #475569;
+        }
+        .block-1 .block-header { border-color: #0ea5e9; }
+        .block-1 .block-header .block-title { color: #0c4a6e; }
+        .block-2 .block-header { border-color: #8b5cf6; }
+        .block-2 .block-header .block-title { color: #4c1d95; }
+        .block-3 .block-header { border-color: #10b981; }
+        .block-3 .block-header .block-title { color: #064e3b; }
+        .block-4 .block-header { border-color: #f59e0b; }
+        .block-4 .block-header .block-title { color: #7c2d12; }
+        .block-5 .block-header { border-color: #ec4899; }
+        .block-5 .block-header .block-title { color: #831843; }
+        .block-6 .block-header { border-color: #06b6d4; }
+        .block-6 .block-header .block-title { color: #134e4a; }
+
+        /* СЕТКА КАРТОЧЕК */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 22px;
+            box-shadow: 0 2px 8px rgba(30, 58, 95, 0.06);
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #3b82f6;
+            transition: width 0.25s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(30, 58, 95, 0.14);
+            border-color: #bfdbfe;
+        }
+        .card:hover::before { width: 6px; }
+        .block-1 .card::before { background: #0ea5e9; }
+        .block-2 .card::before { background: #8b5cf6; }
+        .block-3 .card::before { background: #10b981; }
+        .block-4 .card::before { background: #f59e0b; }
+        .block-5 .card::before { background: #ec4899; }
+        .block-6 .card::before { background: #06b6d4; }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+        }
+        .block-1 .card-num { background: linear-gradient(135deg, #0c4a6e, #0ea5e9); }
+        .block-2 .card-num { background: linear-gradient(135deg, #4c1d95, #8b5cf6); }
+        .block-3 .card-num { background: linear-gradient(135deg, #064e3b, #10b981); }
+        .block-4 .card-num { background: linear-gradient(135deg, #7c2d12, #f59e0b); }
+        .block-5 .card-num { background: linear-gradient(135deg, #831843, #ec4899); }
+        .block-6 .card-num { background: linear-gradient(135deg, #134e4a, #06b6d4); }
+
+        .card-title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.3;
+        }
+        .card-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            margin-top: auto;
+        }
+        .card-meta {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card-arrow {
+            font-size: 14px;
+            color: #3b82f6;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+        .card:hover .card-arrow { transform: translateX(4px); }
+
+        /* СТАТИСТИКА БЛОКА */
+        .block-stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .stat-pill {
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            color: #475569;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ПОДВАЛ */
+        .footer {
+            text-align: center;
+            padding: 30px 60px;
+            color: #64748b;
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+        .footer a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer a:hover { text-decoration: underline; }
+
+        /* СКРЫТИЕ ПРИ ПОИСКЕ */
+        .card.hidden { display: none; }
+        .block.hidden { display: none; }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+            font-size: 15px;
+        }
+        .no-results .nr-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        /* АДАПТИВНОСТЬ */
+        @media (max-width: 900px) {
+            .header { padding: 30px 24px; }
+            .header h1 { font-size: 26px; }
+            .header-stats { gap: 12px; }
+            .header-stat { padding: 10px 16px; }
+            .header-stat .hs-num { font-size: 18px; }
+            .container { padding: 24px; }
+            .nav-panel { padding: 14px; gap: 10px; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ШАПКА -->
+    <header class="header">
+        <div class="header-content">
+            <h1>🎓 Курс «Интернет-маркетинг»</h1>
+            <p class="subtitle">
+                Полный курс из 33 мини-лекций: от основ интернет-маркетинга до анализа эффективности.
+                Каждая лекция — отдельная HTML-презентация с визуализацией, скриптом преподавателя,
+                словарём аббревиатур и актуальными источниками 2025–2026 годов.
+            </p>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="hs-num">33</div>
+                    <div class="hs-label">Мини-лекции</div>
+                </div>
+                <div class="header-stat">
+                    <div class="hs-num">6</div>
+                    <div class="hs-label">Тематических блока</div>
+                </div>
+                <div class="header-stat">
+                    <div class="hs-num">11 ч</div>
+                    <div class="hs-label">Общее время</div>
+                </div>
+                <div class="header-stat">
+                    <div class="hs-num">2025–26</div>
+                    <div class="hs-label">Актуальные данные</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- КОНТЕЙНЕР -->
+    <div class="container">
+
+        <!-- ПАНЕЛЬ НАВИГАЦИИ -->
+        <div class="nav-panel">
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Поиск лекции по названию или теме...">
+            </div>
+            <button class="nav-btn active" data-filter="all">📚 Все лекции</button>
+            <button class="nav-btn" data-filter="block-1">📘 Основы</button>
+            <button class="nav-btn" data-filter="block-2">🔍 SEO</button>
+            <button class="nav-btn" data-filter="block-3">🖥️ Технологии</button>
+            <button class="nav-btn" data-filter="block-4">💰 Реклама</button>
+            <button class="nav-btn" data-filter="block-5">📱 Соцмедиа</button>
+            <button class="nav-btn" data-filter="block-6">📊 Аналитика</button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- БЛОК 1: ОСНОВЫ ИНТЕРНЕТ-МАРКЕТИНГА (лекции 1-5) -->
+        <!-- ============================================================ -->
+        <div class="block block-1" data-block="block-1">
+            <div class="block-header">
+                <div class="block-icon">📘</div>
+                <div class="block-title-wrap">
+                    <div class="block-title">Блок 1. Основы интернет-маркетинга</div>
+                    <div class="block-subtitle">Введение в курс, понятия, эволюция, электронная коммерция и веб-технологии</div>
+                </div>
+                <div class="block-count">5 лекций</div>
+            </div>
+            <div class="cards-grid">
+
+                <a href="Лекция 1.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">1</div>
+                        <div class="card-title">Введение в курс по интернет-маркетингу</div>
+                    </div>
+                    <div class="card-desc">Обзор курса, базовые понятия, ключевые метрики рынка 2025, методология и источники.</div>
+                    <div class="card-footer">
+                        <div class="card-meta">
+                            <span>⏱ 20 мин</span>
+                            <span>📊 1,57 трлн ₽</span>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 2.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">2</div>
+                        <div class="card-title">Что такое интернет-маркетинг</div>
+                    </div>
+                    <div class="card-desc">Определения, структура экосистемы, инструменты, специализации и монетизация.</div>
+                    <div class="card-footer">
+                        <div class="card-meta">
+                            <span>⏱ 20 мин</span>
+                            <span>🛠 6 инструментов</span>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 3.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">3</div>
+                        <div class="card-title">Эволюция представлений об интернет-маркетинге</div>
+                    </div>
+                    <div class="card-desc">Четыре эпохи цифрового маркетинга: от веб-инфраструктуры до ИИ-опосредованного маркетинга.</div>
+                    <div class="card-footer">
+                        <div class="card-meta">
+                            <span>⏱ 20 мин</span>
+                            <span>🕐 4 эпохи</span>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 4.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">4</div>
+                        <div class="card-title">Эволюция электронной коммерции</div>
+                    </div>
+                    <div class="card-desc">Этапы коммерциализации интернета, ключевые события, современное состояние e-commerce.</div>
+                    <div class="card-footer">
+                        <div class="card-meta">
+                            <span>⏱ 20 мин</span>
+                            <span>🛒 11,5 трлн ₽</span>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 5.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">5</div>
+                        <div class="card-title">Эволюция веб-технологий</div>
+                    </div>
+                    <div class="card-desc">Поколения сайтов, современные фреймворки, рынок услуг интернет-маркетинга, итоги курса.</div>
+                    <div class="card-footer">
+                        <div class="card-meta">
+                            <span>⏱ 20 мин</span>
+                            <span>🌐 5 поколений</span>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- БЛОК 2: РЫНОК УСЛУГ И SEO (лекции 6-20) -->
+        <!-- ============================================================ -->
+        <div class="block block-2" data-block="block-2">
+            <div class="block-header">
+                <div class="block-icon">🔍</div>
+                <div class="block-title-wrap">
+                    <div class="block-title">Блок 2. Рынок услуг, сайтостроение и SEO</div>
+                    <div class="block-subtitle">Рынок услуг, интерактивный маркетинг, сайты, CMS, поисковики, SEO-факторы</div>
+                </div>
+                <div class="block-count">15 лекций</div>
+            </div>
+            <div class="cards-grid">
+
+                <a href="Лекция 6.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">6</div>
+                        <div class="card-title">Рынок услуг интернет-маркетинга</div>
+                    </div>
+                    <div class="card-desc">Структура рынка digital-услуг, ключевые метрики 2025, самые динамичные сегменты.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📊 464,1 млрд ₽</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 7.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">7</div>
+                        <div class="card-title">Интернет-маркетинг и интерактивный маркетинг</div>
+                    </div>
+                    <div class="card-desc">Соотношение терминов, вложенность понятий, контент-маркетинг, SMM, мобильный маркетинг.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📖 11 терминов</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 8.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">8</div>
+                        <div class="card-title">Преимущества интернет-маркетинга и интернет-рекламы</div>
+                    </div>
+                    <div class="card-desc">Сравнение с ТВ, журналами, радио и наружной рекламой. Performance-бюджеты 96,7%.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📈 +28% рынок</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 9.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">9</div>
+                        <div class="card-title">Экосистема интерактивной рекламы</div>
+                    </div>
+                    <div class="card-desc">Участники экосистемы, RTB, карта E-Retail Media 2026, национальные экосистемы.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🏗 48 участников</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 10.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">10</div>
+                        <div class="card-title">Элементы экосистемы цифрового маркетинга</div>
+                    </div>
+                    <div class="card-desc">Агентства, медиаселлеры, SEO-компании, классифайды, посредники и их взаимодействие.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🔗 4 участника</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 11.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">11</div>
+                        <div class="card-title">Стратегия сайта и этапы его создания</div>
+                    </div>
+                    <div class="card-desc">Функции сайта, анализ ЦА, первые секунды, параллельность оптимизации, стратегии продаж.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🛠 7 этапов</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 12.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">12</div>
+                        <div class="card-title">Хостинг Web-сайта</div>
+                    </div>
+                    <div class="card-desc">Виды хостинга: shared, VPS, выделенный, облачный. Рынок облачных сервисов 416,5 млрд ₽.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>☁️ 4 типа</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 13.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">13</div>
+                        <div class="card-title">CMS — Content Management System</div>
+                    </div>
+                    <div class="card-desc">Доли CMS на рынке РФ: WordPress 30%, Bitrix 13%, Tilda 12%. Headless CMS, AI-интеграции.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>⚙️ 5 платформ</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 14.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">14</div>
+                        <div class="card-title">Как работает поисковая машина</div>
+                    </div>
+                    <div class="card-desc">Crawling, indexing, ranking. Яндекс 73,34%, Zero-Click 58%, AI Overviews 48%.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🔍 3 задачи</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 15.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">15</div>
+                        <div class="card-title">SEO-факторы и эволюция их веса</div>
+                    </div>
+                    <div class="card-desc">Поведенческие факторы, E-E-A-T, PageRank, прогнозы изменения веса. Переход от SEO к GEO.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📊 6 факторов</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 16.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">16</div>
+                        <div class="card-title">Подбор ключевых слов, семантическое ядро</div>
+                    </div>
+                    <div class="card-desc">Long-tail (36% конверсия), кластеризация по интентам, AI-инструменты, Prompt Research.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🔑 4 кластера</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 17.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">17</div>
+                        <div class="card-title">Оптимизация контента и структуры сайта</div>
+                    </div>
+                    <div class="card-desc">Core Web Vitals, E-E-A-T, хаб-и-спицы, Schema.org, Atomic Answers, llms.txt.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>⚡ 3 метрики CWV</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 18.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">18</div>
+                        <div class="card-title">Легальные и нелегальные методы оптимизации</div>
+                    </div>
+                    <div class="card-desc">White Hat vs Black Hat, 50% сайтов в топ-20 содержат AI-спам, SpamBrain 99%.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🎩 2 подхода</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 19.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">19</div>
+                        <div class="card-title">SEO или аутсорсинг SEO?</div>
+                    </div>
+                    <div class="card-desc">In-house vs фрилансер vs агентство. 47% агентств нарастили обороты, матрица риска.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🤝 3 модели</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 20.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">20</div>
+                        <div class="card-title">Поисковая реклама</div>
+                    </div>
+                    <div class="card-desc">Типы кампаний, инструменты, Vickrey auction, платформы: Яндекс.Директ, VK Ads, Telegram Ads.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>💰 5 платформ</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- БЛОК 3: ПАРТНЁРСКИЕ ПРОГРАММЫ И ТЕХНОЛОГИИ (лекции 21-26) -->
+        <!-- ============================================================ -->
+        <div class="block block-3" data-block="block-3">
+            <div class="block-header">
+                <div class="block-icon">🖥️</div>
+                <div class="block-title-wrap">
+                    <div class="block-title">Блок 3. Партнёрские программы и технологии доставки рекламы</div>
+                    <div class="block-subtitle">Аффилированный маркетинг, поведенческая реклама, Ad Server, RTB, мобильная и email-реклама</div>
+                </div>
+                <div class="block-count">6 лекций</div>
+            </div>
+            <div class="cards-grid">
+
+                <a href="Лекция 21.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">21</div>
+                        <div class="card-title">Аффилированный маркетинг</div>
+                    </div>
+                    <div class="card-desc">Модели CPA/CPL/CPS, экосистема, $17 млрд рынок, ROAS 12:1, защита от фрода.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🤝 4 участника</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 22.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">22</div>
+                        <div class="card-title">Поведенческая реклама, ретаргетинг</div>
+                    </div>
+                    <div class="card-desc">Cookie-технология, Яндекс.Крипта, ретаргетинг: CTR ×10, конверсия ×3, 7 контактов до покупки.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🧠 95% уходят</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 23.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">23</div>
+                        <div class="card-title">Как работает AD-сервер</div>
+                    </div>
+                    <div class="card-desc">6 типов баннеров, схема из 12 шагов, Ad Server издателя и рекламодателя, header bidding.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>⏱ 100 мс</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 24.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">24</div>
+                        <div class="card-title">Как работает RTB</div>
+                    </div>
+                    <div class="card-desc">Аукцион в реальном времени, SSP/DSP/DMP, таймлайн 100 мс, programmatic $1,3 трлн к 2027.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>⚡ 4 участника</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 25.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">25</div>
+                        <div class="card-title">Реклама на мобильных платформах, видеореклама</div>
+                    </div>
+                    <div class="card-desc">8 возможностей мобильного маркетинга, QR-коды, поставщики, видеореклама, купонные сервисы.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📱 $262,8 млрд</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 26.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">26</div>
+                        <div class="card-title">Методы, стратегия и тактика e-mail маркетинга</div>
+                    </div>
+                    <div class="card-desc">Экосистема спама, легальная цепочка, стратегия Дубовика, три слоя, 12,9 млрд писем.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📧 Open Rate 9,4%</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- БЛОК 4: СОЦИАЛЬНЫЕ МЕДИА (лекции 27-30) -->
+        <!-- ============================================================ -->
+        <div class="block block-5" data-block="block-5">
+            <div class="block-header">
+                <div class="block-icon">📱</div>
+                <div class="block-title-wrap">
+                    <div class="block-title">Блок 4. Социальные медиа и работа с UGC</div>
+                    <div class="block-subtitle">Соцсети, психология пользователей, SMO/SMM, UGC-ресурсы и краудсорсинг</div>
+                </div>
+                <div class="block-count">4 лекции</div>
+            </div>
+            <div class="cards-grid">
+
+                <a href="Лекция 27.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">27</div>
+                        <div class="card-title">Социальные сети: теория, история и классификация</div>
+                    </div>
+                    <div class="card-desc">Социальный граф, «мост», эволюция контента, 3 класса соцсетей, 5,24 млрд пользователей.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🕸 5 этапов</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 28.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">28</div>
+                        <div class="card-title">Психология пользователей и мотивация</div>
+                    </div>
+                    <div class="card-desc">Пирамида Маслоу, профили Солиса, агенты влияния, психология покупок 81/77/50.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🧠 5 профилей</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 29.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">29</div>
+                        <div class="card-title">SMO и SMM: принципы и инструменты</div>
+                    </div>
+                    <div class="card-desc">SMO vs SMM, экосистема, Owned/Paid/Earned Media, sentiment-анализ, SMM +16%.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📣 4 фазы</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 30.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">30</div>
+                        <div class="card-title">Особенности рекламы в UGC-ресурсах и краудсорсинг</div>
+                    </div>
+                    <div class="card-desc">UGC-экосистема, sentiment, 4 модели краудсорсинга, $62 млрд рынок, 85% Fortune 500.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🤝 4 модели</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- БЛОК 5: МЕДИАПЛАНИРОВАНИЕ И АНАЛИТИКА (лекции 31-33) -->
+        <!-- ============================================================ -->
+        <div class="block block-6" data-block="block-6">
+            <div class="block-header">
+                <div class="block-icon">📊</div>
+                <div class="block-title-wrap">
+                    <div class="block-title">Блок 5. Медиапланирование и анализ эффективности</div>
+                    <div class="block-subtitle">Типы соцсетей, медиапланирование, анализ эффективности и итоги курса</div>
+                </div>
+                <div class="block-count">3 лекции</div>
+            </div>
+            <div class="cards-grid">
+
+                <a href="Лекция 31.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">31</div>
+                        <div class="card-title">Типы социальных сетей в российском сегменте</div>
+                    </div>
+                    <div class="card-desc">ВКонтакте, Telegram, Одноклассники, Дзен, Max, Rutube. Социальная коммерция, SMM-инструменты.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🇷🇺 6 платформ</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 32.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">32</div>
+                        <div class="card-title">Медиапланирование</div>
+                    </div>
+                    <div class="card-desc">Цикл планирования, таблица «Индра», матрица аудиторий, типы кампаний, пример медиаплана.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>📊 4 квадранта</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+                <a href="Лекция 33.html" class="card">
+                    <div class="card-top">
+                        <div class="card-num">33</div>
+                        <div class="card-title">Анализ эффективности</div>
+                    </div>
+                    <div class="card-desc">Матрица Мейсона, бренд-воронка, 4 вида конверсии, эволюция аналитики, итоги курса.</div>
+                    <div class="card-footer">
+                        <div class="card-meta"><span>⏱ 20 мин</span><span>🎓 Финал</span></div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- СООБЩЕНИЕ ОБ ОТСУТСТВИИ РЕЗУЛЬТАТОВ -->
+        <div class="no-results hidden" id="noResults">
+            <div class="nr-icon">🔍</div>
+            <div>По вашему запросу ничего не найдено.</div>
+            <div style="margin-top: 8px; font-size: 12px;">Попробуйте изменить ключевые слова или выбрать другой блок.</div>
+        </div>
+
+    </div>
+
+    <!-- ПОДВАЛ -->
+    <footer class="footer">
+        Курс «Интернет-маркетинг» · 33 мини-лекции · 2025–2026 · Актуальные данные и источники
+        <br>
+        <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ Наверх</a>
+    </footer>
+
+    <!-- СКРИПТЫ -->
+    <script>
+        // Поиск по лекциям
+        const searchInput = document.getElementById('search');
+        const cards = document.querySelectorAll('.card');
+        const blocks = document.querySelectorAll('.block');
+        const noResults = document.getElementById('noResults');
+        const navBtns = document.querySelectorAll('.nav-btn');
+
+        let currentFilter = 'all';
+
+        function filterCards() {
+            const query = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+            const blockVisible = {};
+
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const desc = card.querySelector('.card-desc').textContent.toLowerCase();
+                const num = card.querySelector('.card-num').textContent.trim();
+                const matches = !query || title.includes(query) || desc.includes(query) || num === query;
+
+                const block = card.closest('.block');
+                const blockId = block.dataset.block;
+                const blockMatches = currentFilter === 'all' || currentFilter === blockId;
+
+                if (matches && blockMatches) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                    blockVisible[blockId] = true;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            blocks.forEach(block => {
+                const blockId = block.dataset.block;
+                if (blockVisible[blockId]) {
+                    block.classList.remove('hidden');
+                } else {
+                    block.classList.add('hidden');
+                }
+            });
+
+            noResults.classList.toggle('hidden', visibleCount > 0);
+        }
+
+        // Фильтр по блокам
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                filterCards();
+            });
+        });
+
+        // Поиск
+        searchInput.addEventListener('input', filterCards);
+
+        // Горячие клавиши: / для поиска, Esc для очистки
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                searchInput.blur();
+                filterCards();
+            }
+        });
+
+        // Плавное появление при загрузке
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.block').forEach((block, i) => {
+                block.style.opacity = '0';
+                block.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    block.style.transition = 'all 0.5s ease';
+                    block.style.opacity = '1';
+                    block.style.transform = 'translateY(0)';
+                }, i * 100);
+            });
+        });
+    </script>
+
+</body>
+</html>

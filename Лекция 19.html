@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 19. SEO или аутсорсинг SEO?</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1e1b4b; color: #e0e7ff; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #312e81; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #6366f1; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #312e81 0%, #4f46e5 60%, #818cf8 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* COMPARE TABLE */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .compare-table th { padding: 10px 12px; text-align: left; font-weight: 600; color: white; }
+        .compare-table th:first-child { background: #334155; border-radius: 8px 0 0 0; }
+        .compare-table th:nth-child(2) { background: #059669; }
+        .compare-table th:nth-child(3) { background: #0284c7; }
+        .compare-table th:last-child { background: #7c3aed; border-radius: 0 8px 0 0; }
+        .compare-table td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; line-height: 1.4; }
+        .compare-table tr:nth-child(even) td { background: #f8fafc; }
+        .compare-table td:first-child { font-weight: 600; color: #1e293b; }
+        .compare-table .good { color: #059669; font-weight: bold; }
+        .compare-table .mid { color: #f59e0b; font-weight: bold; }
+        .compare-table .bad { color: #e11d48; font-weight: bold; }
+
+        /* DECISION MATRIX */
+        .matrix-card { background: #eef2ff; border: 2px solid #c7d2fe; border-radius: 14px; padding: 20px 24px; }
+        .matrix-card .matrix-title { font-size: 14px; font-weight: bold; color: #312e81; margin-bottom: 14px; }
+        .matrix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .matrix-cell { border-radius: 10px; padding: 16px 14px; }
+        .matrix-cell.q1 { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #10b981; }
+        .matrix-cell.q2 { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #3b82f6; }
+        .matrix-cell.q3 { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .matrix-cell.q4 { background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 2px solid #dc2626; }
+        .matrix-cell .mc-icon { font-size: 22px; margin-bottom: 6px; }
+        .matrix-cell .mc-title { font-size: 12.5px; font-weight: bold; margin-bottom: 5px; }
+        .matrix-cell .mc-desc { font-size: 10.5px; color: #475569; line-height: 1.4; }
+
+        /* SVG CHART */
+        .chart-card { background: #ffffff; border: 2px solid #c7d2fe; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #312e81; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* CRITERIA GRID */
+        .criteria-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .criteria-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px 12px; }
+        .criteria-card .crit-icon { font-size: 20px; margin-bottom: 6px; }
+        .criteria-card .crit-name { font-size: 12px; font-weight: bold; color: #312e81; margin-bottom: 4px; }
+        .criteria-card .crit-desc { font-size: 10.5px; color: #64748b; line-height: 1.4; }
+
+        /* PRICE TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #312e81; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #eef2ff; }
+        .metrics-table .price { color: #059669; font-weight: bold; }
+        .metrics-table .high { color: #e11d48; font-weight: bold; }
+
+        /* RISK SVG */
+        .risk-svg { width: 100%; height: auto; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #6366f1; }
+        .rt-btn:hover { background: #4f46e5; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #a5b4fc; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3730a3; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e0e7ff; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #a5b4fc; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #3730a3; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #334155; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #312e81; color: #a5b4fc; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #a5b4fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #6366f1; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #6366f1; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #a5b4fc; font-size: 13px; min-width: 80px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #a5b4fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #6366f1; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #a5b4fc; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 19. SEO или аутсорсинг SEO?
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🤝</div>
+                <div class="hero-data">
+                    <div class="hero-number">47%</div>
+                    <div class="hero-label">Digital-агентств нарастили обороты за 9 мес. 2025</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">24%</div>
+                    <div class="hero-label">Агентств сократили выручку</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">×4</div>
+                    <div class="hero-label">Разница в стоимости in-house и аутсорса SEO</div>
+                </div>
+            </div>
+
+            <!-- COMPARE TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #312e81; margin-bottom: 10px;">⚖️ In-house vs Фрилансер vs Агентство: три модели работы</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Критерий</th>
+                            <th>In-house</th>
+                            <th>Фрилансер</th>
+                            <th>Агентство</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Стоимость / мес</td>
+                            <td class="high">от 200 тыс. ₽ (с налогами)</td>
+                            <td class="good">от 30 тыс. ₽</td>
+                            <td class="mid">от 80 тыс. ₽</td>
+                        </tr>
+                        <tr>
+                            <td>Контроль</td>
+                            <td class="good">Полный</td>
+                            <td class="mid">Частичный</td>
+                            <td class="mid">По KPI</td>
+                        </tr>
+                        <tr>
+                            <td>Экспертиза</td>
+                            <td class="mid">Ограничена командой</td>
+                            <td class="mid">Зависит от специалиста</td>
+                            <td class="good">Команда экспертов</td>
+                        </tr>
+                        <tr>
+                            <td>Масштабируемость</td>
+                            <td class="bad">Ограничена</td>
+                            <td class="mid">Средняя</td>
+                            <td class="good">Высокая</td>
+                        </tr>
+                        <tr>
+                            <td>Скорость запуска</td>
+                            <td class="bad">Долгий найм (2–4 мес.)</td>
+                            <td class="good">1–2 недели</td>
+                            <td class="good">2–4 недели</td>
+                        </tr>
+                        <tr>
+                            <td>Риск санкций</td>
+                            <td class="good">Низкий</td>
+                            <td class="bad">Высокий</td>
+                            <td class="mid">Средний</td>
+                        </tr>
+                        <tr>
+                            <td>Прозрачность</td>
+                            <td class="good">Полная</td>
+                            <td class="mid">Средняя</td>
+                            <td class="good">Отчётность по SLA</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- DECISION MATRIX -->
+            <div class="matrix-card">
+                <div class="matrix-title">🎯 Матрица выбора модели: что подходит вашему бизнесу?</div>
+                <div class="matrix-grid">
+                    <div class="matrix-cell q1">
+                        <div class="mc-icon">✅</div>
+                        <div class="mc-title" style="color: #065f46;">Агентство</div>
+                        <div class="mc-desc">Крупный проект, долгосрочная стратегия, нужна команда экспертов, бюджет от 100 тыс. ₽/мес, готовность к отчётности</div>
+                    </div>
+                    <div class="matrix-cell q2">
+                        <div class="mc-icon">👤</div>
+                        <div class="mc-title" style="color: #1d4ed8;">In-house</div>
+                        <div class="mc-desc">Устойчивый поток задач, долгосрочная перспектива, бюджет на найм и обучение, нужен полный контроль над данными</div>
+                    </div>
+                    <div class="matrix-cell q3">
+                        <div class="mc-icon">⚡</div>
+                        <div class="mc-title" style="color: #92400e;">Фрилансер</div>
+                        <div class="mc-desc">Разовые задачи, ограниченный бюджет, быстрый старт, готовность к риску и самостоятельной проверке результатов</div>
+                    </div>
+                    <div class="matrix-cell q4">
+                        <div class="mc-icon">⚠️</div>
+                        <div class="mc-title" style="color: #991b1b;">Смешанная модель</div>
+                        <div class="mc-desc">In-house стратег + агентство на подряд, фрилансер на контент, агентство на ссылки. Риск: размытая ответственность</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG CHART -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Динамика рынка digital-услуг: кто растёт, кто падает? <span>9 мес. 2025 vs 9 мес. 2024</span></div>
+                <svg viewBox="0 0 600 200" style="width: 100%; height: auto;">
+                    <line x1="60" y1="15" x2="60" y2="160" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="60" y1="160" x2="580" y2="160" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="60" y1="120" x2="580" y2="120" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="60" y1="80" x2="580" y2="80" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="60" y1="40" x2="580" y2="40" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Столбцы: рост >30% -->
+                    <rect x="100" y="40" width="60" height="120" rx="6" fill="#10b981"/>
+                    <text x="130" y="100" font-size="16" fill="white" text-anchor="middle" font-weight="900">>30%</text>
+                    <text x="130" y="180" font-size="10" fill="#065f46" text-anchor="middle" font-weight="bold">Рост >30%</text>
+
+                    <!-- Рост 10-30% -->
+                    <rect x="200" y="60" width="60" height="100" rx="6" fill="#22c55e"/>
+                    <text x="230" y="115" font-size="14" fill="white" text-anchor="middle" font-weight="900">10–30%</text>
+                    <text x="230" y="180" font-size="10" fill="#065f46" text-anchor="middle" font-weight="bold">Рост 10–30%</text>
+
+                    <!-- Рост 0-10% -->
+                    <rect x="300" y="85" width="60" height="75" rx="6" fill="#84cc16"/>
+                    <text x="330" y="128" font-size="14" fill="white" text-anchor="middle" font-weight="900">0–10%</text>
+                    <text x="330" y="180" font-size="10" fill="#365314" text-anchor="middle" font-weight="bold">Рост 0–10%</text>
+
+                    <!-- Снижение 0-10% -->
+                    <rect x="400" y="105" width="60" height="55" rx="6" fill="#f59e0b"/>
+                    <text x="430" y="138" font-size="14" fill="white" text-anchor="middle" font-weight="900">–10%</text>
+                    <text x="430" y="180" font-size="10" fill="#92400e" text-anchor="middle" font-weight="bold">Падение до 10%</text>
+
+                    <!-- Снижение >10% -->
+                    <rect x="500" y="125" width="60" height="35" rx="6" fill="#dc2626"/>
+                    <text x="530" y="148" font-size="14" fill="white" text-anchor="middle" font-weight="900">>10%</text>
+                    <text x="530" y="180" font-size="10" fill="#991b1b" text-anchor="middle" font-weight="bold">Падение >10%</text>
+
+                    <text x="320" y="15" font-size="10" fill="#475569" text-anchor="middle" font-weight="bold">Распределение digital-агентств по динамике выручки</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Данные Workspace, 2025. Рынок углубляет сегментацию: сильные масштабируются, слабые сокращают обороты.</div>
+            </div>
+
+            <!-- CRITERIA GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #312e81; margin-bottom: 10px;">📋 Критерии выбора подрядчика: на что смотреть в 2026</div>
+                <div class="criteria-grid">
+                    <div class="criteria-card">
+                        <div class="crit-icon">📁</div>
+                        <div class="crit-name">Портфолио и кейсы</div>
+                        <div class="crit-desc">Наличие проектов в вашей нише, реальные цифры роста, доступные для проверки</div>
+                    </div>
+                    <div class="criteria-card">
+                        <div class="crit-icon">📊</div>
+                        <div class="crit-name">Прозрачность отчётности</div>
+                        <div class="crit-desc">Ежемесячные отчёты с понятными метриками: позиции, трафик, конверсии, ROI</div>
+                    </div>
+                    <div class="criteria-card">
+                        <div class="crit-icon">🛠️</div>
+                        <div class="crit-name">Инструменты и методы</div>
+                        <div class="crit-desc">White hat или black hat? Какие инструменты используют? Есть ли AI-компетенции?</div>
+                    </div>
+                    <div class="criteria-card">
+                        <div class="crit-icon">⭐</div>
+                        <div class="crit-name">Репутация на рынке</div>
+                        <div class="crit-desc">Отзывы клиентов, рейтинги (Рейтинг Рунета, SEOnews, AdIndex), участие в конференциях</div>
+                    </div>
+                    <div class="criteria-card">
+                        <div class="crit-icon">👥</div>
+                        <div class="crit-name">Команда проекта</div>
+                        <div class="crit-desc">Кто конкретно будет вести ваш проект? Сколько лет опыта? Как распределены роли?</div>
+                    </div>
+                    <div class="criteria-card">
+                        <div class="crit-icon">📜</div>
+                        <div class="crit-name">Договор и SLA</div>
+                        <div class="crit-desc">KPI, сроки, ответственность, условия расторжения, NDA, права на результаты работ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRICE TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #312e81; margin-bottom: 8px;">💰 Стоимость SEO-услуг в России (2025–2026)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Модель</th>
+                            <th>Стоимость / мес</th>
+                            <th>Что входит</th>
+                            <th>Особенность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>In-house</strong></td>
+                            <td class="high">200–500 тыс. ₽</td>
+                            <td>Зарплата, налоги, рабочее место, инструменты</td>
+                            <td>Полный контроль, но долгий найм</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Фрилансер</strong></td>
+                            <td class="price">30–100 тыс. ₽</td>
+                            <td>Конкретные задачи: аудит, контент, ссылки</td>
+                            <td>Дешево, но рискованно</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SEO-агентство</strong></td>
+                            <td class="price">80–300 тыс. ₽</td>
+                            <td>Комплекс: стратегия, контент, ссылки, аналитика</td>
+                            <td>Команда экспертов, отчётность</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Комплексный маркетинг</strong></td>
+                            <td class="high">100 тыс. – 1 млн ₽</td>
+                            <td>SEO + PPC + SMM + аналитика</td>
+                            <td>Максимальный охват</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RISK SVG -->
+            <div class="chart-card">
+                <div class="chart-title">⚠️ Матрица риска: in-house vs аутсорс <span>2026</span></div>
+                <svg viewBox="0 0 600 180" style="width: 100%; height: auto;">
+                    <line x1="60" y1="15" x2="60" y2="140" stroke="#e2e8f0" stroke-width="1.5"/>
+                    <line x1="60" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="60" y1="80" x2="580" y2="80" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+                    <line x1="320" y1="15" x2="320" y2="140" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+
+                    <text x="40" y="25" font-size="9" fill="#64748b" font-weight="bold">Риск ↑</text>
+                    <text x="40" y="135" font-size="9" fill="#64748b" font-weight="bold">Контроль →</text>
+
+                    <!-- Квадранты -->
+                    <text x="190" y="50" font-size="10" fill="#059669" text-anchor="middle" font-weight="bold">Идеально</text>
+                    <text x="450" y="50" font-size="10" fill="#b91c1c" text-anchor="middle" font-weight="bold">Опасно</text>
+                    <text x="190" y="115" font-size="10" fill="#64748b" text-anchor="middle" font-weight="bold">Ограниченно</text>
+                    <text x="450" y="115" font-size="10" fill="#92400e" text-anchor="middle" font-weight="bold">Дорого</text>
+
+                    <!-- Точки: In-house -->
+                    <circle cx="450" cy="50" r="10" fill="#059669" stroke="white" stroke-width="2"/>
+                    <text x="470" y="54" font-size="10" fill="#065f46" font-weight="bold">In-house</text>
+
+                    <!-- Агентство -->
+                    <circle cx="450" cy="90" r="10" fill="#0284c7" stroke="white" stroke-width="2"/>
+                    <text x="470" y="94" font-size="10" fill="#0c4a6e" font-weight="bold">Агентство</text>
+
+                    <!-- Фрилансер -->
+                    <circle cx="140" cy="115" r="10" fill="#f59e0b" stroke="white" stroke-width="2"/>
+                    <text x="160" y="119" font-size="10" fill="#92400e" font-weight="bold">Фрилансер</text>
+
+                    <!-- Гибрид -->
+                    <circle cx="260" cy="60" r="10" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+                    <text x="280" y="64" font-size="10" fill="#5b21b6" font-weight="bold">Гибрид</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">In-house даёт максимальный контроль, но требует наибольших ресурсов. Агентство — баланс контроля и экспертизы. Фрилансер — минимальный контроль и максимальный риск.</div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: SEO своими силами</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Выбор подрядчика</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Аутсорс SEO</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 19 из 20
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1e1b4b; padding: 20px 20px 10px 20px; border-bottom: 1px solid #3730a3; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали легальные и нелегальные методы оптимизации. Сегодня мы обсудим ключевой управленческий вопрос: делать SEO своими силами или отдать на аутсорс? Это решение напрямую влияет на бюджет, скорость результата и уровень риска.</p>
+
+            <div class="action-hint">Обратите внимание студентов на сравнительную таблицу трёх моделей.</div>
+
+            <h3>📌 Три модели работы</h3>
+
+            <p>Существует три базовые модели. <strong>In-house</strong> — SEO-специалисты в штате компании. <strong>Фрилансер</strong> — отдельный исполнитель на договоре. <strong>Агентство</strong> — команда экспертов с процессами и отчётностью.</p>
+
+            <p>Каждая модель имеет свои сильные и слабые стороны. In-house даёт полный контроль, но требует от 200 тыс. рублей в месяц с учётом налогов, рабочего места и инструментов. Фрилансер дёшев (от 30 тыс. рублей), но рискован: качество зависит от одного человека. Агентство предлагает команду экспертов и отчётность по SLA, но дороже и менее гибко.</p>
+
+            <h3>📌 Внутренние ресурсы и продвижение</h3>
+
+            <p>Прежде чем принимать решение, честно ответьте на вопрос: есть ли у вас внутренние ресурсы? Продвижение сайта требует заинтересованности и терпения. Проблема с внутренними ресурсами — частая причина провала SEO-проектов. Если у команды нет времени, компетенций или инструментов — аутсорсинг эффективнее.</p>
+
+            <p>Качество продукта и уровень обучения сотрудников — критический фактор. Если ваша команда не разбирается в SEO, лучше нанять подрядчика и учиться у него, чем пытаться делать всё самостоятельно и допускать системные ошибки.</p>
+
+            <div class="action-hint">Перейдите к матрице выбора модели.</div>
+
+            <h3>📌 Матрица выбора модели</h3>
+
+            <p>Как выбрать подходящую модель? Ориентируйтесь на четыре сценария.</p>
+
+            <p><strong>Агентство</strong> подходит для крупного проекта с долгосрочной стратегией. Вам нужна команда экспертов, бюджет от 100 тыс. рублей в месяц, готовность работать с отчётностью.</p>
+
+            <p><strong>In-house</strong> — для устойчивого потока задач с долгосрочной перспективой. Есть бюджет на найм и обучение, нужен полный контроль над данными.</p>
+
+            <p><strong>Фрилансер</strong> — для разовых задач с ограниченным бюджетом. Быстрый старт, но готовность к риску и самостоятельной проверке результатов.</p>
+
+            <p><strong>Смешанная модель</strong> — in-house стратег плюс агентство на подряд. Работает, но риск размытой ответственности. Чётко распределяйте зоны ответственности в договоре.</p>
+
+            <h3>📌 Анализ трафика и ссылок</h3>
+
+            <p>При работе с любым подрядчиком важно контролировать два блока. Параметры анализа трафика: объём, увеличение, стабильность. Резкие колебания — сигнал проблем. Параметры анализа ссылок: количество, распределение, возраст, источник, авторитетность. Положительные ссылки от известных компаний и традиционных медиа — признак здорового профиля.</p>
+
+            <p>Для проверки используйте Ahrefs, Majestic, Serpstat, Яндекс.Вебмастер. Если подрядчик покупает ссылки на биржах — вы увидите это по резкому росту ссылок с нерелевантных площадок.</p>
+
+            <h3>📌 Параметры оценки сайта</h3>
+
+            <p>Регулярно оценивайте сайт по шести параметрам: юзабилити, контент, контактная информация, оригинальность, содержательность, прошёл ли сайт ручную проверку поисковых систем. Проводите бенчмаркинг с конкурентами. Если ваш подрядчик не может объяснить, почему сайт конкурента растёт быстрее — это тревожный сигнал.</p>
+
+            <div class="action-hint">Обратите внимание студентов на график динамики рынка digital-услуг.</div>
+
+            <h3>📌 Динамика рынка digital-услуг</h3>
+
+            <p>Рынок digital-услуг в 2025 году показал неоднородную динамику. По данным Workspace, 47% агентств нарастили обороты за первые девять месяцев 2025 года, при этом у каждой третьей компании из этой группы рост превысил 30%. Одновременно у 24% агентств выручка сократилась.</p>
+
+            <p>Это означает, что рынок углубляет сегментацию: сильные игроки масштабируются, менее устойчивые вынуждены сокращать обороты. При выборе подрядчика важно смотреть на динамику его бизнеса: растёт ли он, инвестирует ли в команду и инструменты, или сокращает издержки.</p>
+
+            <h3>📌 Критерии выбора подрядчика</h3>
+
+            <p>Шесть критериев, на которые стоит смотреть в 2026 году.</p>
+
+            <p><strong>Портфолио и кейсы.</strong> Наличие проектов в вашей нише, реальные цифры роста, доступные для проверки. Не верьте кейсам без конкретных метрик.</p>
+
+            <p><strong>Прозрачность отчётности.</strong> Ежемесячные отчёты с понятными метриками: позиции, трафик, конверсии, ROI. Если агентство присылает только «мы поработали» — это плохой знак.</p>
+
+            <p><strong>Инструменты и методы.</strong> White hat или black hat? Какие инструменты используют? Есть ли AI-компетенции? В 2026 году без AI-инструментов сложно конкурировать.</p>
+
+            <p><strong>Репутация на рынке.</strong> Отзывы клиентов, рейтинги (Рейтинг Рунета, SEOnews, AdIndex), участие в конференциях.</p>
+
+            <p><strong>Команда проекта.</strong> Кто конкретно будет вести ваш проект? Сколько лет опыта? Как распределены роли? Не соглашайтесь на «команду вообще» — требуйте конкретных людей.</p>
+
+            <p><strong>Договор и SLA.</strong> KPI, сроки, ответственность, условия расторжения, NDA, права на результаты работ. Юридическая защита — обязательна.</p>
+
+            <h3>📌 Стоимость SEO-услуг в России</h3>
+
+            <p>Давайте разберём цены. In-house: 200–500 тыс. рублей в месяц — зарплата, налоги, рабочее место, инструменты. Фрилансер: 30–100 тыс. рублей — конкретные задачи: аудит, контент, ссылки. SEO-агентство: 80–300 тыс. рублей — комплекс: стратегия, контент, ссылки, аналитика. Комплексный маркетинг: 100 тыс. – 1 млн рублей — SEO, PPC, SMM, аналитика.</p>
+
+            <p>Интересно, что стоимость in-house в 4 раза выше стоимости агентства при сопоставимом объёме задач. Это объясняется накладными расходами: налоги, оборудование, обучение, текучесть кадров. Однако in-house даёт полный контроль над данными и приоритетами.</p>
+
+            <h3>📌 Матрица риска</h3>
+
+            <p>In-house — максимальный контроль, но и максимальные затраты. Агентство — баланс контроля и экспертизы. Фрилансер — минимальный контроль и максимальный риск. Гибридная модель (in-house стратег + агентство на подряд) — компромисс, но требует чёткого распределения ответственности.</p>
+
+            <h3>📌 Модели работы с подрядчиками</h3>
+
+            <p>Фрилансер — дёшево, но рискованно; подходит для разовых задач. SEO-агентство — комплексные услуги, но дороже. In-house команда — полный контроль, но высокие затраты на найм и обучение. По данным 2025 года, 47% digital-агентств нарастили обороты, а сильные игроки масштабируются — это сигнал, что аутсорс остаётся востребованной моделью.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали дилемму: SEO своими силами или аутсорсинг. Ключевые выводы:</p>
+
+            <ul>
+                <li>Три модели: in-house (от 200 тыс. ₽/мес), фрилансер (от 30 тыс. ₽/мес), агентство (от 80 тыс. ₽/мес).</li>
+                <li>In-house даёт максимальный контроль, агентство — экспертизу, фрилансер — скорость запуска.</li>
+                <li>47% агентств нарастили обороты в 2025 году, 24% сократили — рынок углубляет сегментацию.</li>
+                <li>Шесть критериев выбора: портфолио, прозрачность, инструменты, репутация, команда, договор.</li>
+                <li>Стоимость in-house в 4 раза выше агентства — из-за накладных расходов.</li>
+                <li>Матрица риска: in-house → максимальный контроль, фрилансер → максимальный риск.</li>
+            </ul>
+
+            <p>На следующей, заключительной лекции мы разберём поисковую рекламу. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">In-house</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Внутренняя команда</div>
+                            <div class="gloss-def">SEO-специалисты в штате компании, работающие только над её проектами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Outsource</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Аутсорсинг</div>
+                            <div class="gloss-def">Передача задач внешним исполнителям — фрилансерам или агентствам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SLA</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Service Level Agreement</div>
+                            <div class="gloss-def">Соглашение об уровне обслуживания — гарантии сроков и качества</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">KPI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Key Performance Indicator</div>
+                            <div class="gloss-def">Ключевой показатель эффективности — метрика для оценки подрядчика</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">NDA</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Non-Disclosure Agreement</div>
+                            <div class="gloss-def">Соглашение о неразглашении конфиденциальной информации</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">RFP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Request for Proposal</div>
+                            <div class="gloss-def">Запрос коммерческого предложения от потенциальных подрядчиков</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Бриф</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Brief</div>
+                            <div class="gloss-def">Документ с исходными данными для подрядчика: цели, задачи, аудитория, бюджет</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Investment</div>
+                            <div class="gloss-def">Возврат инвестиций — ключевая метрика эффективности SEO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок digital-услуг</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Workspace: 47% digital-агентств нарастили обороты за 9 месяцев 2025 года. — <a href="https://workspace.ru" target="_blank">Workspace.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">«Рейтинг Рунета»: Затраты бизнеса и государства на digital-услуги выросли на 8,7%. — <a href="https://ratingruneta.ru" target="_blank">RatingRuneta.ru</a> <span class="src-date">04.09.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Sostav.ru: SMM — один из устойчивых сегментов российского digital-рынка (+16%). — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">19.08.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">💰 Стоимость и зарплаты</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Checkroi.ru: Digital-специалист — кто это и сколько платят в 2026. — <a href="https://checkroi.ru" target="_blank">Checkroi.ru</a> <span class="src-date">11.07.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Workspace: Обзор цен на SEO-услуги в России. — <a href="https://workspace.ru" target="_blank">Workspace.ru</a> <span class="src-date">26.04.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏆 Рейтинги и выбор подрядчика</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">SEOnews: Рейтинг известности SEO-компаний 2025 — Ingate Group лидер. — <a href="https://www.seonews.ru" target="_blank">SEONews.ru</a> <span class="src-date">05.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">AdIndex: Digital Index 2025 — лучшие агентства по продвижению. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">26.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">TopVisor: Как выбрать SEO-подрядчика — чек-лист 2026. — <a href="https://journal.topvisor.com" target="_blank">TopVisor.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 In-house vs аутсорс</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Search Engine Journal: In-House SEO vs Agency — Pros and Cons. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Ahrefs: Should You Hire an SEO Agency or Do It Yourself? — <a href="https://ahrefs.com/blog" target="_blank">Ahrefs.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

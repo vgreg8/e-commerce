@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 5. Эволюция веб-технологий</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #111827; color: #e5e7eb; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #4c1d95; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #8b5cf6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* ============ ГОРИЗОНТАЛЬНЫЙ ТАЙМЛАЙН ПОКОЛЕНИЙ САЙТОВ ============ */
+        .gen-timeline { background: #faf5ff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 22px 26px; }
+        .gen-timeline .gen-title { font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 16px; }
+        .gen-track { display: flex; gap: 0; align-items: stretch; position: relative; }
+        .gen-track::before { content: ''; position: absolute; top: 40px; left: 0; right: 0; height: 3px; background: #ddd6fe; z-index: 1; }
+        .gen-item { flex: 1; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+        .gen-badge { width: 80px; height: 80px; border-radius: 50%; background: white; border: 4px solid #8b5cf6; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.15); margin-bottom: 10px; }
+        .gen-badge .gen-icon { font-size: 22px; line-height: 1; }
+        .gen-badge .gen-year { font-size: 10px; font-weight: 900; color: #7c3aed; margin-top: 2px; }
+        .gen-item .gen-label { font-size: 11.5px; font-weight: bold; color: #4c1d95; text-align: center; line-height: 1.25; }
+        .gen-item .gen-sub { font-size: 10px; color: #64748b; text-align: center; margin-top: 3px; line-height: 1.25; }
+        .gen-item.active .gen-badge { border-color: #e11d48; box-shadow: 0 6px 14px rgba(225, 29, 72, 0.25); }
+        .gen-item.active .gen-label { color: #be123c; }
+
+        /* ============ РАДАР КОМПЕТЕНЦИЙ (SVG) ============ */
+        .radar-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08); }
+        .radar-card .radar-title { font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .radar-card .radar-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ============ HORIZONTAL BAR CHART ============ */
+        .h-bar-card { background: #f0fdfa; border: 2px solid #99f6e4; border-radius: 14px; padding: 20px 24px; }
+        .h-bar-card .h-bar-title { font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 14px; }
+        .h-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .h-bar-label { font-size: 12px; color: #1e293b; width: 200px; font-weight: 500; }
+        .h-bar-track { flex: 1; background: #ccfbf1; height: 22px; border-radius: 6px; position: relative; overflow: hidden; }
+        .h-bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: bold; color: white; }
+        .h-bar-fill.green { background: linear-gradient(90deg, #059669, #10b981); }
+        .h-bar-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .h-bar-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+        .h-bar-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+
+        /* ============ HEATMAP СПЕЦИАЛИЗАЦИЙ ============ */
+        .heat-card { background: #fffbeb; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .heat-card .heat-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 12px; }
+        .heat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; font-size: 11px; }
+        .heat-head { padding: 8px 4px; text-align: center; font-weight: bold; color: #78350f; font-size: 10.5px; background: #fef3c7; border-radius: 4px; }
+        .heat-cell { padding: 10px 4px; text-align: center; border-radius: 4px; font-weight: bold; color: #1f2937; }
+        .heat-5 { background: #34d399; }
+        .heat-4 { background: #6ee7b7; }
+        .heat-3 { background: #fcd34d; }
+        .heat-2 { background: #fb923c; }
+        .heat-1 { background: #f87171; color: white; }
+
+        /* ============ СЛАЙДЕР ТРЕНДОВ ============ */
+        .trend-slider { background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 50%, #a78bfa 100%); border-radius: 16px; padding: 22px 28px; color: white; box-shadow: 0 10px 24px rgba(139, 92, 246, 0.25); position: relative; overflow: hidden; }
+        .trend-slider::before { content: ''; position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+        .trend-slider::after { content: ''; position: absolute; bottom: -60px; left: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        .trend-slider .ts-tag { font-size: 10px; letter-spacing: 1.5px; opacity: 0.85; text-transform: uppercase; margin-bottom: 4px; position: relative; z-index: 2; }
+        .trend-slider .ts-title { font-size: 22px; font-weight: 900; margin-bottom: 10px; position: relative; z-index: 2; letter-spacing: -0.5px; }
+        .trend-slider .ts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; position: relative; z-index: 2; }
+        .trend-slider .ts-item { background: rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 12px; backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.15); }
+        .trend-slider .ts-item .ts-icon { font-size: 18px; }
+        .trend-slider .ts-item .ts-name { font-size: 12px; font-weight: bold; margin: 4px 0 2px; }
+        .trend-slider .ts-item .ts-desc { font-size: 10.5px; opacity: 0.9; line-height: 1.35; }
+
+        /* ============ ИТОГОВАЯ ТАБЛИЦА КУРСА ============ */
+        .summary-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .summary-card .summary-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 12px; }
+        .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .summary-table th { background: #4c1d95; color: white; padding: 9px 11px; text-align: left; font-weight: 600; }
+        .summary-table td { padding: 8px 11px; border-bottom: 1px solid #e2e8f0; color: #1e293b; }
+        .summary-table tr:nth-child(even) td { background: #f8fafc; }
+        .summary-table .key { font-weight: bold; color: #4c1d95; }
+        .summary-table .up { color: #059669; font-weight: bold; }
+        .summary-table .down { color: #e11d48; font-weight: bold; }
+
+        /* ============ ВИДЕОПЛЕЕР ============ */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #8b5cf6; }
+        .rt-btn:hover { background: #7c3aed; }
+        .stop-btn { background: #be123c; }
+        .stop-btn:hover { background: #9f1239; }
+
+        /* ============ ТЕКСТ ЛЕКТОРА ============ */
+        .notes-header { font-size: 17px; color: #c4b5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 10px; }
+        .timer-badge { background: #be123c; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e5e7eb; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #c4b5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1f2937; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1f2937; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #4c1d95; color: #ddd6fe; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* ============ СЛОВАРЬ: ГОРИЗОНТАЛЬНЫЕ БЕЙДЖИ ============ */
+        .badge-glossary { margin-top: 30px; }
+        .badge-glossary-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .badge-glossary-title::before { content: ''; width: 4px; height: 20px; background: #8b5cf6; border-radius: 2px; }
+        .badge-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .badge-item { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 8px 12px; flex: 1 1 calc(50% - 8px); min-width: 200px; }
+        .badge-item .badge-abbr { font-size: 12px; font-weight: 900; color: #c4b5fd; letter-spacing: -0.3px; }
+        .badge-item .badge-full { font-size: 10.5px; color: #fbbf24; margin: 2px 0; }
+        .badge-item .badge-def { font-size: 10.5px; color: #9ca3af; line-height: 1.4; }
+
+        /* ============ ИСТОЧНИКИ: ЛЕНТА ВРЕМЕНИ ============ */
+        .timeline-sources { margin-top: 30px; }
+        .timeline-sources-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .timeline-sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .ts-line { position: relative; padding-left: 24px; }
+        .ts-line::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #374151; }
+        .ts-entry { position: relative; margin-bottom: 14px; }
+        .ts-entry::before { content: ''; position: absolute; left: -22px; top: 4px; width: 12px; height: 12px; background: #8b5cf6; border: 2px solid #111827; border-radius: 50%; box-shadow: 0 0 0 2px #8b5cf6; }
+        .ts-entry .ts-year { font-size: 11px; font-weight: 900; color: #fbbf24; margin-bottom: 2px; }
+        .ts-entry .ts-body { font-size: 11.5px; color: #d1d5db; line-height: 1.45; }
+        .ts-entry .ts-body a { color: #c4b5fd; text-decoration: none; }
+        .ts-entry .ts-body a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 5. Эволюция веб-технологий
+        </div>
+
+        <div class="slide-body">
+
+            <!-- ГОРИЗОНТАЛЬНЫЙ ТАЙМЛАЙН ПОКОЛЕНИЙ -->
+            <div class="gen-timeline">
+                <div class="gen-title">🌐 Пять поколений веб-сайтов: от статических страниц до агентного веба</div>
+                <div class="gen-track">
+                    <div class="gen-item">
+                        <div class="gen-badge"><div class="gen-icon">📄</div><div class="gen-year">1994</div></div>
+                        <div class="gen-label">Статические</div>
+                        <div class="gen-sub">HTML-страницы</div>
+                    </div>
+                    <div class="gen-item">
+                        <div class="gen-badge"><div class="gen-icon">⚙️</div><div class="gen-year">1998</div></div>
+                        <div class="gen-label">Динамические</div>
+                        <div class="gen-sub">CGI, PHP, базы данных</div>
+                    </div>
+                    <div class="gen-item">
+                        <div class="gen-badge"><div class="gen-icon">🛒</div><div class="gen-year">2003</div></div>
+                        <div class="gen-label">Интерактивные</div>
+                        <div class="gen-sub">E-commerce, AJAX</div>
+                    </div>
+                    <div class="gen-item">
+                        <div class="gen-badge"><div class="gen-icon">🎨</div><div class="gen-year">2015</div></div>
+                        <div class="gen-label">SPA / PWA</div>
+                        <div class="gen-sub">React, Vue, Angular</div>
+                    </div>
+                    <div class="gen-item active">
+                        <div class="gen-badge"><div class="gen-icon">🤖</div><div class="gen-year">2025</div></div>
+                        <div class="gen-label">Агентный веб</div>
+                        <div class="gen-sub">AI-агенты, GEO</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- РАДАР КОМПЕТЕНЦИЙ (SVG) -->
+            <div class="radar-card">
+                <div class="radar-title">🎯 Компетенции современного веб-маркетолога <span>Шкала 0–10</span></div>
+                <svg viewBox="0 0 500 280" style="width: 100%; height: auto;">
+                    <!-- Сетка -->
+                    <g stroke="#e9d5ff" stroke-width="1" fill="none">
+                        <polygon points="250,30 430,105 370,240 130,240 70,105" />
+                        <polygon points="250,70 385,125 340,220 160,220 115,125" />
+                        <polygon points="250,110 340,145 310,200 190,200 160,145" />
+                        <polygon points="250,150 295,165 280,180 220,180 205,165" />
+                    </g>
+                    <!-- Оси -->
+                    <g stroke="#e9d5ff" stroke-width="1">
+                        <line x1="250" y1="150" x2="250" y2="30" />
+                        <line x1="250" y1="150" x2="430" y2="105" />
+                        <line x1="250" y1="150" x2="370" y2="240" />
+                        <line x1="250" y1="150" x2="130" y2="240" />
+                        <line x1="250" y1="150" x2="70" y2="105" />
+                    </g>
+                    <!-- Подписи осей -->
+                    <g font-size="10" fill="#4c1d95" font-weight="bold" text-anchor="middle">
+                        <text x="250" y="20">AI / GEO</text>
+                        <text x="445" y="105">Аналитика</text>
+                        <text x="385" y="258">Программирование</text>
+                        <text x="115" y="258">Контент</text>
+                        <text x="55" y="105">UX/UI</text>
+                    </g>
+                    <!-- Ромб компетенций -->
+                    <polygon points="250,50 380,120 340,220 170,210 100,120"
+                             fill="rgba(139, 92, 246, 0.25)" stroke="#8b5cf6" stroke-width="2.5"/>
+                    <circle cx="250" cy="50" r="4" fill="#e11d48"/>
+                    <circle cx="380" cy="120" r="4" fill="#8b5cf6"/>
+                    <circle cx="340" cy="220" r="4" fill="#8b5cf6"/>
+                    <circle cx="170" cy="210" r="4" fill="#8b5cf6"/>
+                    <circle cx="100" cy="120" r="4" fill="#8b5cf6"/>
+                </svg>
+            </div>
+
+            <!-- HORIZONTAL BAR: СТРУКТУРА РЫНКА DIGITAL-УСЛУГ -->
+            <div class="h-bar-card">
+                <div class="h-bar-title">📊 Структура рынка digital-услуг в России (2025) — 464,1 млрд ₽</div>
+                <div class="h-bar-row">
+                    <div class="h-bar-label">Маркетинг и реклама</div>
+                    <div class="h-bar-track"><div class="h-bar-fill violet" style="width: 68%;">68% — 316 млрд ₽</div></div>
+                </div>
+                <div class="h-bar-row">
+                    <div class="h-bar-label">Заказная разработка</div>
+                    <div class="h-bar-track"><div class="h-bar-fill green" style="width: 22%;">22% — 102 млрд ₽</div></div>
+                </div>
+                <div class="h-bar-row">
+                    <div class="h-bar-label">Цифровой дизайн</div>
+                    <div class="h-bar-track"><div class="h-bar-fill amber" style="width: 6%;">6%</div></div>
+                </div>
+                <div class="h-bar-row">
+                    <div class="h-bar-label">Видеопродакшен</div>
+                    <div class="h-bar-track"><div class="h-bar-fill rose" style="width: 4%;">4%</div></div>
+                </div>
+            </div>
+
+            <!-- HEATMAP СПЕЦИАЛИЗАЦИЙ -->
+            <div class="heat-card">
+                <div class="heat-title">🔥 Востребованность специализаций по каналам (2025–2026)</div>
+                <div class="heat-grid">
+                    <div class="heat-head">Канал</div>
+                    <div class="heat-head">SEO</div>
+                    <div class="heat-head">PPC</div>
+                    <div class="heat-head">SMM</div>
+                    <div class="heat-head">Email</div>
+                    <div class="heat-head">GEO</div>
+
+                    <div class="heat-head" style="background: #ede9fe;">Маркетплейсы</div>
+                    <div class="heat-cell heat-3">3</div>
+                    <div class="heat-cell heat-5">5</div>
+                    <div class="heat-cell heat-3">3</div>
+                    <div class="heat-cell heat-2">2</div>
+                    <div class="heat-cell heat-4">4</div>
+
+                    <div class="heat-head" style="background: #ede9fe;">D2C бренды</div>
+                    <div class="heat-cell heat-5">5</div>
+                    <div class="heat-cell heat-4">4</div>
+                    <div class="heat-cell heat-5">5</div>
+                    <div class="heat-cell heat-5">5</div>
+                    <div class="heat-cell heat-5">5</div>
+
+                    <div class="heat-head" style="background: #ede9fe;">B2B / SaaS</div>
+                    <div class="heat-cell heat-4">4</div>
+                    <div class="heat-cell heat-3">3</div>
+                    <div class="heat-cell heat-2">2</div>
+                    <div class="heat-cell heat-5">5</div>
+                    <div class="heat-cell heat-4">4</div>
+
+                    <div class="heat-head" style="background: #ede9fe;">Локальный бизнес</div>
+                    <div class="heat-cell heat-4">4</div>
+                    <div class="heat-cell heat-5">5</div>
+                    <div class="heat-cell heat-4">4</div>
+                    <div class="heat-cell heat-1">1</div>
+                    <div class="heat-cell heat-3">3</div>
+                </div>
+                <div style="font-size: 10px; color: #78350f; margin-top: 8px;">Шкала: 1 — низкая, 3 — средняя, 5 — максимальная востребованность</div>
+            </div>
+
+            <!-- СЛАЙДЕР ТРЕНДОВ 2026 -->
+            <div class="trend-slider">
+                <div class="ts-tag">Тренды 2026</div>
+                <div class="ts-title">Куда движется веб и интернет-маркетинг</div>
+                <div class="ts-grid">
+                    <div class="ts-item">
+                        <div class="ts-icon">🤖</div>
+                        <div class="ts-name">Агентный веб</div>
+                        <div class="ts-desc">Сайты как API-эндпоинты для AI-агентов. Chrome интегрирует Gemini для автономных действий</div>
+                    </div>
+                    <div class="ts-item">
+                        <div class="ts-icon">🔍</div>
+                        <div class="ts-name">GEO вместо SEO</div>
+                        <div class="ts-desc">58% запросов — без клика. Оптимизация для генеративных поисковых систем</div>
+                    </div>
+                    <div class="ts-item">
+                        <div class="ts-icon">⛓️</div>
+                        <div class="ts-name">Web3-маркетинг</div>
+                        <div class="ts-desc">Децентрализованные платформы, токенизация лояльности, участие пользователей</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИТОГОВАЯ ТАБЛИЦА КУРСА -->
+            <div class="summary-card">
+                <div class="summary-title">📋 Итоги курса: ключевые метрики, которые нужно запомнить</div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>2024</th>
+                            <th>2025</th>
+                            <th>Δ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="key">Рынок интернет-рекламы</td>
+                            <td>1,22 трлн ₽</td>
+                            <td>1,57 трлн ₽</td>
+                            <td class="up">+28%</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Рынок digital-услуг</td>
+                            <td>427 млрд ₽</td>
+                            <td>464,1 млрд ₽</td>
+                            <td class="up">+8,68%</td>
+                        </tr>
+                        <tr>
+                            <td class="key">E-commerce</td>
+                            <td>9,0 трлн ₽</td>
+                            <td>11,5 трлн ₽</td>
+                            <td class="up">+28%</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Email-маркетинг</td>
+                            <td>9,3 млрд писем</td>
+                            <td>12,9 млрд писем</td>
+                            <td class="up">+38,7%</td>
+                        </tr>
+                        <tr>
+                            <td class="key">SMM-сегмент</td>
+                            <td>—</td>
+                            <td>+16%</td>
+                            <td class="up">+16%</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Видеопродакшен</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td class="down">–17%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Эволюция веб-сайтов</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Современные фреймворки</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Агентный веб и GEO</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 5 из 5
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #111827; padding: 20px 20px 10px 20px; border-bottom: 1px solid #374151; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня — заключительная лекция нашего курса. Мы проследим эволюцию веб-технологий и разберём, как она трансформировала рынок услуг интернет-маркетинга. Это финальная лекция, поэтому в конце мы подведём итоги всего курса.</p>
+
+            <div class="action-hint">Обратите внимание студентов на горизонтальный таймлайн поколений веб-сайтов.</div>
+
+            <h3>📌 Поколения веб-сайтов</h3>
+
+            <p>Эволюция веб-сайтов отражает эволюцию самого интернета. Выделяют пять ключевых поколений:</p>
+
+            <ul>
+                <li><strong>Статические сайты (с 1994):</strong> HTML-страницы, вручную свёрстанные. Контент менялся только через редактирование кода. Минимальная интерактивность.</li>
+                <li><strong>Динамические сайты (с 1998):</strong> CGI-скрипты, PHP, подключение баз данных. Контент формируется на лету. Первые CMS.</li>
+                <li><strong>Интерактивные и e-commerce (с 2003):</strong> AJAX-технологии, корзины, онлайн-платежи. Сайт превращается в инструмент продаж.</li>
+                <li><strong>SPA / PWA (с 2015):</strong> React, Vue, Angular. Одностраничные приложения с реактивным интерфейсом. Progressive Web Apps — сайты, работающие как мобильные приложения.</li>
+                <li><strong>Агентный веб (с 2025):</strong> сайты трансформируются из пунктов назначения в API-эндпоинты. AI-агенты (Gemini в Chrome, автономные ассистенты) самостоятельно взаимодействуют с сайтами — бронируют, покупают, сравнивают.</li>
+            </ul>
+
+            <h3>📌 Современные веб-фреймворки (2025–2026)</h3>
+
+            <p>Сегодня рынок веб-разработки определяется тремя ключевыми метафреймворками:</p>
+
+            <ul>
+                <li><strong>Next.js</strong> — лидер по использованию: <span class="stat-inline">59%</span> среди метафреймворков. 25,6 млн загрузок npm в неделю, 138k звёзд на GitHub. Экосистема Vercel, полная поддержка SSR/SSG/ISR. Универсальный выбор для большинства проектов.</li>
+                <li><strong>Astro</strong> — победитель в производительности. 25 загрузок/день. Оптимален для контентных сайтов, блогов, документации и корпоративных сайтов с фокусом на SEO.</li>
+                <li><strong>Remix / React Router v7</strong> — фокус на веб-стандартах, формах и потоках данных. 28 млн загрузок npm в неделю (react-router). Растущая популярность среди разработчиков, ценящих стандарты.</li>
+            </ul>
+
+            <p>Для менеджера важно понимать: выбор фреймворка влияет на скорость загрузки сайта, SEO-показатели и стоимость поддержки. Next.js даёт гибкость, Astro — максимальную скорость, Remix — стандартизацию.</p>
+
+            <h3>📌 Трансформация медиа и ПО</h3>
+
+            <p>Веб-технологии радикально изменили целые отрасли:</p>
+
+            <ul>
+                <li><strong>Медиа:</strong> кино, журналы, газеты, телевидение мигрировали в онлайн. Стриминговые сервисы, цифровые издания, подкасты.</li>
+                <li><strong>ПО как услуга (SaaS):</strong> переход от коробочных продуктов к подпискам. Salesforce, HubSpot, Notion — всё работает через браузер.</li>
+                <li><strong>ИТ-инфраструктура:</strong> облачные вычисления (AWS, Azure, Yandex Cloud) заменили физические серверы. Компании арендуют мощности вместо покупки оборудования.</li>
+            </ul>
+
+            <h3>📌 Рынок услуг интернет-маркетинга (2025)</h3>
+
+            <p>Теперь — к рынку. По оценке «Рейтинга Рунета», общий объём рынка digital-услуг в России по итогам 2025 года составил <span class="stat-inline">464,1 млрд рублей</span>, что на 8,68% больше, чем в 2024 году (427 млрд руб.)[reference:0]. Однако темпы роста существенно замедлились: в 2024 году прирост составлял 29%[reference:1].</p>
+
+            <p>Структура рынка:</p>
+
+            <ul>
+                <li><strong>Маркетинг и реклама (68%):</strong> 316 млрд руб. — крупнейший сегмент.</li>
+                <li><strong>Заказная разработка (22%):</strong> 102 млрд руб.</li>
+                <li><strong>Цифровой дизайн (6%):</strong> ~28 млрд руб.</li>
+                <li><strong>Видеопродакшен (4%):</strong> ~18 млрд руб.</li>
+            </ul>
+
+            <p>Что интересно: суммарные обороты агентств интернет-маркетинга и рекламы в 2025 году увеличились всего на 1% год к году[reference:2]. Студии цифрового дизайна сохранили показатели на прежнем уровне, а обороты видеопродакшенов сократились на 17%[reference:3]. При этом сегмент SMM показал рост на 16% — один из наиболее устойчивых сегментов российского digital-рынка[reference:4].</p>
+
+            <p>Прогноз на 2026 год: темпы роста рынка digital-услуг могут замедлиться до 10–15%[reference:5]. Рынок коммерческих и государственных тендеров на digital-услуги в 2025 году сократится на 3–7% по количеству проектов, однако их общий бюджет может увеличиться на 5–7%[reference:6].</p>
+
+            <div class="action-hint">Обратите внимание студентов на heatmap востребованности специализаций.</div>
+
+            <h3>📌 Специализации: кто нужен рынку в 2025–2026</h3>
+
+            <p>Востребованность специализаций зависит от типа бизнеса. Согласно данным heatmap:</p>
+
+            <ul>
+                <li><strong>D2C-бренды</strong> — максимальная востребованность всех специализаций. Здесь нужны и SEO, и PPC, и SMM, и email, и GEO.</li>
+                <li><strong>Маркетплейсы</strong> — критичны PPC (управление ставками) и GEO (оптимизация карточек товаров для AI-поиска).</li>
+                <li><strong>B2B / SaaS</strong> — главный канал — email-маркетинг (5 из 5) и SEO (4 из 5).</li>
+                <li><strong>Локальный бизнес</strong> — фокус на PPC (5 из 5) и SMM (4 из 5).</li>
+            </ul>
+
+            <p>Стоимость услуг фрилансеров на рынке: SEO-оптимизация — от 30 000 до 5 000 000 руб., комплексный маркетинг — от 100 000 до 1 000 000 руб., веб-дизайн — около 70 000 руб., интернет-маркетинг — от 45 000 руб.[reference:7][reference:8]. Ведущие маркетологи (Head of SEO) берут от 200 000 руб. за проект[reference:9].</p>
+
+            <h3>📌 Переход к рынку услуг: что это значит для менеджера</h3>
+
+            <p>Рынок услуг интернет-маркетинга переживает фундаментальный сдвиг. Вот ключевые изменения, которые должен понимать менеджер:</p>
+
+            <ul>
+                <li><strong>От SEO к GEO.</strong> Традиционная поисковая оптимизация уступает место оптимизации для генеративных поисковых систем. 58% запросов заканчиваются без клика — старые SEO-модели теряют эффективность.</li>
+                <li><strong>Агентный веб.</strong> Google I/O 2026 представил обновления Chrome, позволяющие AI-агентам самостоятельно строить и взаимодействовать с сайтами[reference:10]. Сайты превращаются в наборы инструментов для агентов.</li>
+                <li><strong>Web3-маркетинг.</strong> Децентрализованные платформы и токенизация лояльности трансформируют отношения брендов с клиентами — от транзакционного взаимодействия к совместному созданию ценности[reference:11].</li>
+                <li><strong>First-party data.</strong> Собственные данные о клиентах становятся ключевым активом в условиях ужесточения политики конфиденциальности.</li>
+            </ul>
+
+            <h3>📌 Итоги курса</h3>
+
+            <p>Мы прошли путь от введения в интернет-маркетинг до эволюции веб-технологий. Давайте зафиксируем ключевые метрики, которые нужно запомнить:</p>
+
+            <ul>
+                <li><strong>Рынок интернет-рекламы:</strong> 1,57 трлн руб. (+28%).</li>
+                <li><strong>Рынок digital-услуг:</strong> 464,1 млрд руб. (+8,68%).</li>
+                <li><strong>E-commerce:</strong> 11,5 трлн руб. (+28%).</li>
+                <li><strong>Email-маркетинг:</strong> 12,9 млрд писем (+38,7%), open rate 9,4%.</li>
+                <li><strong>SMM-сегмент:</strong> +16% — один из устойчивых сегментов.</li>
+                <li><strong>Видеопродакшен:</strong> –17% — сокращение.</li>
+            </ul>
+
+            <p>Главный вывод курса: интернет-маркетинг — это не набор разрозненных инструментов, а управляемая экосистема, которая эволюционирует вместе с технологиями. От статических страниц 1994 года до агентного веба 2025 года — каждый этап отвечал на конкретный экономический вызов. Сегодня мы находимся на пороге эпохи, когда AI-агенты станут основными потребителями веб-контента, а GEO заменит SEO как основной инструмент видимости.</p>
+
+            <p>Спасибо за внимание! Успехов в изучении интернет-маркетинга!</p>
+
+            <!-- ============ СЛОВАРЬ: БЕЙДЖИ ============ -->
+            <div class="badge-glossary">
+                <div class="badge-glossary-title">📖 Словарь аббревиатур</div>
+                <div class="badge-list">
+                    <div class="badge-item">
+                        <div class="badge-abbr">AJAX</div>
+                        <div class="badge-full">Asynchronous JavaScript and XML</div>
+                        <div class="badge-def">Технология асинхронного обновления страницы без полной перезагрузки</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">API</div>
+                        <div class="badge-full">Application Programming Interface</div>
+                        <div class="badge-def">Интерфейс программирования приложений</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">CGI</div>
+                        <div class="badge-full">Common Gateway Interface</div>
+                        <div class="badge-def">Стандарт взаимодействия веб-сервера с программами</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">CMS</div>
+                        <div class="badge-full">Content Management System</div>
+                        <div class="badge-def">Система управления контентом сайта</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">GEO</div>
+                        <div class="badge-full">Generative Engine Optimization</div>
+                        <div class="badge-def">Оптимизация для генеративных поисковых систем и AI-ассистентов</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">ISR</div>
+                        <div class="badge-full">Incremental Static Regeneration</div>
+                        <div class="badge-def">Инкрементная статическая регенерация страниц</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">PWA</div>
+                        <div class="badge-full">Progressive Web App</div>
+                        <div class="badge-def">Прогрессивное веб-приложение — сайт, работающий как мобильное приложение</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">SaaS</div>
+                        <div class="badge-full">Software as a Service</div>
+                        <div class="badge-def">Программное обеспечение как услуга по подписке</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">SEO</div>
+                        <div class="badge-full">Search Engine Optimization</div>
+                        <div class="badge-def">Оптимизация сайта для поисковых систем</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">SPA</div>
+                        <div class="badge-full">Single Page Application</div>
+                        <div class="badge-def">Одностраничное приложение с реактивным интерфейсом</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">SSG</div>
+                        <div class="badge-full">Static Site Generation</div>
+                        <div class="badge-def">Генерация статических страниц на этапе сборки</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">SSR</div>
+                        <div class="badge-full">Server-Side Rendering</div>
+                        <div class="badge-def">Рендеринг страниц на сервере</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">UX/UI</div>
+                        <div class="badge-full">User Experience / User Interface</div>
+                        <div class="badge-def">Пользовательский опыт / интерфейс</div>
+                    </div>
+                    <div class="badge-item">
+                        <div class="badge-abbr">Web3</div>
+                        <div class="badge-full">Web 3.0</div>
+                        <div class="badge-def">Децентрализованный веб на основе блокчейна</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ ИСТОЧНИКИ: ЛЕНТА ВРЕМЕНИ ============ -->
+            <div class="timeline-sources">
+                <div class="timeline-sources-title">📚 Источники и литература</div>
+                <div class="ts-line">
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2025 — Рынок digital-услуг</div>
+                        <div class="ts-body">«Рейтинг Рунета»: рынок digital- и маркетинговых услуг вырос на 8,68% — до 464,1 млрд руб. — <a href="https://ratingruneta.ru" target="_blank">RatingRuneta.ru</a></div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2026 — Замедление рынка</div>
+                        <div class="ts-body">«Рейтинг Рунета»: темпы роста рынка цифровых услуг могут замедлиться до 10–15%. — <a href="https://www.likeni.ru/events/zatraty-biznesa-i-gosudarstva-na-digital-uslugi-vyrosli-na-8-7-reyting-runeta/" target="_blank">Likeni.ru</a>, 04.09.2026</div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2026 — SMM и видеопродакшен</div>
+                        <div class="ts-body">SMM вырос на 16%, видеопродакшен сократился на 17%. — <a href="https://www.likeni.ru" target="_blank">Likeni.ru</a>, 19.08.2026</div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2026 — Агентный веб</div>
+                        <div class="ts-body">Google I/O 2026: Chrome интегрирует Gemini для AI-агентов, autonomously взаимодействующих с сайтами. — <a href="https://developer.chrome.com" target="_blank">Chrome for Developers</a>, 2026</div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2026 — Web3-маркетинг</div>
+                        <div class="ts-body">Frontiers: Web 3.0 в глобальном маркетинге — от экстрактивной рекламы к партисипативным моделям. — <a href="https://www.frontiersin.org" target="_blank">Frontiers</a>, 24.07.2026</div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2025 — Фреймворки</div>
+                        <div class="ts-body">State of JavaScript 2025: Next.js — лидер метафреймворков (59%). Astro — победитель в производительности. Remix — фокус на веб-стандартах. — <a href="https://bestofjs.org" target="_blank">Best of JS</a></div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2025 — Стоимость услуг</div>
+                        <div class="ts-body">Workspace.ru: комплексный маркетинг — от 100 000 до 1 000 000 руб. — <a href="https://workspace.ru" target="_blank">Workspace.ru</a>, 26.04.2025</div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2026 — Рынок интернет-рекламы</div>
+                        <div class="ts-body">АРИР: российский рынок рекламы и продвижения в интернете в 2025 году вырос на 28% — до 1,569 трлн руб. — <a href="https://interactivead.ru" target="_blank">InteractiveAd.ru</a>, 09.04.2026</div>
+                    </div>
+
+                    <div class="ts-entry">
+                        <div class="ts-year">2026 — Zero-Click</div>
+                        <div class="ts-body">Zenodo: Zero-Click Paradigm Whitepaper — 58% поисковых запросов без клика. — <a href="https://zenodo.org" target="_blank">Zenodo.org</a>, 01.12.2025</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

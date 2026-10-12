@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 28. Психология пользователей и мотивация в социальных сетях</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1e1b4b; color: #e0e7ff; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #3730a3; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #6366f1; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #818cf8 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 34px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* PYRAMID SVG */
+        .pyramid-card { background: #eef2ff; border: 2px solid #c7d2fe; border-radius: 14px; padding: 20px 24px; }
+        .pyramid-card .pyr-title { font-size: 14px; font-weight: bold; color: #3730a3; margin-bottom: 14px; }
+        .pyramid-levels { display: flex; flex-direction: column; gap: 8px; }
+        .pyr-level { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; }
+        .pyr-level.l5 { background: linear-gradient(90deg, #7c3aed, #a855f7); color: white; margin-left: 40%; }
+        .pyr-level.l4 { background: linear-gradient(90deg, #2563eb, #3b82f6); color: white; margin-left: 30%; margin-right: 10%; }
+        .pyr-level.l3 { background: linear-gradient(90deg, #059669, #10b981); color: white; margin-left: 20%; margin-right: 20%; }
+        .pyr-level.l2 { background: linear-gradient(90deg, #d97706, #f59e0b); color: white; margin-left: 10%; margin-right: 30%; }
+        .pyr-level.l1 { background: linear-gradient(90deg, #b91c1c, #dc2626); color: white; margin-right: 40%; }
+        .pyr-level .pyr-icon { font-size: 20px; }
+        .pyr-level .pyr-data { flex: 1; }
+        .pyr-level .pyr-name { font-size: 12.5px; font-weight: bold; margin-bottom: 3px; }
+        .pyr-level .pyr-services { font-size: 10.5px; opacity: 0.9; }
+        .pyr-level .pyr-role { font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; }
+
+        /* BEHAVIOR PROFILES */
+        .profiles-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .prof-card { border-radius: 12px; padding: 14px 10px; text-align: center; }
+        .prof-card.careerist { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .prof-card.convers { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .prof-card.observer { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border: 2px solid #94a3b8; }
+        .prof-card.broadcaster { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .prof-card.authority { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .prof-card .prof-icon { font-size: 22px; margin-bottom: 5px; }
+        .prof-card .prof-name { font-size: 11px; font-weight: 900; margin-bottom: 5px; }
+        .prof-card.careerist .prof-name { color: #1e3a8a; }
+        .prof-card.convers .prof-name { color: #065f46; }
+        .prof-card.observer .prof-name { color: #334155; }
+        .prof-card.broadcaster .prof-name { color: #78350f; }
+        .prof-card.authority .prof-name { color: #831843; }
+        .prof-card .prof-desc { font-size: 9.5px; color: #1e293b; line-height: 1.35; }
+
+        /* SVG INFLUENCE MODEL */
+        .chart-card { background: #ffffff; border: 2px solid #c7d2fe; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #3730a3; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* PSYCHOLOGY BARS */
+        .psych-card { background: #fef3c7; border: 2px solid #fde68a; border-radius: 14px; padding: 20px 24px; }
+        .psych-card .psych-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 14px; }
+        .psych-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .psych-label { font-size: 11.5px; color: #1e293b; width: 200px; font-weight: 500; text-align: right; }
+        .psych-track { flex: 1; background: #fde68a; height: 24px; border-radius: 6px; overflow: hidden; }
+        .psych-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: bold; color: white; }
+        .psych-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+        .psych-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .psych-fill.green { background: linear-gradient(90deg, #047857, #10b981); }
+        .psych-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+
+        /* BUSINESS SHIFT */
+        .shift-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .shift-card { border-radius: 12px; padding: 16px; }
+        .shift-card.old { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border: 2px solid #64748b; }
+        .shift-card.new { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .shift-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .shift-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .shift-card li { margin-bottom: 4px; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #3730a3; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #eef2ff; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .mid { color: #f59e0b; font-weight: bold; }
+        .metrics-table .cat { color: #7c3aed; font-weight: bold; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #6366f1; }
+        .rt-btn:hover { background: #4f46e5; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #a5b4fc; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3730a3; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e0e7ff; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #a5b4fc; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #3730a3; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #3730a3; color: #a5b4fc; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #a5b4fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #6366f1; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #6366f1; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #a5b4fc; font-size: 13px; min-width: 100px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #a5b4fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #6366f1; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #a5b4fc; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 28. Психология пользователей и мотивация в социальных сетях
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🧠</div>
+                <div class="hero-data">
+                    <div class="hero-number">81%</div>
+                    <div class="hero-label">Покупателей спрашивают совета в соцсетях</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">77%</div>
+                    <div class="hero-label">Читают обзоры профессионалов</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">50%</div>
+                    <div class="hero-label">Покупают по совету из своего сообщества</div>
+                </div>
+            </div>
+
+            <!-- PYRAMID OF NEEDS -->
+            <div class="pyramid-card">
+                <div class="pyr-title">🔺 Пирамида Маслоу и социальные сервисы: где какие потребности закрываются</div>
+                <div class="pyramid-levels">
+                    <div class="pyr-level l5">
+                        <div class="pyr-icon">🎨</div>
+                        <div class="pyr-data">
+                            <div class="pyr-name">Самореализация</div>
+                            <div class="pyr-services">Блоги, WordPress — самовыражение, творчество</div>
+                        </div>
+                        <div class="pyr-role">Автор</div>
+                    </div>
+                    <div class="pyr-level l4">
+                        <div class="pyr-icon">🏆</div>
+                        <div class="pyr-data">
+                            <div class="pyr-name">Уважение и признание</div>
+                            <div class="pyr-services">Twitter — демонстрация статуса: «прилетел из Лиссабона»</div>
+                        </div>
+                        <div class="pyr-role">Статус</div>
+                    </div>
+                    <div class="pyr-level l3">
+                        <div class="pyr-icon">🤝</div>
+                        <div class="pyr-data">
+                            <div class="pyr-name">Социальные связи</div>
+                            <div class="pyr-services">Facebook, ВКонтакте, Одноклассники — друзья, семья, единомышленники</div>
+                        </div>
+                        <div class="pyr-role">Общение</div>
+                    </div>
+                    <div class="pyr-level l2">
+                        <div class="pyr-icon">🛡️</div>
+                        <div class="pyr-data">
+                            <div class="pyr-name">Безопасность</div>
+                            <div class="pyr-services">LinkedIn — профессиональные связи, поиск работы, подстраховка</div>
+                        </div>
+                        <div class="pyr-role">Карьера</div>
+                    </div>
+                    <div class="pyr-level l1">
+                        <div class="pyr-icon">🍎</div>
+                        <div class="pyr-data">
+                            <div class="pyr-name">Физиологические потребности</div>
+                            <div class="pyr-services">Базовый уровень — не соотносится с соцсетями напрямую</div>
+                        </div>
+                        <div class="pyr-role">База</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BEHAVIOR PROFILES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #3730a3; margin-bottom: 10px;">👥 Пять профилей поведения по Брайану Солису</div>
+                <div class="profiles-grid">
+                    <div class="prof-card careerist">
+                        <div class="prof-icon">💼</div>
+                        <div class="prof-name">Карьерист</div>
+                        <div class="prof-desc">Строит карьеру, копит социальный капитал</div>
+                    </div>
+                    <div class="prof-card convers">
+                        <div class="prof-icon">💬</div>
+                        <div class="prof-name">Конверс</div>
+                        <div class="prof-desc">Поддерживает беседу, комментирует, участвует</div>
+                    </div>
+                    <div class="prof-card observer">
+                        <div class="prof-icon">👀</div>
+                        <div class="prof-name">Обсервер</div>
+                        <div class="prof-desc">Только наблюдает, мнение не высказывает</div>
+                    </div>
+                    <div class="prof-card broadcaster">
+                        <div class="prof-icon">📢</div>
+                        <div class="prof-name">Бродкастер</div>
+                        <div class="prof-desc">Публикует контент без анализа, по бинарному принципу</div>
+                    </div>
+                    <div class="prof-card authority">
+                        <div class="prof-icon">🎯</div>
+                        <div class="prof-name">Авторитет</div>
+                        <div class="prof-desc">Имеет мнение и влияние на свою аудиторию</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG INFLUENCE MODEL -->
+            <div class="chart-card">
+                <div class="chart-title">🎯 Модель влияния: как авторитеты формируют мнение сообщества <span>Управление репутацией</span></div>
+                <svg viewBox="0 0 600 260" style="width: 100%; height: auto;">
+                    <!-- Авторитет -->
+                    <circle cx="300" cy="60" r="34" fill="#ec4899" stroke="#831843" stroke-width="3"/>
+                    <text x="300" y="68" font-size="22" text-anchor="middle">🎯</text>
+                    <text x="300" y="115" font-size="12" fill="#831843" text-anchor="middle" font-weight="bold">АВТОРИТЕТ</text>
+                    <text x="300" y="130" font-size="9.5" fill="#64748b" text-anchor="middle">Широкий набор контактов</text>
+                    <text x="300" y="143" font-size="9.5" fill="#64748b" text-anchor="middle">Публикует новый контент</text>
+
+                    <!-- Стрелки влияния -->
+                    <line x1="270" y1="90" x2="150" y2="150" stroke="#ec4899" stroke-width="2.5" marker-end="url(#arrowPink3)"/>
+                    <line x1="300" y1="95" x2="300" y2="150" stroke="#ec4899" stroke-width="2.5" marker-end="url(#arrowPink3)"/>
+                    <line x1="330" y1="90" x2="450" y2="150" stroke="#ec4899" stroke-width="2.5" marker-end="url(#arrowPink3)"/>
+
+                    <defs>
+                        <marker id="arrowPink3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ec4899"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Последователи -->
+                    <circle cx="120" cy="185" r="22" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="120" y="190" font-size="14" text-anchor="middle">👤</text>
+
+                    <circle cx="200" cy="200" r="22" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="200" y="205" font-size="14" text-anchor="middle">👤</text>
+
+                    <circle cx="300" cy="190" r="22" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="300" y="195" font-size="14" text-anchor="middle">👤</text>
+
+                    <circle cx="400" cy="200" r="22" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="400" y="205" font-size="14" text-anchor="middle">👤</text>
+
+                    <circle cx="480" cy="185" r="22" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="480" y="190" font-size="14" text-anchor="middle">👤</text>
+
+                    <text x="300" y="240" font-size="11" fill="#3730a3" text-anchor="middle" font-weight="bold">Задача бренда: завоевать доверие авторитетов → они транслируют лояльность последователям</text>
+                    <text x="300" y="255" font-size="10" fill="#64748b" text-anchor="middle" font-style="italic">Отдача максимальна: авторитеты формируют мнение целых сообществ</text>
+                </svg>
+            </div>
+
+            <!-- PSYCHOLOGY BARS -->
+            <div class="psych-card">
+                <div class="psych-title">🧠 Психология социальных покупок: ключевые факторы (по Брайану Солису)</div>
+                <div class="psych-row">
+                    <div class="psych-label">Мнение толпы — ищут совет</div>
+                    <div class="psych-track"><div class="psych-fill violet" style="width: 81%;">81%</div></div>
+                </div>
+                <div class="psych-row">
+                    <div class="psych-label">Обзоры профессионалов</div>
+                    <div class="psych-track"><div class="psych-fill amber" style="width: 77%;">77%</div></div>
+                </div>
+                <div class="psych-row">
+                    <div class="psych-label">Совет из своего сообщества</div>
+                    <div class="psych-track"><div class="psych-fill green" style="width: 50%;">50%</div></div>
+                </div>
+                <div class="psych-row">
+                    <div class="psych-label">Хотят эксклюзив из ограниченной партии</div>
+                    <div class="psych-track"><div class="psych-fill rose" style="width: 45%;">45%</div></div>
+                </div>
+                <div style="font-size: 11px; color: #78350f; margin-top: 10px;">«Чем меньше — тем лучше»: ограниченный доступ стимулирует решение о покупке. Бинарное доверие: «наш/не наш».</div>
+            </div>
+
+            <!-- BUSINESS SHIFT -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #3730a3; margin-bottom: 10px;">🔄 Как социальные сети меняют бизнес: 4 сдвига</div>
+                <div class="shift-grid">
+                    <div class="shift-card old">
+                        <h5 style="color: #475569;">📜 Было</h5>
+                        <ul>
+                            <li>Навязывание продаж</li>
+                            <li>Массовые коммуникации</li>
+                            <li>Закрытые коммуникации</li>
+                            <li>Ограниченная персональная доступность</li>
+                        </ul>
+                    </div>
+                    <div class="shift-card new">
+                        <h5 style="color: #065f46;">🌐 Стало</h5>
+                        <ul>
+                            <li>Взаимодействие с аудиторией</li>
+                            <li>Персонализированные контакты</li>
+                            <li>Прозрачные коммуникации</li>
+                            <li>Широкая доступность через соцсети</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 8px;">Пример: прямое обращение к топ-менеджеру через LinkedIn вместо секретаря и info@. Общие знакомые и общие сообщества работают как фильтр.</div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #3730a3; margin-bottom: 8px;">📊 Метрики доверия и вовлечённости (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Доверие рекомендациям инфлюенсеров</td>
+                            <td class="high">60%</td>
+                            <td class="cat">растёт</td>
+                            <td>Nielsen</td>
+                        </tr>
+                        <tr>
+                            <td>Доверие UGC vs брендированный контент</td>
+                            <td class="high">+28%</td>
+                            <td class="cat">растёт</td>
+                            <td>Stackla</td>
+                        </tr>
+                        <tr>
+                            <td>Средний ER в соцсетях</td>
+                            <td>1,5–3%</td>
+                            <td class="cat">стабильно</td>
+                            <td>Hootsuite</td>
+                        </tr>
+                        <tr>
+                            <td>Доля обсерверов в аудитории</td>
+                            <td class="mid">60–70%</td>
+                            <td class="cat">стабильно</td>
+                            <td>Forrester</td>
+                        </tr>
+                        <tr>
+                            <td>Влияние микро-инфлюенсеров</td>
+                            <td class="high">+40%</td>
+                            <td class="cat">растёт</td>
+                            <td>Markerly</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Психология в соцсетях</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Пирамида Маслоу</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Профили Солиса</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 28 из 30
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1e1b4b; padding: 20px 20px 10px 20px; border-bottom: 1px solid #3730a3; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали теорию, историю и классификацию социальных сетей. Сегодня мы поговорим о психологии пользователей — о том, какие потребности они закрывают через социальные сети и как это использовать в маркетинге.</p>
+
+            <div class="action-hint">Обратите внимание студентов на пирамиду Маслоу.</div>
+
+            <h3>📌 Пирамида Маслоу и социальные сервисы</h3>
+
+            <p>Любопытный взгляд на мотивацию пользователей предлагает совмещение пирамиды потребностей Маслоу с социальными сервисами. Согласно Маслоу, потребности человека можно представить в виде пятислойной пирамиды. Каждому слою, кроме базового, соответствует определённый тип социальных сервисов.</p>
+
+            <p><strong>Физиологические потребности</strong> — базовый уровень, не соотносится с соцсетями напрямую.</p>
+
+            <p><strong>Потребность в безопасности</strong> — LinkedIn. Действительно, эта сеть широко используется для поиска работы, предоставления информации для аппликантов. Связи в LinkedIn часто устанавливаются на тот случай, чтобы подстраховаться при потере работы. Живого общения здесь гораздо меньше, чем в других соцсетях.</p>
+
+            <p><strong>Социальные связи</strong> — Facebook, ВКонтакте, Одноклассники. Здесь люди ищут друзей, общаются с членами семьи, возлюбленными, единомышленниками.</p>
+
+            <p><strong>Потребность в уважении</strong> — Twitter. В этой сети часто можно встретить сообщения: «Я сегодня был на приёме у министра», «Я только что прилетел из Лиссабона». Люди демонстрируют статус, что поднимает их в глазах окружающих.</p>
+
+            <p><strong>Самовыражение и самореализация</strong> — блоги, WordPress. Человек может почувствовать себя журналистом, писателем, найти творческую реализацию.</p>
+
+            <div class="action-hint">Перейдите к профилям поведения.</div>
+
+            <h3>📌 Пять профилей поведения по Брайану Солису</h3>
+
+            <p>Аудитория социальных сетей неоднородна. Брайан Солис выделяет несколько профилей поведения.</p>
+
+            <p><strong>Карьерист</strong> — использует соцсети для построения карьеры, накопления социального капитала и использования социальных связей.</p>
+
+            <p><strong>Конверс</strong> — поддерживает беседу, активно комментирует, участвует в дискуссиях, отвечает на чужие посты.</p>
+
+            <p><strong>Обсервер</strong> — только наблюдает, своё мнение не высказывает, не проявляет позиции по отношению к брендам. Это самая многочисленная категория — 60–70% аудитории.</p>
+
+            <p><strong>Бродкастер</strong> — публикует контент без конца, без анализа. Действует по бинарному принципу: эта статья прославляет наш бренд — публикуем, эта ругает — пишем негативные комментарии. Такие пользователи часто становятся сетевыми фанатами бренда: ездит на Mercedes, носит бейсболку Mercedes, кроссовки Mercedes — и в соцсетях отстаивает интересы этого бренда.</p>
+
+            <p><strong>Авторитет</strong> — имеет своё мнение, аналитические способности, публикует новые материалы. Имеет определённый авторитет и набор последователей, которые за ним следят. Оказывает влияние на свою социальную группу.</p>
+
+            <div class="action-hint">Обратите внимание студентов на модель влияния.</div>
+
+            <h3>📌 Агенты влияния: авторитеты как ключ к продвижению</h3>
+
+            <p>Для маркетолога ключевая категория — авторитеты. Они имеют широкий набор контактов, публикуют новый интересный контент, их мнение авторитетно для последователей. Если авторитет становится лояльным к бренду — отдача от такого пользователя в формировании мнения максимальна.</p>
+
+            <p>Задача бренда — завоевать доверие авторитетов. Если они становятся фанатами бренда, они сами транслируют лояльность своим последователям, обращают их в свою веру. Чем больше авторитетов вовлечено, тем сильнее влияние на среднюю тональность высказываний о бренде.</p>
+
+            <p>Бродкастеры полезны как «распространители» контента, но требуют осторожного подхода: могут публиковать непроверенные факты.</p>
+
+            <div class="action-hint">Перейдите к психологии социальных покупок.</div>
+
+            <h3>📌 Психология социальных покупок</h3>
+
+            <p>Какие общие черты психологии социальных покупок можно выделить и использовать в построении маркетинговых кампаний?</p>
+
+            <p><strong>Мнение толпы.</strong> Люди склонны смотреть на то, что сделали другие, чтобы избежать ошибок. По данным Брайана Солиса, <span class="stat-inline">81%</span> покупателей спрашивают советов в социальных сетях.</p>
+
+            <p><strong>Авторитеты.</strong> Люди доверяют обзорам профессионалов. <span class="stat-inline">77%</span> обращаются к обзорам профессионалов в соцсетях. Возможность повлиять на эти обзоры — важный инструмент продвижения.</p>
+
+            <p><strong>Принцип «чем меньше, тем лучше».</strong> Люди хотят получить эксклюзивное предложение из ограниченной партии. «Предложение ограничено», «Всего имеется столько-то товаров по такой цене» — это действует и в соцмедиа.</p>
+
+            <p><strong>Следуем за теми, кому доверяем.</strong> Люди склонны распространять информацию о выгодных сделках на группу своего сетевого сообщества для упрочения степени доверия к собственной персоне. Почти <span class="stat-inline">50%</span> покупателей совершили покупку по совету из своего сообщества в социальных сетях.</p>
+
+            <p><strong>Взаимопомощь.</strong> Людям присуще желание поддерживать принцип социальной справедливости и благодарить за услуги, даже если их не запрашивали. Именно поэтому каждый месяц пользователи генерируют миллиарды единиц контента в Facebook.</p>
+
+            <p>Приведу личный пример. Недавно покупал печь для дома. Рекламных предложений в интернете так много, что для выбора надёжного возникает желание обратиться к своему сетевому сообществу — спросить, кто что выбирал. Степень доверия к своему окружению выше, чем к рекламным предложениям.</p>
+
+            <div class="action-hint">Перейдите к 4 сдвигам в бизнесе.</div>
+
+            <h3>📌 Как социальные сети меняют бизнес</h3>
+
+            <p>Социальные сети меняют бизнес-коммуникации по четырём направлениям.</p>
+
+            <p><strong>От навязывания продаж к взаимодействию с аудиторией.</strong> Вместо монолога — диалог.</p>
+
+            <p><strong>От массовых коммуникаций к персонализированным контактам.</strong> Ориентированным на профессиональные интересы конкретных групп.</p>
+
+            <p><strong>От закрытых коммуникаций к прозрачным.</strong> Жизненный цикл информации в соцсетях гораздо короче, чем в традиционных коммуникациях.</p>
+
+            <p><strong>От ограниченной персональной доступности к широкой.</strong> Пример: сегодня гораздо проще обратиться к топ-менеджеру компании через LinkedIn. Если вы идёте традиционным путём — звоните по телефону с сайта, вас встретит секретарь, спросит суть предложения, скажет «шлите на info@», и неизвестно, кто и когда прочитает. А через соцсеть вы можете найти нужного менеджера напрямую, увидеть общих знакомых или общие сообщества, и он ответит вам — возможно, даже не в рабочие часы, со своего мобильного. Функция секретаря как фильтра выполняется самой социальной сетью.</p>
+
+            <h3>📌 Масштаб доверия в 2025</h3>
+
+            <p>Доверие рекомендациям инфлюенсеров достигло <span class="stat-inline">60%</span>. UGC конвертирует на <span class="stat-inline">28%</span> лучше брендированного контента. Средний ER в соцсетях — 1,5–3%. Доля обсерверов в аудитории — 60–70%. Влияние микро-инфлюенсеров (10–100 тыс. подписчиков) растёт на 40% — это самый эффективный сегмент для брендов.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали психологию пользователей и мотивацию в социальных сетях. Ключевые выводы:</p>
+
+            <ul>
+                <li>Пирамида Маслоу: LinkedIn — безопасность, Facebook — социальные связи, Twitter — уважение, блоги — самореализация.</li>
+                <li>Пять профилей поведения по Солису: карьерист, конверс, обсервер, бродкастер, авторитет.</li>
+                <li>Авторитеты — ключевая категория для продвижения бренда. Отдача максимальна.</li>
+                <li>Психология покупок: 81% спрашивают совет, 77% читают обзоры, 50% покупают по совету сообщества.</li>
+                <li>Соцсети меняют бизнес: от навязывания к взаимодействию, от массовых к персонализированным.</li>
+                <li>Доверие инфлюенсерам — 60%, UGC конвертирует на 28% лучше брендированного.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём принципы SMO и SMM. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Пирамида Маслоу</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Maslow's Hierarchy of Needs</div>
+                            <div class="gloss-def">Модель потребностей человека: физиология, безопасность, связи, уважение, самореализация</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Авторитет</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Authority</div>
+                            <div class="gloss-def">Профиль поведения: пользователь с мнением, аналитикой и влиянием на аудиторию</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Бродкастер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Broadcaster</div>
+                            <div class="gloss-def">Профиль поведения: публикует контент без анализа, по бинарному принципу</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Обсервер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Observer</div>
+                            <div class="gloss-def">Профиль поведения: только наблюдает, не высказывает мнение (60–70% аудитории)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Конверс</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Conversationalist</div>
+                            <div class="gloss-def">Профиль поведения: поддерживает беседу, активно комментирует</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Карьерист</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Careerist</div>
+                            <div class="gloss-def">Профиль поведения: строит карьеру через соцсети, копит социальный капитал</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ER</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Engagement Rate</div>
+                            <div class="gloss-def">Показатель вовлечённости — отношение реакций к охвату</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">UGC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">User-Generated Content</div>
+                            <div class="gloss-def">Пользовательский контент — генерируется самими пользователями</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Микро-инфлюенсер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Micro-influencer</div>
+                            <div class="gloss-def">Блогер с 10–100 тыс. подписчиков — самый эффективный сегмент</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Sentiment</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Sentiment Analysis</div>
+                            <div class="gloss-def">Анализ тональности высказываний: позитив, негатив, нейтрал</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🧠 Психология и мотивация</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Maslow A. H. (1943). A Theory of Human Motivation. — Psychological Review.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Solis B. Engage! The Complete Guide for Brands and Businesses to Build, Cultivate, and Measure Success in the New Web. — Wiley, 2010.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Solis B. What's the Future of Business? Changing the Way Businesses Create Experiences. — Wiley, 2013.</div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Доверие и покупки</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Nielsen: Global Trust in Advertising Survey 2025 — 60% доверяют инфлюенсерам. — <a href="https://www.nielsen.com" target="_blank">Nielsen.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Stackla: The Consumer Content Report 2025 — UGC конвертирует на 28% лучше. — <a href="https://stackla.com" target="_blank">Stackla.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Markerly: Instagram Engagement Report — микро-инфлюенсеры эффективнее на 40%. — <a href="https://markerly.com" target="_blank">Markerly.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">👥 Профили и типы</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Forrester Research: The Social Technographics Ladder. — <a href="https://www.forrester.com" target="_blank">Forrester.com</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Hootsuite: Social Media Trends 2025 — средний ER в соцсетях. — <a href="https://www.hootsuite.com" target="_blank">Hootsuite.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🇷🇺 Российский рынок</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Brand Analytics: Социальные сети в России — портреты пользователей. — <a href="https://br-analytics.ru" target="_blank">Br-Analytics.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Sostav.ru: Как бренды работают с авторитетами в соцсетях. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

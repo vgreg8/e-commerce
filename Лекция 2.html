@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 2. Что такое интернет-маркетинг</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0c1222; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #0c4a6e; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #0ea5e9; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* ============ HERO DEFINITION ============ */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #0c4a6e 0%, #0ea5e9 60%, #38bdf8 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* ============ DONUT CHART ============ */
+        .donut-card { display: flex; gap: 25px; align-items: center; background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 14px; padding: 20px 24px; }
+        .donut-chart { width: 160px; height: 160px; border-radius: 50%; position: relative; flex-shrink: 0;
+            background: conic-gradient(#0ea5e9 0deg 245deg, #f59e0b 245deg 320deg, #10b981 320deg 360deg); }
+        .donut-chart::after { content: ''; position: absolute; inset: 32px; background: #f0f9ff; border-radius: 50%; }
+        .donut-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .donut-center .donut-pct { font-size: 26px; font-weight: 900; color: #0c4a6e; }
+        .donut-center .donut-cap { font-size: 10px; color: #0c4a6e; text-transform: uppercase; letter-spacing: 0.5px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 10px; font-size: 12.5px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .donut-legend .legend-color { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+        .donut-legend .legend-text strong { color: #0c4a6e; }
+        .donut-legend .legend-text small { color: #64748b; display: block; font-size: 11px; }
+
+        /* ============ HORIZONTAL BAR: AI TOOLS ============ */
+        .hbar-card { background: #f5f3ff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 20px 24px; }
+        .hbar-card .hbar-title { font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+        .hbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+        .hbar-label { font-size: 12px; color: #1e293b; width: 140px; font-weight: 500; text-align: right; }
+        .hbar-track { flex: 1; background: #ede9fe; height: 20px; border-radius: 5px; overflow: hidden; position: relative; }
+        .hbar-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10.5px; font-weight: bold; color: white; }
+        .hbar-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+        .hbar-fill.indigo { background: linear-gradient(90deg, #4338ca, #6366f1); }
+        .hbar-fill.cyan { background: linear-gradient(90deg, #0e7490, #06b6d4); }
+
+        /* ============ FUNNEL ============ */
+        .funnel-card { background: #fef2f2; border: 2px solid #fecaca; border-radius: 14px; padding: 20px 24px; }
+        .funnel-card .funnel-title { font-size: 14px; font-weight: bold; color: #991b1b; margin-bottom: 12px; }
+        .funnel { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .funnel-step { color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .funnel-step .funnel-num { font-weight: 900; margin-right: 6px; }
+        .funnel-1 { width: 96%; background: #991b1b; }
+        .funnel-2 { width: 82%; background: #dc2626; }
+        .funnel-3 { width: 68%; background: #ef4444; }
+        .funnel-4 { width: 54%; background: #f87171; }
+        .funnel-5 { width: 40%; background: #fca5a5; color: #7f1d1d; }
+
+        /* ============ SPECIALIZATION GRID ============ */
+        .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .spec-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; transition: transform 0.15s, box-shadow 0.15s; }
+        .spec-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .spec-card .spec-icon { font-size: 22px; flex-shrink: 0; }
+        .spec-card .spec-body { flex: 1; }
+        .spec-card .spec-name { font-size: 12.5px; font-weight: bold; color: #0c4a6e; margin-bottom: 2px; }
+        .spec-card .spec-salary { font-size: 11px; color: #059669; font-weight: 700; }
+        .spec-card .spec-demand { font-size: 10.5px; color: #64748b; margin-top: 2px; }
+        .spec-card .spec-badge { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; }
+        .badge-hot { background: #e11d48; }
+        .badge-warm { background: #f59e0b; }
+
+        /* ============ TIMELINE ============ */
+        .timeline-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .timeline-card .tl-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 14px; }
+        .timeline-track { display: flex; justify-content: space-between; position: relative; padding: 0 10px; }
+        .timeline-track::before { content: ''; position: absolute; top: 20px; left: 0; width: 100%; height: 4px; background: #e2e8f0; z-index: 1; }
+        .tl-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22%; }
+        .tl-dot { width: 40px; height: 40px; border-radius: 50%; background: #0ea5e9; border: 4px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-bottom: 8px; }
+        .tl-item.active .tl-dot { background: #e11d48; transform: scale(1.15); box-shadow: 0 6px 12px rgba(225,29,72,0.3); }
+        .tl-year { font-size: 12px; font-weight: bold; color: #0f172a; }
+        .tl-label { font-size: 10.5px; color: #64748b; text-align: center; line-height: 1.3; }
+
+        /* ============ ВИДЕОПЛЕЕР ============ */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #0ea5e9; }
+        .rt-btn:hover { background: #0284c7; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ============ ТЕКСТ ЛЕКТОРА ============ */
+        .notes-header { font-size: 17px; color: #7dd3fc; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #7dd3fc; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #0c4a6e; color: #7dd3fc; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* ============ СЛОВАРЬ: СЕТКА-КАРТОЧКИ ============ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #0ea5e9; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #0ea5e9; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #7dd3fc; font-size: 13px; min-width: 65px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ============ ИСТОЧНИКИ: КАТЕГОРИИ ============ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #0ea5e9; color: #0c1222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #7dd3fc; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 2. Что такое интернет-маркетинг
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO: ОПРЕДЕЛЕНИЕ -->
+            <div class="hero-def">
+                <div class="hd-icon">🌐</div>
+                <div class="hd-body">
+                    <div class="hd-title">Интернет-маркетинг — это продвижение товаров и услуг онлайн</div>
+                    <div class="hd-text">Конечная цель — продажа товара, услуги или повышение узнаваемости компании. Основное отличие от классического маркетинга — возможность с помощью веб-аналитики отследить весь путь пользователя: от первого взаимодействия до продажи. <span style="opacity: 0.8;">(Elama.ru, 2025)</span></div>
+                    <div class="hd-quote">«Достижение маркетинговых целей через применение цифровых медиа, данных и технологий» — Dave Chaffey, Smart Insights, 2025</div>
+                </div>
+            </div>
+
+            <!-- DONUT: РЫНОК -->
+            <div class="donut-card">
+                <div class="donut-chart">
+                    <div class="donut-center">
+                        <div class="donut-pct">1,57</div>
+                        <div class="donut-cap">трлн ₽</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div style="font-size: 13px; font-weight: bold; color: #0c4a6e; margin-bottom: 4px;">Рынок интернет-рекламы и продвижения (2025)</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #0ea5e9;"></div>
+                        <div class="legend-text">
+                            <strong>eРитейл медиа — 68% (580 млрд ₽)</strong>
+                            <small>Реклама на маркетплейсах и в ритейл-медиа</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <div class="legend-text">
+                            <strong>Перформанс — 21% (471 млрд ₽)</strong>
+                            <small>Контекстная, таргетированная реклама</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <div class="legend-text">
+                            <strong>Брендинг и классифайды — 11%</strong>
+                            <small>Медийная реклама, объявления</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL BAR: AI TOOLS -->
+            <div class="hbar-card">
+                <div class="hbar-title">🤖 Внедрение AI-инструментов в маркетинг (2025)</div>
+                <div class="hbar-row">
+                    <div class="hbar-label">ChatGPT</div>
+                    <div class="hbar-track"><div class="hbar-fill violet" style="width: 91%;">91% CMO</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Midjourney</div>
+                    <div class="hbar-track"><div class="hbar-fill indigo" style="width: 59%;">59% CMO</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">YandexGPT / Kandinsky</div>
+                    <div class="hbar-track"><div class="hbar-fill cyan" style="width: 73%;">73% удовлетв.</div></div>
+                </div>
+                <div style="font-size: 11px; color: #4c1d95; margin-top: 8px;">93% маркетинговых команд используют генеративный ИИ в рабочих процессах. 41% — ежедневно. (RB.ru, 2025)</div>
+            </div>
+
+            <!-- FUNNEL: КОНВЕРСИЯ -->
+            <div class="funnel-card">
+                <div class="funnel-title">🔻 Воронка интернет-маркетинга (средние данные, 2025)</div>
+                <div class="funnel">
+                    <div class="funnel-step funnel-1"><span class="funnel-num">100%</span>Охват аудитории (показы рекламы)</div>
+                    <div class="funnel-step funnel-2"><span class="funnel-num">62%</span>Взаимодействие (клик, переход)</div>
+                    <div class="funnel-step funnel-3"><span class="funnel-num">28%</span>Интерес (просмотр, изучение)</div>
+                    <div class="funnel-step funnel-4"><span class="funnel-num">14%</span>Конверсия (заявка, корзина)</div>
+                    <div class="funnel-step funnel-5"><span class="funnel-num">11%</span>Продажа (оплата, получение)</div>
+                </div>
+            </div>
+
+            <!-- SPECIALIZATION GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">👥 Специализации и зарплаты (2025–2026)</div>
+                <div class="spec-grid">
+                    <div class="spec-card">
+                        <div class="spec-icon">🔍</div>
+                        <div class="spec-body">
+                            <div class="spec-name">SEO-специалист <span class="spec-badge badge-warm">растущий</span></div>
+                            <div class="spec-salary">70 000–200 000 ₽</div>
+                            <div class="spec-demand">Оптимизация, семантика, технический аудит</div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <div class="spec-icon">📱</div>
+                        <div class="spec-body">
+                            <div class="spec-name">SMM-менеджер <span class="spec-badge badge-hot">+16%</span></div>
+                            <div class="spec-salary">70 000–150 000 ₽</div>
+                            <div class="spec-demand">Контент, комьюнити, таргет</div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <div class="spec-icon">💰</div>
+                        <div class="spec-body">
+                            <div class="spec-name">Таргетолог / PPC <span class="spec-badge badge-warm">стабильный</span></div>
+                            <div class="spec-salary">70 000–150 000 ₽</div>
+                            <div class="spec-demand">Платная реклама в соцсетях и поиске</div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <div class="spec-icon">🧠</div>
+                        <div class="spec-body">
+                            <div class="spec-name">AI-стратег <span class="spec-badge badge-hot">новая роль</span></div>
+                            <div class="spec-salary">от 150 000 ₽</div>
+                            <div class="spec-demand">Стратегия ИИ, контроль качества контента</div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <div class="spec-icon">📊</div>
+                        <div class="spec-body">
+                            <div class="spec-name">Data-аналитик <span class="spec-badge badge-hot">растущий</span></div>
+                            <div class="spec-salary">от 120 000 ₽</div>
+                            <div class="spec-demand">Сквозная аналитика, дашборды, предиктив</div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <div class="spec-icon">📧</div>
+                        <div class="spec-body">
+                            <div class="spec-name">Email-маркетолог <span class="spec-badge badge-warm">стабильный</span></div>
+                            <div class="spec-salary">80 000–160 000 ₽</div>
+                            <div class="spec-demand">Рассылки, сегментация, автоматизация</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIMELINE -->
+            <div class="timeline-card">
+                <div class="tl-title">🕐 Эволюция интернет-маркетинга: ключевые вехи</div>
+                <div class="timeline-track">
+                    <div class="tl-item">
+                        <div class="tl-dot">🖼️</div>
+                        <div class="tl-year">1994</div>
+                        <div class="tl-label">Первый баннер<br>AT&T на HotWired</div>
+                    </div>
+                    <div class="tl-item">
+                        <div class="tl-dot">🔍</div>
+                        <div class="tl-year">2000</div>
+                        <div class="tl-label">Google AdWords<br>Революция PPC</div>
+                    </div>
+                    <div class="tl-item">
+                        <div class="tl-dot">📱</div>
+                        <div class="tl-year">2007–2010</div>
+                        <div class="tl-label">Мобильная эра<br>iPhone, Android</div>
+                    </div>
+                    <div class="tl-item active">
+                        <div class="tl-dot">🤖</div>
+                        <div class="tl-year">2023–2026</div>
+                        <div class="tl-label">ИИ-эра<br>GEO, генеративный поиск</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Что такое интернет-маркетинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Каналы продвижения</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Инструменты маркетинга</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 2 из 5
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0c1222; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e293b; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы заложили фундамент курса и познакомились с ключевыми метриками рынка. Сегодня мы детально разберём, что такое интернет-маркетинг, из чего он состоит, какие инструменты использует и какие специализации существуют в этой сфере.</p>
+
+            <div class="action-hint">Обратите внимание студентов на определение и цитату Дэйва Чаффи на слайде.</div>
+
+            <h3>📌 Определение интернет-маркетинга</h3>
+
+            <p>Начнём с терминологии. В широком смысле <strong>интернет-маркетинг</strong> — это продвижение товаров и услуг онлайн. Конечная цель — продажа товара, услуги или повышение узнаваемости компании. Его основное отличие от классического маркетинга — возможность с помощью веб-аналитики отследить весь путь пользователя: от первого взаимодействия до продажи. Онлайн-маркетинг позволяет точечно таргетироваться на каждого отдельного пользователя, в отличие от традиционных каналов вроде телевидения, где аудитория широка и недифференцирована.</p>
+
+            <p>Классическое определение Дэйва Чаффи, автора бестселлера «Digital Marketing: Strategy, Implementation and Practice», звучит так: «Достижение маркетинговых целей через применение цифровых медиа, данных и технологий». Обратите внимание: акцент делается на <em>цели</em>, а не на инструменты. Это принципиально важно — инструменты меняются, цели остаются.</p>
+
+            <p>Что входит в современный интернет-маркетинг: платная реклама (контекстная, таргетированная, медийная), SMM, инфлюенс-маркетинг, мессенджер-маркетинг, SEO-продвижение, email-маркетинг, веб-аналитика и контент-маркетинг.</p>
+
+            <h3>📌 Ключевые метрики рынка (2025)</h3>
+
+            <p>Объём российского рынка рекламы и продвижения в интернете по итогам 2025 года достиг <span class="stat-inline">1,57 трлн рублей</span>, увеличившись на 28% по сравнению с 2024 годом. Аудитория российского сегмента интернета составила 105 млн человек, доля россиян старше 12 лет, пользующихся интернетом — 86%.</p>
+
+            <p>Самым быстрорастущим сегментом стал <strong>eРитейл медиа</strong> — реклама на маркетплейсах и в ритейл-медиа. Его объём достиг 580 млрд руб., что на 58% больше, чем годом ранее. Этот сегмент уже превышает треть всего рынка интернет-рекламы.</p>
+
+            <p>Перформанс-реклама остаётся одним из крупнейших сегментов по объёму — 471,1 млрд руб., однако темпы роста здесь скромнее — всего 8%. Реклама в классифайдах выросла на 19% — до 226 млрд руб.</p>
+
+            <h3>📌 Внедрение AI-инструментов</h3>
+
+            <p>Один из ключевых трендов 2025 года — массовое внедрение генеративного искусственного интеллекта. По данным исследования Ассоциации директоров по маркетингу и компании red_mad_robot, уже <span class="stat-inline">93%</span> маркетинговых команд используют генеративный ИИ в рабочих процессах. Ежедневно им пользуются 41% специалистов — вдвое чаще, чем глобальные показатели (10–20%).</p>
+
+            <p>Главный рабочий инструмент — ChatGPT: им пользуются 91% CMO. Второй по популярности — Midjourney (59%). Локальные решения, такие как YandexGPT и Kandinsky, оцениваются сдержаннее — 71–75% удовлетворённости.</p>
+
+            <p>Эффект от использования нейросетей заметен: 77% директоров по маркетингу фиксируют рост скорости и качества контента, а 73% — ускорение процессов в целом. При этом 64% компаний выделяют на инициативы, связанные с GenAI, только 1–5% маркетингового бюджета.</p>
+
+            <h3>📌 Email-маркетинг: возвращение канала</h3>
+
+            <p>Email-маркетинг переживает ренессанс. За 2025 год бизнес отправил <span class="stat-inline">12,9 млрд</span> электронных писем против 9,3 млрд в 2023 году — рост почти на 40%. Средний open rate увеличился до 9,4%.</p>
+
+            <p>Наибольшие объёмы email-маркетинга в 2025 году пришлись на образование (2,6 млрд писем), электронную коммерцию (1,7 млрд), ретейл (1,6 млрд), IT (1,4 млрд) и маркетинг (1,2 млрд).</p>
+
+            <p>Одна из причин роста email-канала — нестабильность работы мессенджеров. Бизнес возвращается к email как к надёжному каналу коммуникации.</p>
+
+            <h3>📌 Специализации и зарплаты (2025–2026)</h3>
+
+            <p>Структура рынка труда в digital меняется. Раньше специалист отвечал за конкретный канал — ведение соцсетей, настройку таргета, написание статей. Сейчас рынок требует другого подхода: нужны не исполнители отдельных задач, а стратеги, которые управляют всем циклом от идеи до результата.</p>
+
+            <p>Наиболее востребованные специализации:</p>
+
+            <ul>
+                <li><strong>SEO-специалист:</strong> 70 000–200 000 ₽. SEO-рынок остаётся стабильным: в 2025 году сегмент вырос на 6,77%.</li>
+                <li><strong>SMM-менеджер:</strong> 70 000–150 000 ₽. SMM — один из устойчивых сегментов: суммарные обороты выросли на 16%.</li>
+                <li><strong>Таргетолог / PPC-специалист:</strong> 70 000–150 000 ₽. Таргетированная реклама сократилась на 12,26%, контекстная — на 5,44%.</li>
+                <li><strong>Data-аналитик:</strong> от 120 000 ₽. Аналитика — единственная растущая категория замены martech-инструментов.</li>
+                <li><strong>AI-стратег:</strong> от 150 000 ₽. Новая роль, которая формирует стратегию использования ИИ, контролирует качество контента и следит за репутационными рисками.</li>
+            </ul>
+
+            <p>Интересно, что в маркетинговых коммуникациях быстрее всего рос PR: плюс 31,52% за год. CRM-маркетинг прибавил 24,99%, SMM — 11,23%, стратегический маркетинг — 9,55%.</p>
+
+            <h3>📌 Монетизация в интернет-маркетинге</h3>
+
+            <p>Существует несколько моделей монетизации. При наличии собственного товара — продажа физических продуктов, продажа себя как фрилансера или эксперта, продвижение информационных продуктов. Без собственного товара — реклама и продвижение чужого продукта, аффилированный (партнёрский) маркетинг, получение пожертвований.</p>
+
+            <p>Аффилированный маркетинг переживает бум: мировая индустрия достигла примерно 17 млрд долларов к концу 2025 года. Краудфандинг в России: инвестиционные платформы выдали 23,66 млрд рублей в 2025 году.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы детально разобрали, что такое интернет-маркетинг, как он устроен, какие инструменты использует и какие специализации существуют в этой сфере. Запомните главное: интернет-маркетинг — это управляемая экосистема, а не набор разрозненных инструментов. Рынок продолжает расти, но темпы замедляются — это переход от экстенсивного роста к интенсивному, где качество данных и персонализация становятся решающими.</p>
+
+            <p>На следующей лекции мы проследим эволюцию представлений об интернет-маркетинге — от первых баннеров до эпохи искусственного интеллекта. Спасибо за внимание!</p>
+
+            <!-- ============ СЛОВАРЬ ============ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">A/B-тест</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">A/B Testing (Split Testing)</div>
+                            <div class="gloss-def">Сравнительный тест двух версий страницы или объявления для определения более эффективной</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AI / ИИ</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Artificial Intelligence / Искусственный интеллект</div>
+                            <div class="gloss-def">Технологии, позволяющие машинам выполнять задачи, требующие человеческого интеллекта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">API</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Application Programming Interface</div>
+                            <div class="gloss-def">Интерфейс программирования приложений</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CMS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Content Management System</div>
+                            <div class="gloss-def">Система управления контентом сайта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CRM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Customer Relationship Management</div>
+                            <div class="gloss-def">Система управления взаимоотношениями с клиентами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GA4</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Google Analytics 4</div>
+                            <div class="gloss-def">Платформа веб-аналитики от Google</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Generative Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация для генеративных поисковых систем и нейросетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">KPI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Key Performance Indicator</div>
+                            <div class="gloss-def">Ключевой показатель эффективности</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PPC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Pay-Per-Click</div>
+                            <div class="gloss-def">Модель оплаты рекламы за клик</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Investment</div>
+                            <div class="gloss-def">Возврат инвестиций</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Social Media Marketing</div>
+                            <div class="gloss-def">Маркетинг в социальных сетях</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">UX/UI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">User Experience / User Interface</div>
+                            <div class="gloss-def">Пользовательский опыт / интерфейс</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ ИСТОЧНИКИ ============ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок интернет-маркетинга</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">АРИР: российский рынок рекламы и продвижения в интернете в 2025 году вырос на 28% — до 1,569 трлн руб. — <a href="https://interactivead.ru/products/arir-obem-rossijskogo-rynka-reklamy-i-prodvizheniya-v-internete-v-2025-godu-vyros-na-28-do-1569-trln-rublej/" target="_blank">InteractiveAd.ru</a> <span class="src-date">09.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">РАЭК: объём экономики Рунета в 2025 году вырос на 28,1% — до 38,4 трлн руб. — <a href="https://www.sostav.ru/publication/sektor-reklamy-i-prodvizheniya-v-runete-vyros-v-2025-godu-bolee-chem-na-27-83468.html" target="_blank">Sostav.ru</a> <span class="src-date">28.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">«Рейтинг Рунета»: затраты бизнеса и государства на digital-услуги выросли на 8,7% — до 464,1 млрд руб. — <a href="https://www.likeni.ru/events/zatraty-biznesa-i-gosudarstva-na-digital-uslugi-vyrosli-na-8-7-reyting-runeta/" target="_blank">Likeni.ru</a> <span class="src-date">04.09.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Определение и структура</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Dave Chaffey, Smart Insights. «What is digital marketing? 2025 edition». — <a href="https://www.smartinsights.com/digital-marketing-strategy/what-is-digital-marketing/" target="_blank">SmartInsights.com</a> <span class="src-date">10.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Elama.ru: «Интернет-маркетинг: что это такое». — <a href="https://elama.ru/blog/internet-marketing-osnovy/" target="_blank">Elama.ru</a> <span class="src-date">01.11.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 AI-инструменты</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">RB.ru: 93% команд в маркетинге используют ИИ. — <a href="https://rb.ru/news/93-komand-v-marketinge-ispolzuyut-ii-nejroseti-pomogayut-s-kontentom-no-im-pochti-ne-doveryayut-strategiyu-i-byudzhety/" target="_blank">RB.ru</a> <span class="src-date">03.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">MarTech Replacement Survey 2025: AI emerges as a major factor. — <a href="https://martech.org/wp-content/uploads/2026/03/MT_replacement_survey_2025_031126.pdf" target="_blank">MarTech.org</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📧 Email-маркетинг</div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">AdIndex: объём отправленных по email писем вырос почти на 40% за 3 года. — <a href="https://adindex.ru/news/tendencies/2026/03/19/343383.phtml" target="_blank">AdIndex.ru</a> <span class="src-date">19.03.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">ComNews: электронная почта стала главным каналом связи компаний с аудиторией. — <a href="https://www.comnews.ru" target="_blank">ComNews.ru</a> <span class="src-date">06.05.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">👥 Специализации</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Checkroi.ru: Digital-специалист: кто это и сколько платят в 2026. — <a href="https://checkroi.ru" target="_blank">Checkroi.ru</a> <span class="src-date">11.07.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Likeni.ru: Новые роли в digital: какие специалисты будут нужны в 2026–2027 году. — <a href="https://www.likeni.ru/analytics/novye-roli-v-digital-kakie-spetsialisty-budut-nuzhny-v-2026-2027-godu/" target="_blank">Likeni.ru</a> <span class="src-date">12.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">SMM оказался одним из устойчивых сегментов российского digital-рынка. — <a href="https://www.likeni.ru/events/smm-okazalsya-odnim-iz-ustoychivyh-segmentov-rossiyskogo-digital-rynka-sumarnye-oboroty-vyrosli-na-16/" target="_blank">Likeni.ru</a> <span class="src-date">19.08.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤝 Монетизация</div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">РБК: как облачные платформы меняют рынок партнёрского маркетинга. — <a href="https://www.rbc.ru/industries/news/6852b14f9a794724ecb9e8a7" target="_blank">RBC.ru</a> <span class="src-date">23.06.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">Kommersant: инвестиции встали на платформу (рынок краудфандинга). — <a href="https://www.kommersant.ru/doc/8420908" target="_blank">Kommersant.ru</a> <span class="src-date">10.02.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 3. Эволюция представлений об интернет-маркетинге</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a0a2e; color: #e9d5ff; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #4a1d96; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #a855f7; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* ============ HERO ============ */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #4a1d96 0%, #7c3aed 50%, #a855f7 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* ============ ГОРИЗОНТАЛЬНЫЙ ТАЙМЛАЙН ЭПОХ ============ */
+        .era-timeline { background: #faf5ff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 22px 26px; }
+        .era-timeline .era-title { font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 16px; }
+        .era-track { display: flex; gap: 0; align-items: stretch; position: relative; }
+        .era-track::before { content: ''; position: absolute; top: 36px; left: 0; right: 0; height: 4px; background: #ddd6fe; z-index: 1; }
+        .era-item { flex: 1; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; padding: 0 6px; }
+        .era-badge { width: 72px; height: 72px; border-radius: 50%; background: white; border: 4px solid #a855f7; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.15); margin-bottom: 10px; }
+        .era-badge .era-icon { font-size: 22px; line-height: 1; }
+        .era-badge .era-year { font-size: 9.5px; font-weight: 900; color: #7c3aed; margin-top: 2px; }
+        .era-item .era-label { font-size: 11px; font-weight: bold; color: #4a1d96; text-align: center; line-height: 1.25; }
+        .era-item .era-sub { font-size: 9.5px; color: #64748b; text-align: center; margin-top: 3px; line-height: 1.25; }
+        .era-item.active .era-badge { border-color: #e11d48; box-shadow: 0 6px 14px rgba(225, 29, 72, 0.25); }
+        .era-item.active .era-label { color: #be123c; }
+
+        /* ============ COMPARE GRID ============ */
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .compare-card { border-radius: 12px; padding: 18px; }
+        .compare-card.online { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 2px solid #7dd3fc; }
+        .compare-card.offline { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #fcd34d; }
+        .compare-card h5 { font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .compare-card ul { margin: 0 0 0 16px; font-size: 12px; line-height: 1.55; color: #334155; }
+        .compare-card li { margin-bottom: 5px; }
+        .compare-card .metric { font-weight: 900; color: #0c4a6e; }
+        .compare-card.offline .metric { color: #92400e; }
+
+        /* ============ SVG CHART: SEO → GEO ============ */
+        .chart-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ============ RADIAL PERCENT ============ */
+        .radial-row { display: flex; gap: 20px; justify-content: space-between; }
+        .radial-item { flex: 1; text-align: center; background: #faf5ff; border: 2px solid #ddd6fe; border-radius: 12px; padding: 14px 10px; }
+        .radial-circle { width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .radial-circle .radial-inner { width: 66px; height: 66px; background: #faf5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .radial-circle .radial-val { font-size: 18px; font-weight: 900; color: #4a1d96; line-height: 1; }
+        .radial-circle .radial-cap { font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+        .radial-label { font-size: 11px; font-weight: bold; color: #4a1d96; line-height: 1.3; }
+
+        /* ============ METRICS TABLE ============ */
+        .metrics-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .metrics-card .metrics-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 12px; }
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .metrics-table th { background: #4a1d96; color: white; padding: 9px 11px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 11px; border-bottom: 1px solid #e2e8f0; color: #1e293b; }
+        .metrics-table tr:nth-child(even) td { background: #f8fafc; }
+        .metrics-table .up { color: #059669; font-weight: bold; }
+        .metrics-table .down { color: #e11d48; font-weight: bold; }
+
+        /* ============ ВИДЕОПЛЕЕР ============ */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #a855f7; }
+        .rt-btn:hover { background: #9333ea; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ============ ТЕКСТ ЛЕКТОРА ============ */
+        .notes-header { font-size: 17px; color: #c4b5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3b1f6e; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e9d5ff; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #c4b5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #3b1f6e; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #2a1a4e; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #4a1d96; color: #c4b5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* ============ СЛОВАРЬ: СЕТКА-КАРТОЧКИ ============ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #a855f7; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #2a1a4e; border-left: 3px solid #a855f7; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #3b1f6e; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #c4b5fd; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ============ ИСТОЧНИКИ: КАТЕГОРИИ ============ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #2a1a4e; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #a855f7; color: #1a0a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #c4b5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 3. Эволюция представлений об интернет-маркетинге
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO: ЭВОЛЮЦИЯ -->
+            <div class="hero-def">
+                <div class="hd-icon">🧬</div>
+                <div class="hd-body">
+                    <div class="hd-title">Четыре эпохи цифрового маркетинга: от веб-инфраструктуры до ИИ-опосредованного маркетинга</div>
+                    <div class="hd-text">За два десятилетия цифровой маркетинг прошёл путь от базовых email-рассылок и статических сайтов до сложных, управляемых данными стратегий. Сегодня мы разберём, как менялись представления об интернет-маркетинге и что это значит для бизнеса.</div>
+                    <div class="hd-quote">«С 2025 года каналы привлечения смещаются в сторону генеративной выдачи, цифровой репутации и персонализированных креативов» — Ашманов и партнёры, 2026</div>
+                </div>
+            </div>
+
+            <!-- ТАЙМЛАЙН ЭПОХ -->
+            <div class="era-timeline">
+                <div class="era-title">🕐 Четыре перекрывающиеся эпохи цифрового маркетинга (Hotoi, 2026)</div>
+                <div class="era-track">
+                    <div class="era-item">
+                        <div class="era-badge"><div class="era-icon">🌐</div><div class="era-year">2010–2013</div></div>
+                        <div class="era-label">Веб-инфраструктура</div>
+                        <div class="era-sub">Сайты, email, базовые инструменты аналитики</div>
+                    </div>
+                    <div class="era-item">
+                        <div class="era-badge"><div class="era-icon">📊</div><div class="era-year">2013–2017</div></div>
+                        <div class="era-label">Социальная аналитика</div>
+                        <div class="era-sub">Мониторинг, поисковый ИИ, изучение онлайн-влияния</div>
+                    </div>
+                    <div class="era-item">
+                        <div class="era-badge"><div class="era-icon">⚙️</div><div class="era-year">2018–2022</div></div>
+                        <div class="era-label">Зрелость и пандемия</div>
+                        <div class="era-sub">Алгоритмическая доставка рекламы, трансформация потребителей</div>
+                    </div>
+                    <div class="era-item active">
+                        <div class="era-badge"><div class="era-icon">🤖</div><div class="era-year">2023–2026</div></div>
+                        <div class="era-label">ИИ-опосредованный маркетинг</div>
+                        <div class="era-sub">Генеративный ИИ, алгоритмические кампании, потеря сигналов</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СРАВНЕНИЕ ОНЛАЙН / ОФЛАЙН -->
+            <div class="compare-grid">
+                <div class="compare-card online">
+                    <h5>💻 Онлайн-маркетинг</h5>
+                    <ul>
+                        <li><span class="metric">46%</span> МСП окупают вложения за 3 месяца</li>
+                        <li><span class="metric">63%</span> предпринимателей: запуск дешевле, чем ожидали</li>
+                        <li><span class="metric">30%</span> считают интернет-рекламу дешевле офлайн</li>
+                        <li>Точный таргетинг, измеримость, персонализация</li>
+                        <li>Результаты в реальном времени</li>
+                    </ul>
+                </div>
+                <div class="compare-card offline">
+                    <h5>🏢 Офлайн-маркетинг</h5>
+                    <ul>
+                        <li>Построение доверия и кредибельности</li>
+                        <li>Эмоциональная связь через личный контакт</li>
+                        <li>Широкий охват и сильное локальное присутствие</li>
+                        <li>Долгосрочное укрепление бренда</li>
+                        <li>Ограниченная таргетированность и измеримость</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SVG CHART: SEO → GEO -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Переход от SEO к GEO: рост AI-поиска <span>2025 → 2026</span></div>
+                <svg viewBox="0 0 600 160" style="width: 100%; height: auto;">
+                    <line x1="50" y1="20" x2="50" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="130" x2="580" y2="130" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="90" x2="580" y2="90" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="50" x2="580" y2="50" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <polygon points="90,115 200,100 310,82 420,62 530,40 530,130 90,130"
+                             fill="url(#grad-geo)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="grad-geo" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#a855f7"/>
+                            <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <polyline points="90,115 200,100 310,82 420,62 530,40"
+                              fill="none" stroke="#a855f7" stroke-width="3" stroke-linejoin="round"/>
+
+                    <circle cx="90" cy="115" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="200" cy="100" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="310" cy="82" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="420" cy="62" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="530" cy="40" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <text x="90" y="108" font-size="9" fill="#4a1d96" text-anchor="middle" font-weight="bold">15,6</text>
+                    <text x="200" y="93" font-size="9" fill="#4a1d96" text-anchor="middle" font-weight="bold">17,2</text>
+                    <text x="310" y="75" font-size="9" fill="#4a1d96" text-anchor="middle" font-weight="bold">19,5</text>
+                    <text x="420" y="55" font-size="9" fill="#4a1d96" text-anchor="middle" font-weight="bold">23,4</text>
+                    <text x="530" y="33" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">27,4</text>
+
+                    <text x="90" y="145" font-size="10" fill="#475569" text-anchor="middle">Q1 2025</text>
+                    <text x="200" y="145" font-size="10" fill="#475569" text-anchor="middle">Q2 2025</text>
+                    <text x="310" y="145" font-size="10" fill="#475569" text-anchor="middle">Q3 2025</text>
+                    <text x="420" y="145" font-size="10" fill="#475569" text-anchor="middle">Q4 2025</text>
+                    <text x="530" y="145" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">Q1 2026</text>
+
+                    <text x="555" y="45" font-size="10" fill="#e11d48" text-anchor="end" font-weight="bold">+42,8%</text>
+                    <text x="555" y="58" font-size="9" fill="#64748b" text-anchor="end">млрд визитов</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">AI-поиск: 15,6 млрд визитов (Q1 2025) → 27,4 млрд (Q1 2026). Google: +2,4%. Semrush: AI-поиск обгонит традиционный к 2028 году.</div>
+            </div>
+
+            <!-- RADIAL PERCENT: ПЕРСОНАЛИЗАЦИЯ -->
+            <div class="radial-row">
+                <div class="radial-item">
+                    <div class="radial-circle" style="background: conic-gradient(#a855f7 0deg 226deg, #e9d5ff 226deg 360deg);">
+                        <div class="radial-inner">
+                            <div class="radial-val">63%</div>
+                            <div class="radial-cap">CMO</div>
+                        </div>
+                    </div>
+                    <div class="radial-label">Инвестируют в персонализацию</div>
+                </div>
+                <div class="radial-item">
+                    <div class="radial-circle" style="background: conic-gradient(#a855f7 0deg 162deg, #e9d5ff 162deg 360deg);">
+                        <div class="radial-inner">
+                            <div class="radial-val">45%</div>
+                            <div class="radial-cap">shoppers</div>
+                        </div>
+                    </div>
+                    <div class="radial-label">Ищут персонализированный опыт</div>
+                </div>
+                <div class="radial-item">
+                    <div class="radial-circle" style="background: conic-gradient(#e11d48 0deg 191deg, #e9d5ff 191deg 360deg);">
+                        <div class="radial-inner">
+                            <div class="radial-val">53%</div>
+                            <div class="radial-cap">негатив</div>
+                        </div>
+                    </div>
+                    <div class="radial-label">Негативный опыт персонализации</div>
+                </div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div class="metrics-card">
+                <div class="metrics-title">📊 Ключевые метрики эволюции (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Рынок рекламы и продвижения в интернете</td>
+                            <td><strong>1,57 трлн ₽</strong></td>
+                            <td class="up">+28%</td>
+                            <td>АРИР</td>
+                        </tr>
+                        <tr>
+                            <td>eРитейл медиа</td>
+                            <td>580 млрд ₽</td>
+                            <td class="up">+58%</td>
+                            <td>АРИР</td>
+                        </tr>
+                        <tr>
+                            <td>Онлайн-реклама (ЕРИР)</td>
+                            <td>691 млрд ₽</td>
+                            <td class="down">–19,5%</td>
+                            <td>ЕРИР</td>
+                        </tr>
+                        <tr>
+                            <td>Перформанс-реклама</td>
+                            <td>471,1 млрд ₽</td>
+                            <td class="up">+8%</td>
+                            <td>АРИР</td>
+                        </tr>
+                        <tr>
+                            <td>AI-поиск (Q1 2026)</td>
+                            <td>27,4 млрд визитов</td>
+                            <td class="up">+42,8%</td>
+                            <td>Wix AI Search Lab</td>
+                        </tr>
+                        <tr>
+                            <td>Запросы без клика (Zero-Click)</td>
+                            <td><strong>58%</strong></td>
+                            <td class="up">растёт</td>
+                            <td>Zenodo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: История интернет-маркетинга</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Онлайн vs офлайн</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Эпоха ИИ в маркетинге</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 3 из 5
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a0a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #3b1f6e; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлых лекциях мы разобрали, что такое интернет-маркетинг и из чего он состоит. Сегодня мы проследим, как менялись представления об интернет-маркетинге — от первых баннеров до эпохи искусственного интеллекта.</p>
+
+            <div class="action-hint">Обратите внимание студентов на таймлайн четырёх эпох на слайде.</div>
+
+            <h3>📌 Четыре эпохи цифрового маркетинга</h3>
+
+            <p>Согласно академическому обзору, опубликованному в 2026 году, эволюция цифрового маркетинга прошла через четыре перекрывающиеся эпохи:</p>
+
+            <ul>
+                <li><strong>Эпоха веб-инфраструктуры (начало 2010-х):</strong> формирование операционных основ цифрового маркетинга — сайты, email, базовые инструменты аналитики.</li>
+                <li><strong>Эпоха социальной аналитики (середина 2010-х):</strong> мониторинг, поисковый ИИ, систематическое изучение онлайн-влияния потребителей.</li>
+                <li><strong>Эпоха зрелости и пандемии (конец 2010-х — 2022):</strong> алгоритмическая доставка рекламы становится операционным стандартом, поведение потребителей существенно трансформируется.</li>
+                <li><strong>Эпоха ИИ-опосредованного маркетинга (2023–2026):</strong> генеративный ИИ, полностью алгоритмические типы кампаний и потеря сигналов из-за политики конфиденциальности переопределили условия цифровой рекламы.</li>
+            </ul>
+
+            <p>Исследования показывают, что научный интерес к цифровому маркетингу растёт экспоненциально с 2014 года — это отражает реакцию отрасли на мобильные экосистемы, социальные сети и большие данные. Согласно другому исследованию, эволюция стратегий цифрового маркетинга прошла три фазы: ускорение после пандемии, консолидация на основе больших данных и трансформация на основе искусственного интеллекта с гиперперсонализацией.</p>
+
+            <div class="action-hint">Перейдите к сравнению онлайн- и офлайн-маркетинга.</div>
+
+            <h3>📌 Онлайн vs офлайн: сравнительный анализ</h3>
+
+            <p>Сравнительные исследования показывают, что онлайн-стратегии продвижения предлагают превосходные преимущества по охвату рынка, скорости, интерактивности и персонализации. Офлайн-стратегии сохраняют значимость для построения потребительского доверия, кредибельности и эмоциональной связи через личные взаимодействия.</p>
+
+            <p>Данные по малому и среднему бизнесу (МСП) показывают: <span class="stat-inline">46%</span> представителей МСП окупают вложения в онлайн-рекламу в течение трёх месяцев. По словам <span class="stat-inline">63%</span> предпринимателей, на практике запустить интернет-кампанию оказалось дешевле, чем они думали. При этом 30% считают, что интернет-реклама дешевле офлайн-рекламы, 14% — что дешевле офлайн, и ещё 14% не увидели разницы.</p>
+
+            <p>Интеграция онлайн- и офлайн-стратегий даёт оптимальную промо-эффективность, объединяя цифровую масштабируемость с реляционной аутентичностью. Гибридные модели поддерживают цифровую трансформацию МСП и укрепляют потребительские отношения.</p>
+
+            <div class="action-hint">Обратите внимание студентов на SVG-график роста AI-поиска.</div>
+
+            <h3>📌 Переход от SEO к GEO</h3>
+
+            <p>Один из ключевых трендов 2025–2026 годов — переход от традиционной поисковой оптимизации (SEO) к оптимизации для генеративных поисковых систем (GEO — Generative Engine Optimization). GEO — это практика создания цифрового контента, который появляется в ответах генеративных ИИ-систем.</p>
+
+            <p>Цифры впечатляют. AI-поиск вырос на <span class="stat-inline">42,8%</span> год к году — с 15,6 млрд визитов в Q1 2025 до 27,4 млрд в Q1 2026. Для сравнения: Google Search вырос всего на 2,4%. Semrush прогнозирует, что AI-поиск обгонит традиционный к 2028 году.</p>
+
+            <p>Более <span class="stat-inline">58%</span> поисковых запросов заканчиваются без клика на сайт. Согласно отчёту Conductor, AEO/GEO — оптимизация для ответных и генеративных систем — стала главным стратегическим приоритетом для 2026 года. Традиционный SEO остаётся техническим фундаментом: crawlability, здоровье сайта, внутренняя перелинковка и качество контента критически важны. Без этой основы GEO-усилия не масштабируются.</p>
+
+            <p>Что меняется: фокус смещается с оптимизации под ранжирование на оптимизацию под видимость и влияние в поисковых и ответных системах. Успех всё чаще измеряется цитированиями и долей в AI-сгенерированных ответах, а не только сессиями.</p>
+
+            <div class="action-hint">Перейдите к разбору радиальной диаграммы персонализации.</div>
+
+            <h3>📌 Персонализация: двойственный тренд</h3>
+
+            <p>Персонализация стала ключевым направлением инвестиций, но с важными нюансами. По данным Gartner, в 2025 году <span class="stat-inline">64%</span> директоров по маркетингу планировали увеличить инвестиции в персонализацию цифровых коммерческих точек контакта. Расходы на персонализацию выросли с 19,3% маркетингового бюджета в 2024 году до <span class="stat-inline">25,9%</span> в 2025 году.</p>
+
+            <p>Рынок персонализационных движков в 2024 году вырос на 26,1% и достиг $1,2 млрд. При этом <span class="stat-inline">45%</span> онлайн-покупателей активно ищут бренды, предлагающие персонализированный цифровой опыт.</p>
+
+            <p>Однако есть и обратная сторона. Согласно исследованию Gartner, персонализированный маркетинг генерирует негативный опыт для <span class="stat-inline">53%</span> потребителей. Такие покупатели в 3,2 раза чаще сожалеют о покупке и на 44% реже совершают повторные покупки. Более 60% американских потребителей скорее откажутся от персонализированного опыта, чем позволят отслеживать свои цифровые привычки.</p>
+
+            <p>Это создаёт вызов: компаниям, которые тратят больше бюджета на обучение персонализации, чем на технологии, в 1,7 раза чаще удаётся превысить свои цели.</p>
+
+            <h3>📌 Ключевые метрики рынка (2025)</h3>
+
+            <p>По итогам 2025 года объём российского рынка рекламы и продвижения в интернете достиг <span class="stat-inline">1,57 трлн рублей</span>, увеличившись на 28% по сравнению с 2024 годом. Однако темпы роста замедлились: в 2024 году динамика составляла 53%.</p>
+
+            <p>Самым быстрорастущим сегментом стал <strong>eРитейл медиа</strong> — реклама на маркетплейсах и в ритейл-медиа. Его объём достиг 580 млрд руб., что на 58% больше, чем годом ранее. Этот сегмент уже превышает треть всего рынка интернет-рекламы.</p>
+
+            <p>По данным Единого реестра интернет-рекламы (ЕРИР), сегмент онлайн-рекламы в 2025 году составил 691 млрд руб., что на 19,5% меньше, чем годом ранее. Это расхождение связано с регуляторными изменениями и переклассификацией ряда инструментов продвижения.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы проследили эволюцию представлений об интернет-маркетинге — от первых баннеров 1994 года до эпохи генеративного ИИ. Ключевые выводы:</p>
+
+            <ul>
+                <li>Цифровой маркетинг прошёл четыре эпохи: веб-инфраструктура → социальная аналитика → зрелость и пандемия → ИИ-опосредованный маркетинг.</li>
+                <li>Онлайн-маркетинг превосходит офлайн по охвату, скорости, измеримости и экономической эффективности, но офлайн сохраняет значимость для построения доверия.</li>
+                <li>Переход от SEO к GEO — фундаментальный сдвиг 2025–2026 годов, вызванный ростом генеративных поисковых систем.</li>
+                <li>Персонализация становится ключевым направлением инвестиций, но сталкивается с растущей потребительской озабоченностью о приватности.</li>
+            </ul>
+
+            <p>На следующей лекции мы детально разберём эволюцию электронной коммерции. Спасибо за внимание!</p>
+
+            <!-- ============ СЛОВАРЬ ============ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">A/B-тест</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">A/B Testing (Split Testing)</div>
+                            <div class="gloss-def">Сравнительный тест двух версий страницы или объявления</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Answer Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация контента для ответных систем и ИИ-ассистентов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AI / ИИ</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Artificial Intelligence / Искусственный интеллект</div>
+                            <div class="gloss-def">Технологии, позволяющие машинам выполнять задачи, требующие человеческого интеллекта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CMO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Chief Marketing Officer</div>
+                            <div class="gloss-def">Директор по маркетингу — высшее должностное лицо, отвечающее за маркетинговую стратегию</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Generative Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация для генеративных поисковых систем и нейросетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">KPI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Key Performance Indicator</div>
+                            <div class="gloss-def">Ключевой показатель эффективности</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">МСП</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Малое и среднее предпринимательство</div>
+                            <div class="gloss-def">Категория бизнеса с ограниченной численностью сотрудников и выручкой</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Social Media Marketing</div>
+                            <div class="gloss-def">Маркетинг в социальных сетях</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ЕРИР</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Единый реестр интернет-рекламы</div>
+                            <div class="gloss-def">Государственная система учёта интернет-рекламы в России</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">LTV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Lifetime Value</div>
+                            <div class="gloss-def">Совокупная прибыль, которую клиент приносит за всё время взаимодействия</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ ИСТОЧНИКИ ============ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Эволюция цифрового маркетинга</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Hotoi, A. Two Decades of Digital Marketing Research: From Web-Based Consumer Influence to AI-Mediated Marketing Decisions. — <a href="https://ideas.repec.org/a/but/manage/v43y2026i1p131-140.html" target="_blank">IDEAS/RePEc</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Garuda: эволюция стратегий цифрового маркетинга — три фазы. — <a href="https://garuda.kemdiktisaintek.go.id" target="_blank">Garuda</a> <span class="src-date">14.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Zenodo: An emerging future for digital marketing. — <a href="https://zenodo.org" target="_blank">Zenodo.org</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚖️ Онлайн vs офлайн</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Comparative Effectiveness of Online and Offline Promotional Strategies for MSMEs. — <a href="https://zenodo.org/records/18136324" target="_blank">Zenodo.org</a> <span class="src-date">31.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">НАФИ: 46% представителей МСП окупают вложения в онлайн-рекламу за три месяца. — <a href="https://nafi.ru" target="_blank">NAFI.ru</a> <span class="src-date">26.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Sostav.ru: В чём разница между офлайн и digital-маркетингом. — <a href="https://www.sostav.ru/blogs2/271225/58702" target="_blank">Sostav.ru</a> <span class="src-date">26.03.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🔍 Переход от SEO к GEO</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Conductor: The State of AEO/GEO in 2026: CMO Investment Report. — <a href="https://www.conductor.com/academy/state-of-aeo-geo-report/" target="_blank">Conductor.com</a> <span class="src-date">28.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Contently: GEO vs Traditional SEO: What Changes for Marketers in 2026. — <a href="https://contently.com/2026/02/11/geo-vs-traditional-seo/" target="_blank">Contently.com</a> <span class="src-date">11.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Wix AI Search Lab: AI search visits grew 42.8% year over year. — <a href="https://www.wix.com/studio/ai-search-lab/research/ai-search-vs-google" target="_blank">Wix.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Sostav.ru: От SEO к GEO — как изменились алгоритмы поиска к 2026 году. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Персонализация</div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Gartner: Magic Quadrant for Personalization Engines. — <a href="https://www.gartner.com/doc/reprints?id=1-2MSTEYQR&ct=260202&st=sb" target="_blank">Gartner.com</a> <span class="src-date">03.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Gartner: Personalization Can Triple the Likelihood of Customer Regret. — <a href="https://www.gartner.com/en/newsroom/press-releases/2025-06-03-gartner-survey-reveals-personalization-can-triple-the-likelihood-of-customer-regret-at-key-journey-points" target="_blank">Gartner.com</a> <span class="src-date">03.06.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">Contentstack: Personalization Report Fall 2025. — <a href="https://www.contentstack.com" target="_blank">Contentstack.com</a> <span class="src-date">01.11.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок и метрики (2025)</div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">АРИР: российский рынок рекламы и продвижения в интернете в 2025 году вырос на 28% — до 1,569 трлн руб. — <a href="https://interactivead.ru/news/arir-obem-rossijskogo-rynka-reklamy-i-prodvizheniya-v-internete-v-2025-godu-vyros-na-28-do-1569-trln-rublej/" target="_blank">InteractiveAd.ru</a> <span class="src-date">09.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">15</div>
+                        <div class="source-body">РГ: Единый реестр интернет-рекламы избавил рынок от серых схем. — <a href="https://rg.ru" target="_blank">RG.ru</a> <span class="src-date">13.07.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">16</div>
+                        <div class="source-body">РАЭК: темпы роста рынка интернет-рекламы снизились с 53% в 2024 до 28% в 2025. — <a href="https://www.kommersant.ru" target="_blank">Kommersant.ru</a> <span class="src-date">23.04.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🧠 Тренды 2026</div>
+                    <div class="source-item">
+                        <div class="source-num">17</div>
+                        <div class="source-body">Ашманов и партнёры: 10 трендов digital-маркетинга в 2026 году. — <a href="https://www.ashmanov.com/education/articles/10-trendov-digital-marketinga-v-2026-godu/" target="_blank">Ashmanov.com</a> <span class="src-date">09.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">18</div>
+                        <div class="source-body">Sostav.ru: Покупка без выбора? Психохаки digital-маркетинга 2026+. — <a href="https://www.sostav.ru/blogs2/29779/74502" target="_blank">Sostav.ru</a> <span class="src-date">12.01.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

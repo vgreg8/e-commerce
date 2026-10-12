@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 8. Преимущества интернет-маркетинга и интернет-рекламы</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a1a2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #7c2d12; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #f97316; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #7c2d12 0%, #ea580c 50%, #f97316 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(234, 88, 12, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* HORIZONTAL BAR: RELEVANCE */
+        .hbar-card { background: #fff7ed; border: 2px solid #fed7aa; border-radius: 14px; padding: 20px 24px; }
+        .hbar-card .hbar-title { font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+        .hbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+        .hbar-label { font-size: 12px; color: #1e293b; width: 160px; font-weight: 500; text-align: right; }
+        .hbar-track { flex: 1; background: #ffedd5; height: 24px; border-radius: 6px; overflow: hidden; position: relative; }
+        .hbar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: bold; color: white; }
+        .hbar-fill.orange { background: linear-gradient(90deg, #c2410c, #f97316); }
+        .hbar-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .hbar-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+        .hbar-fill.slate { background: linear-gradient(90deg, #475569, #64748b); }
+
+        /* DONUT: BUDGET REDISTRIBUTION */
+        .donut-card { display: flex; gap: 25px; align-items: center; background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px; padding: 20px 24px; }
+        .donut-chart { width: 160px; height: 160px; border-radius: 50%; position: relative; flex-shrink: 0;
+            background: conic-gradient(#16a34a 0deg 348deg, #64748b 348deg 360deg); }
+        .donut-chart::after { content: ''; position: absolute; inset: 32px; background: #f0fdf4; border-radius: 50%; }
+        .donut-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .donut-center .donut-pct { font-size: 26px; font-weight: 900; color: #14532d; }
+        .donut-center .donut-cap { font-size: 10px; color: #14532d; text-transform: uppercase; letter-spacing: 0.5px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 10px; font-size: 12.5px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .donut-legend .legend-color { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+        .donut-legend .legend-text strong { color: #14532d; }
+        .donut-legend .legend-text small { color: #64748b; display: block; font-size: 11px; }
+
+        /* SVG LINE CHART: MARKET GROWTH */
+        .chart-card { background: #ffffff; border: 2px solid #fed7aa; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* COMPARE TABLE */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .compare-table th { padding: 9px 10px; text-align: left; font-weight: 600; color: white; }
+        .compare-table th:first-child { background: #334155; border-radius: 8px 0 0 0; }
+        .compare-table th:nth-child(2) { background: #f97316; }
+        .compare-table th:nth-child(3) { background: #0ea5e9; }
+        .compare-table th:nth-child(4) { background: #8b5cf6; }
+        .compare-table th:last-child { background: #10b981; border-radius: 0 8px 0 0; }
+        .compare-table td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; color: #334155; line-height: 1.4; }
+        .compare-table tr:nth-child(even) td { background: #f8fafc; }
+        .compare-table td:first-child { font-weight: 600; color: #1e293b; }
+
+        /* PROGRESS RINGS */
+        .progress-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .progress-card { background: #fff7ed; border: 2px solid #fed7aa; border-radius: 12px; padding: 16px; text-align: center; }
+        .progress-ring { width: 90px; height: 90px; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .progress-ring .ring-inner { width: 66px; height: 66px; background: #fff7ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .progress-ring .ring-val { font-size: 18px; font-weight: 900; color: #7c2d12; line-height: 1; }
+        .progress-ring .ring-cap { font-size: 8px; color: #7c2d12; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+        .progress-label { font-size: 11px; font-weight: bold; color: #7c2d12; line-height: 1.3; }
+
+        /* TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .metrics-table th { background: #7c2d12; color: white; padding: 9px 11px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 11px; border-bottom: 1px solid #e2e8f0; color: #2d3748; }
+        .metrics-table tr:nth-child(even) td { background: #fff7ed; }
+        .metrics-table .up { color: #059669; font-weight: bold; }
+        .metrics-table .down { color: #e11d48; font-weight: bold; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #f97316; }
+        .rt-btn:hover { background: #ea580c; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #fdba74; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #fdba74; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #7c2d12; color: #fdba74; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #fdba74; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #f97316; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #f97316; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #fdba74; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #fdba74; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #f97316; color: #1a1a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #fdba74; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 8. Преимущества интернет-маркетинга и интернет-рекламы
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-def">
+                <div class="hd-icon">🚀</div>
+                <div class="hd-body">
+                    <div class="hd-title">96,7% рекламных бюджетов российских компаний — это инструменты с измеримым результатом</div>
+                    <div class="hd-text">В 2026 году бизнес практически полностью отказался от имиджевой рекламы в пользу performance-инструментов. На классические форматы (баннеры, охватные ролики) приходится лишь 3,3% бюджетов. Это фундаментальный сдвиг: реклама перестала быть «искусством» и стала «инженерией».</div>
+                    <div class="hd-quote">«Бизнес все активнее концентрируется на каналах с контролируемой окупаемостью затрат» — CFO Russia, 2026</div>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL BAR: RELEVANCE -->
+            <div class="hbar-card">
+                <div class="hbar-title">📊 Релевантность рекламных каналов: что считают полезным сами пользователи</div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Интернет-реклама</div>
+                    <div class="hbar-track"><div class="hbar-fill orange" style="width: 61%;">61%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Телевидение</div>
+                    <div class="hbar-track"><div class="hbar-fill amber" style="width: 44%;">44%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Наружная реклама</div>
+                    <div class="hbar-track"><div class="hbar-fill rose" style="width: 22%;">22%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Email-рассылки</div>
+                    <div class="hbar-track"><div class="hbar-fill slate" style="width: 10%;">10%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Печатные издания</div>
+                    <div class="hbar-track"><div class="hbar-fill slate" style="width: 8%;">8%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Радио</div>
+                    <div class="hbar-track"><div class="hbar-fill slate" style="width: 6%;">6%</div></div>
+                </div>
+                <div style="font-size: 11px; color: #7c2d12; margin-top: 8px;">Источник: «Ромир», июль 2025. Опрос 1 600 респондентов по всей России.</div>
+            </div>
+
+            <!-- DONUT: BUDGET REDISTRIBUTION -->
+            <div class="donut-card">
+                <div class="donut-chart">
+                    <div class="donut-center">
+                        <div class="donut-pct">96,7%</div>
+                        <div class="donut-cap">performance</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div style="font-size: 13px; font-weight: bold; color: #14532d; margin-bottom: 4px;">Перераспределение рекламных бюджетов (2026)</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #16a34a;"></div>
+                        <div class="legend-text">
+                            <strong>Performance-инструменты — 96,7%</strong>
+                            <small>Заявки, клики, конверсии, измеримые действия</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #64748b;"></div>
+                        <div class="legend-text">
+                            <strong>Имиджевые форматы — 3,3%</strong>
+                            <small>Баннеры, охватные видеоролики, брендинг</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG LINE CHART: MARKET GROWTH -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Рост российского рынка интернет-рекламы <span>2022 → 2026</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <!-- Сетка -->
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Подписи Y -->
+                    <text x="42" y="144" font-size="9" fill="#64748b" text-anchor="end">0</text>
+                    <text x="42" y="104" font-size="9" fill="#64748b" text-anchor="end">0,8</text>
+                    <text x="42" y="64" font-size="9" fill="#64748b" text-anchor="end">1,6</text>
+
+                    <!-- Заливка -->
+                    <polygon points="90,128 220,115 350,95 480,60 580,35 580,140 90,140"
+                             fill="url(#grad-market)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="grad-market" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#f97316"/>
+                            <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Линия -->
+                    <polyline points="90,128 220,115 350,95 480,60 580,35"
+                              fill="none" stroke="#f97316" stroke-width="3" stroke-linejoin="round"/>
+
+                    <!-- Точки -->
+                    <circle cx="90" cy="128" r="5" fill="#f97316" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="115" r="5" fill="#f97316" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="95" r="5" fill="#f97316" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="60" r="5" fill="#f97316" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="35" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <!-- Значения -->
+                    <text x="90" y="120" font-size="9" fill="#7c2d12" text-anchor="middle" font-weight="bold">0,54</text>
+                    <text x="220" y="107" font-size="9" fill="#7c2d12" text-anchor="middle" font-weight="bold">0,66</text>
+                    <text x="350" y="87" font-size="9" fill="#7c2d12" text-anchor="middle" font-weight="bold">0,89</text>
+                    <text x="480" y="52" font-size="9" fill="#7c2d12" text-anchor="middle" font-weight="bold">1,22</text>
+                    <text x="580" y="28" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">1,57</text>
+
+                    <!-- Подписи X -->
+                    <text x="90" y="155" font-size="10" fill="#475569" text-anchor="middle">2022</text>
+                    <text x="220" y="155" font-size="10" fill="#475569" text-anchor="middle">2023</text>
+                    <text x="350" y="155" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="480" y="155" font-size="10" fill="#475569" text-anchor="middle">2025</text>
+                    <text x="580" y="155" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2026 F</text>
+
+                    <text x="555" y="40" font-size="10" fill="#e11d48" text-anchor="end" font-weight="bold">+28%</text>
+                    <text x="555" y="53" font-size="9" fill="#64748b" text-anchor="end">трлн ₽</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Объём рынка рекламы и продвижения в интернете: 0,54 трлн ₽ (2022) → 1,57 трлн ₽ (2025). Прогноз на 2026 — с замедлением до 8,5%.</div>
+            </div>
+
+            <!-- COMPARE TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 10px;">⚖️ Сравнение интернет-рекламы с традиционными каналами</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Критерий</th>
+                            <th>Интернет-реклама</th>
+                            <th>Телевидение</th>
+                            <th>Журналы</th>
+                            <th>Радио</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Таргетинг</td>
+                            <td style="color: #059669; font-weight: bold;">Высокий (демография, интересы, ремаркетинг)</td>
+                            <td style="color: #e11d48;">Низкий (только возраст / время)</td>
+                            <td style="color: #f59e0b;">Средний (тематика)</td>
+                            <td style="color: #f59e0b;">Средний (регион)</td>
+                        </tr>
+                        <tr>
+                            <td>Измеримость</td>
+                            <td style="color: #059669; font-weight: bold;">Полная (клики, конверсии, ROI)</td>
+                            <td style="color: #e11d48;">Ограниченная (охват)</td>
+                            <td style="color: #e11d48;">Ограниченная</td>
+                            <td style="color: #e11d48;">Ограниченная</td>
+                        </tr>
+                        <tr>
+                            <td>Стоимость входа</td>
+                            <td style="color: #059669; font-weight: bold;">Низкая (от 25 тыс. ₽/мес)</td>
+                            <td style="color: #e11d48;">Высокая (млн ₽)</td>
+                            <td style="color: #e11d48;">Высокая</td>
+                            <td style="color: #f59e0b;">Средняя</td>
+                        </tr>
+                        <tr>
+                            <td>Скорость запуска</td>
+                            <td style="color: #059669; font-weight: bold;">Часы</td>
+                            <td style="color: #e11d48;">Недели (производство ролика)</td>
+                            <td style="color: #f59e0b;">Недели</td>
+                            <td style="color: #059669; font-weight: bold;">Быстро</td>
+                        </tr>
+                        <tr>
+                            <td>Гибкость</td>
+                            <td style="color: #059669; font-weight: bold;">Мгновенная оптимизация</td>
+                            <td style="color: #e11d48;">Низкая</td>
+                            <td style="color: #e11d48;">Низкая</td>
+                            <td style="color: #f59e0b;">Средняя</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PROGRESS RINGS -->
+            <div class="progress-grid">
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#f97316 0deg 219deg, #ffedd5 219deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">61%</div>
+                            <div class="ring-cap">digital</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Компаний планируют увеличить digital-бюджеты на 4–20%</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#16a34a 0deg 293deg, #dcfce7 293deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">81%</div>
+                            <div class="ring-cap">AI</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Ожидают распространения AI-управляемых форматов</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#e11d48 0deg 245deg, #fee2e2 245deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">68%</div>
+                            <div class="ring-cap">ROI</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">ROI как ключевой показатель (рост с 35% за 4 года)</div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Преимущества интернет-рекламы</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Сравнение каналов</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Performance-маркетинг</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 8 из 10
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a1a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #334155; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали соотношение интернет-маркетинга и интерактивного маркетинга. Сегодня мы поговорим о том, почему интернет-реклама стала доминирующим каналом и какие у неё преимущества перед традиционными медиа.</p>
+
+            <div class="action-hint">Обратите внимание студентов на диаграмму релевантности каналов.</div>
+
+            <h3>📌 Прогнозы роста затрат на интерактивный маркетинг</h3>
+
+            <p>Начнём с цифр. По данным АРИР и Data Insight, 66% компаний малого и среднего бизнеса увеличили digital-бюджеты в 2025 году, а 63% респондентов прогнозируют их дальнейший рост в 2026-м[reference:0]. В среднем расходы на интерактивную рекламу составляют 4–5% от всех затрат компании. Однако у предприятий с ежемесячной выручкой свыше 10 млн рублей этот показатель достигает 8–16% и выше[reference:1].</p>
+
+            <p>Особенно показательно, что 27% компаний полагаются исключительно на digital-каналы. Это подчёркивает их доступность, скорость запуска и управляемость в условиях ограниченных бюджетов[reference:2]. Базовый набор инструментов малого и среднего бизнеса сосредоточен вокруг каналов с низким порогом входа: реклама в соцсетях (63%), SMM (56%) и реклама в мессенджерах (51%)[reference:3].</p>
+
+            <p>По данным АКАР, объём рекламного рынка России в 2025 году составил 981,6 млрд рублей. Рост составил 8,5% вместо ожидавшихся 25%. Замедление связано с охлаждением экономики и высокой ключевой ставкой ЦБ[reference:4].</p>
+
+            <h3>📌 Доля интернет-рекламы в структуре бюджетов</h3>
+
+            <p>Доля интерактивной рекламы в структуре рекламных бюджетов российских компаний в 2025 году выросла до 56%. При этом 61% компаний планируют увеличить бюджеты на digital-рекламу на 4–20%, тогда как почти 80% сократят или сохранят траты на офлайн[reference:5][reference:6].</p>
+
+            <p>Крупнейшую долю рынка занимает реклама в диджитал — 361–363 млрд рублей, или 53% от общего объёма. Видеореклама сохраняет второе место с показателем 205–207 млрд рублей (30%), а сегмент Out of Home занимает третью позицию с объёмом в 80,4–81,4 млрд рублей (12%)[reference:7].</p>
+
+            <div class="action-hint">Перейдите к сравнению интернет-рекламы с традиционными каналами.</div>
+
+            <h3>📌 Сравнение с традиционными каналами</h3>
+
+            <p>Давайте разберём каждый традиционный канал и его ограничения.</p>
+
+            <p><strong>Телевидение.</strong> Охватывает все возрастные группы, обеспечивает профессиональную съёмку и озвучку. Однако недостатки существенны: высокая стоимость вхождения, низкие возможности таргетинга, высокая стоимость изготовления ролика. По данным «Ромир», телевизионную рекламу находит полезной лишь 44% респондентов[reference:8].</p>
+
+            <p><strong>Журналы.</strong> Позволяют таргетировать рекламу на профессиональную аудиторию, обеспечивают регулярность и доверие уважаемых изданий. Но высокая стоимость одного контакта, статичность и вытеснение новыми интерактивными медиа делают их всё менее эффективными[reference:9].</p>
+
+            <p><strong>Радио.</strong> Возможность слушать в фоновом режиме, дешевизна изготовления аудиоматериалов, быстрота запуска кампании, таргетинг на отдалённые регионы. Недостатки: уступает мультимедиа, сокращает свою долю на рынке. Полезным радио считают лишь 6% респондентов[reference:10].</p>
+
+            <p><strong>Наружная реклама.</strong> Постоянная экспозиция 24/7, статичность, ориентировочная информация. Недостаток — отсутствие времени для фиксации данных. Полезной её находят 22% опрошенных[reference:11].</p>
+
+            <h3>📌 Преимущества интернет-рекламы</h3>
+
+            <p>Теперь — к преимуществам. Вот ключевые факторы, которые делают интернет-рекламу доминирующим каналом.</p>
+
+            <p><strong>Быстрый отклик.</strong> Хорошую кампанию в digital можно запустить за часы, а не за недели. Первые клики и заявки вы видите почти сразу[reference:12].</p>
+
+            <p><strong>Возможность отслеживания взаимодействия с клиентами.</strong> Каждый просмотр, клик, заявка, покупка — зафиксированы. Вы видите, какие кампании, аудитории и креативы тянут бюджет вниз, а какие приносят деньги[reference:13].</p>
+
+            <p><strong>Контроль затрат и гибкость бюджета.</strong> В рекламном кабинете нет «минимальной суммы входа». Можно начать с небольшого теста и посмотреть, есть ли спрос. В случае успеха — масштабироваться[reference:14].</p>
+
+            <p><strong>Высокий уровень таргетинга.</strong> Точность таргетинга позволяет сократить «шум» в данных и повысить эффективность рекламных затрат, обеспечивая, по данным медиаплатформ, прирост конверсии более чем на 90%[reference:15].</p>
+
+            <p><strong>Релевантность для пользователей.</strong> По данным «Ромир», 61% опрошенных считают, что интернет-объявления чаще соответствуют их интересам и потребностям. Это самый высокий показатель среди всех рекламных каналов. Более трети участников опроса (35%) совершают покупки по рекомендациям интернет-рекламы минимум раз в месяц[reference:16].</p>
+
+            <p><strong>Рост ROI как ключевой метрики.</strong> ROI как ключевой показатель эффективности вырос с 35% до 68% за четыре года. Наиболее популярные форматы: таргетированная реклама (75%), баннеры (61%) и influence marketing (57%)[reference:17].</p>
+
+            <div class="action-hint">Перейдите к разбору метрик роста рынка.</div>
+
+            <h3>📌 Исторические метрики и современность</h3>
+
+            <p>В 2012 году рекламный рынок России составил 56 млрд рублей, из которых 19% пришлось на интернет-рекламу. Интернет-реклама росла на 15%, в то время как газеты и телевидение — на 5–10%.</p>
+
+            <p>Сегодня ситуация радикально изменилась. Объём российского рынка рекламы и продвижения в интернете в 2025 году достиг 1,57 трлн рублей, увеличившись на 28% по сравнению с 2024 годом. Однако темпы роста замедлились: в 2024 году динамика составляла 53%[reference:18].</p>
+
+            <p>Ключевым драйвером роста стал сегмент e-retail media — реклама на маркетплейсах и в ритейл-медиа. Его объём достиг 580 млрд рублей, что на 58% больше, чем годом ранее. Этот сегмент уже превышает треть всего рынка интернет-рекламы[reference:19]. По оценке Easy Commerce, рекламодатели инвестировали в рекламу на маркетплейсах и площадках ритейлеров 613 млрд рублей — на 69% больше, чем годом ранее[reference:20].</p>
+
+            <p>Наиболее динамичные форматы: кликаут-баннеры в e-retail media выросли на 180% (до 42 млрд руб.), вся баннерная реклама — на 36% (122,6 млрд руб.), видеореклама — на 24,4% (39,3 млрд руб.), реклама в мессенджерах — на 20% (до 24 млрд руб.)[reference:21].</p>
+
+            <p>Рынок Connected TV (CTV) в 2025 году составил 15,5 млрд рублей. Проникновение Smart TV достигло 67% домохозяйств, а доля брендов, использующих продвижение на Smart TV, выросла до 25%[reference:22].</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали преимущества интернет-маркетинга и интернет-рекламы. Ключевые выводы:</p>
+
+            <ul>
+                <li>96,7% рекламных бюджетов российских компаний — это performance-инструменты с измеримым результатом.</li>
+                <li>61% пользователей считают интернет-рекламу релевантной — это самый высокий показатель среди всех каналов.</li>
+                <li>Ключевые преимущества интернет-рекламы: быстрый отклик, полная измеримость, гибкость бюджета, высокий таргетинг.</li>
+                <li>Рынок интернет-рекламы в России достиг 1,57 трлн рублей, ключевой драйвер — e-retail media (580 млрд руб., +58%).</li>
+                <li>Доля интерактивной рекламы в бюджетах выросла до 56%, 61% компаний планируют увеличить digital-бюджеты.</li>
+                <li>ROI как ключевой показатель вырос с 35% до 68% за четыре года.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём экосистему интерактивной рекламы и её участников. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AIO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">AI Optimization</div>
+                            <div class="gloss-def">Оптимизация контента для ИИ-ассистентов и генеративных поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Mille</div>
+                            <div class="gloss-def">Стоимость за тысячу показов рекламного объявления</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Connected TV</div>
+                            <div class="gloss-def">Подключённое телевидение — Smart TV с доступом к интернет-сервисам и стримингу</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Click-Through Rate</div>
+                            <div class="gloss-def">Показатель кликабельности — отношение кликов к показам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">OOH</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Out of Home</div>
+                            <div class="gloss-def">Наружная реклама — все форматы рекламы вне дома</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROAS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Ad Spend</div>
+                            <div class="gloss-def">Возврат на рекламные расходы — отношение выручки к затратам на рекламу</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Investment</div>
+                            <div class="gloss-def">Возврат инвестиций — показатель эффективности вложений</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Smart TV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Smart Television</div>
+                            <div class="gloss-def">Телевизор с доступом в интернет и возможностью установки приложений</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Social Media Marketing</div>
+                            <div class="gloss-def">Маркетинг в социальных сетях</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">АКАР</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Ассоциация коммуникационных агентств России</div>
+                            <div class="gloss-def">Крупнейшее отраслевое объединение, публикующее данные по объёму рекламного рынка России</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">АРИР</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Ассоциация развития интерактивной рекламы</div>
+                            <div class="gloss-def">Ключевая организация, публикующая данные по объёму рынка интернет-рекламы в России</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">МСП</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Малое и среднее предпринимательство</div>
+                            <div class="gloss-def">Категория бизнеса с ограниченной численностью сотрудников и выручкой</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Бюджеты и прогнозы</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">АРИР: 66% компаний МСБ увеличили расходы на интерактивную рекламу в 2025 году. — <a href="https://interactivead.ru/products/66-kompanij-msb-uvelichili-rashody-na-interaktivnuyu-reklamu-v-2025-godu/" target="_blank">InteractiveAd.ru</a> <span class="src-date">03.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">CFO Russia: Российские компании перераспределили рекламные бюджеты в пользу инструментов с измеримым результатом. — <a href="https://www.cfo-russia.ru/novosti/?article=99138" target="_blank">CFO-Russia.ru</a> <span class="src-date">20.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Life.ru: Доля интерактивной рекламы в России достигнет 56% в 2025 году. — <a href="https://life.ru/p/1807192" target="_blank">Life.ru</a> <span class="src-date">06.11.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚖️ Сравнение каналов</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">AdIndex: Онлайн-реклама обошла традиционные каналы по релевантности для пользователей. — <a href="https://adindex.ru/news/researches/2025/07/24/335657.phtml" target="_blank">AdIndex.ru</a> <span class="src-date">24.07.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Zenodo: Digital Advertising: An Innovative Tool of Modern Marketing. — <a href="https://zenodo.org" target="_blank">Zenodo.org</a> <span class="src-date">31.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Sage Journals: Comparative Analysis of Traditional and Digital Marketing Effectiveness in SMEs. — <a href="https://journals.sagepub.com" target="_blank">SagePub.com</a> <span class="src-date">26.08.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 Рынок интернет-рекламы</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Коммерсантъ: Рынок интернет-рекламы в России замедлился почти в два раза. — <a href="https://www.kommersant.ru/doc/8572217" target="_blank">Kommersant.ru</a> <span class="src-date">09.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">AdIndex: Объем российского рекламного рынка достиг 680 млрд рублей — АКАР. — <a href="https://adindex.ru/news/ad_budjet/2025/11/12/339047.phtml" target="_blank">AdIndex.ru</a> <span class="src-date">12.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">AdIndex: Три ключевых тренда диджитал-рекламы в 2025 году. — <a href="https://adindex.ru/publication/analitics/search/2025/10/28/338633.phtml" target="_blank">AdIndex.ru</a> <span class="src-date">28.10.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📺 CTV и Retail Media</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">ComNews: Российский рынок CTV привлек рекламодателей и кибермошенников. — <a href="https://www.comnews.ru/content/243857/2026-02-18/2026-w08/1008/rossiyskiy-rynok-ctv-privlek-reklamodateley-i-kibermoshennikov" target="_blank">ComNews.ru</a> <span class="src-date">18.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Sostav.ru: CTV в России — от большого экрана к измеримому brandformance-инструменту. — <a href="https://www.sostav.ru/blogs/276047/92386" target="_blank">Sostav.ru</a> <span class="src-date">24.06.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Oborot.ru: Суммарная рекламная выручка Wildberries, Ozon и Яндекс Маркета за 2025 год превысила 500 млрд рублей. — <a href="https://oborot.ru/news/summarnaya-reklamnaya-vyruchka-wildberries-ozon-i-yandeks-market-v-2025-godu-prevysila-500-mlrd-rublej-i267915.html" target="_blank">Oborot.ru</a> <span class="src-date">14.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">Точка продаж: Ключевые тренды E-Retail Media в 2026–2027 годах. — <a href="https://tpmag.ru/news/e-commerce/prognoz-po-e-retail-media/" target="_blank">TPMag.ru</a> <span class="src-date">23.07.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Таргетинг и эффективность</div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">MMR: Секреты Google Ads, Meta Ads, TikTok Ads — 5 сильных сторон. — <a href="https://mmr.ua/ru/longreads/digital/sekrety-reklamnyh-kabinetiv-5-sylnyh-storin-pro-yaki-vsi-govoryat-ta-problemy-pro-yaki-zazvychay-movchat/" target="_blank">MMR.ua</a> <span class="src-date">10.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">15</div>
+                        <div class="source-body">Sostav.ru: 66% малых и средних компаний нарастили расходы на интерактивную рекламу в 2025 году. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">03.04.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

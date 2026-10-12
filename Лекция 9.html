@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 9. Экосистема интерактивной рекламы</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0f1a2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #1e3a5f; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #3b82f6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #3b82f6 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* ECOSYSTEM MAP */
+        .eco-map { background: #f0f5ff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 18px 22px; }
+        .eco-map .eco-title { font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 12px; }
+        .eco-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: stretch; }
+        .eco-block { flex: 1; border-radius: 8px; padding: 10px 12px; font-size: 11px; font-weight: 600; color: white; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 44px; }
+        .eco-block small { display: block; font-weight: 400; font-size: 9.5px; opacity: 0.85; margin-top: 2px; }
+        .eco-arrow-row { display: flex; justify-content: center; gap: 8px; margin: 4px 0; font-size: 16px; color: #94a3b8; }
+
+        /* HORIZONTAL BAR */
+        .hbar-card { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px; padding: 20px 24px; }
+        .hbar-card .hbar-title { font-size: 14px; font-weight: bold; color: #166534; margin-bottom: 14px; }
+        .hbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+        .hbar-label { font-size: 12px; color: #1e293b; width: 150px; font-weight: 500; text-align: right; }
+        .hbar-track { flex: 1; background: #dcfce7; height: 22px; border-radius: 6px; overflow: hidden; }
+        .hbar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10.5px; font-weight: bold; color: white; }
+        .hbar-fill.blue { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+        .hbar-fill.green { background: linear-gradient(90deg, #15803d, #22c55e); }
+        .hbar-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .hbar-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+
+        /* TOP ADVERTISERS TABLE */
+        .top-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .top-table th { background: #1e3a5f; color: white; padding: 8px 10px; text-align: left; font-weight: 600; }
+        .top-table td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; }
+        .top-table tr:nth-child(even) td { background: #f0f5ff; }
+        .top-table .rank { font-weight: 900; color: #2563eb; }
+        .top-table .money { font-weight: bold; color: #059669; }
+
+        /* RTB SCHEMA */
+        .rtb-card { background: #fefce8; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .rtb-card .rtb-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 12px; }
+        .rtb-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .rtb-node { flex: 1; min-width: 90px; background: white; border: 2px solid #f59e0b; border-radius: 8px; padding: 10px 8px; text-align: center; }
+        .rtb-node .rtb-icon { font-size: 20px; margin-bottom: 4px; }
+        .rtb-node .rtb-name { font-size: 11px; font-weight: bold; color: #78350f; }
+        .rtb-node .rtb-desc { font-size: 9.5px; color: #92400e; margin-top: 2px; line-height: 1.3; }
+        .rtb-arrow { font-size: 18px; color: #f59e0b; font-weight: bold; }
+
+        /* ROLE COMPARE */
+        .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .role-card { border-radius: 12px; padding: 16px; }
+        .role-card.seller { background: #eff6ff; border: 2px solid #93c5fd; }
+        .role-card.buyer { background: #fef2f2; border: 2px solid #fca5a5; }
+        .role-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .role-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.5; color: #334155; }
+        .role-card li { margin-bottom: 4px; }
+
+        /* PROGRESS RINGS */
+        .progress-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .progress-card { background: #f0f5ff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 16px; text-align: center; }
+        .progress-ring { width: 90px; height: 90px; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .progress-ring .ring-inner { width: 66px; height: 66px; background: #f0f5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .progress-ring .ring-val { font-size: 18px; font-weight: 900; color: #1e3a5f; line-height: 1; }
+        .progress-ring .ring-cap { font-size: 8px; color: #1e3a5f; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+        .progress-label { font-size: 11px; font-weight: bold; color: #1e3a5f; line-height: 1.3; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #3b82f6; }
+        .rt-btn:hover { background: #2563eb; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #93c5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #93c5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #1e3a5f; color: #93c5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #3b82f6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #93c5fd; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #3b82f6; color: #0f1a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #93c5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 9. Экосистема интерактивной рекламы
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-def">
+                <div class="hd-icon">🏗️</div>
+                <div class="hd-body">
+                    <div class="hd-title">Экосистема интерактивной рекламы — это сложная многоуровневая сеть участников, технологий и данных</div>
+                    <div class="hd-text">Размещение одного рекламного объявления в интернете — это результат взаимодействия десятков компаний: от рекламодателя и агентства до SSP-платформы, DMP-системы и паблишера. Сегодня мы разберём, кто эти участники и как они связаны.</div>
+                    <div class="hd-quote">«Интерактив забрал 52% российского рынка — исторический рекорд» — Елена Врацкая, вице-президент АРИР</div>
+                </div>
+            </div>
+
+            <!-- ECOSYSTEM MAP -->
+            <div class="eco-map">
+                <div class="eco-title">🗺️ Карта экосистемы интерактивной рекламы (2025–2026)</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #1e3a5f, #2563eb);">Рекламодатели <small>Сбер, ВТБ, Яндекс, Wildberries</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #7c3aed, #8b5cf6);">Агентства <small>Realweb, MGCom, Nectarin</small></div>
+                </div>
+
+                <div class="eco-arrow-row">↓</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #0e7490, #06b6d4);">DSP-платформы <small>Яндекс Директ, Madnet</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #b45309, #f59e0b);">DMP-системы <small>Данные и сегментация</small></div>
+                </div>
+
+                <div class="eco-arrow-row">↓</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #15803d, #22c55e);">SSP-платформы <small>Yandex SSP, RTBSape, Adlook</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #be123c, #e11d48);">Ad Exchange / RTB <small>Биржи реального времени</small></div>
+                </div>
+
+                <div class="eco-arrow-row">↓</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #475569, #64748b);">Паблишеры / Медиа <small>Маркетплейсы, соцсети, сайты</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #1e3a5f, #334155);">Аудитория <small>105 млн пользователей Рунета</small></div>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL BAR: MARKET GROWTH -->
+            <div class="hbar-card">
+                <div class="hbar-title">📈 Ключевые сегменты рынка интернет-рекламы (2025)</div>
+                <div class="hbar-row">
+                    <div class="hbar-label">E-Retail Media</div>
+                    <div class="hbar-track"><div class="hbar-fill blue" style="width: 100%;">580 млрд ₽ (+58%)</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Перформанс-реклама</div>
+                    <div class="hbar-track"><div class="hbar-fill green" style="width: 81%;">471 млрд ₽ (+8%)</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Классифайды</div>
+                    <div class="hbar-track"><div class="hbar-fill amber" style="width: 39%;">226 млрд ₽ (+19%)</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Баннерная реклама</div>
+                    <div class="hbar-track"><div class="hbar-fill violet" style="width: 21%;">123 млрд ₽ (+36%)</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Видеореклама</div>
+                    <div class="hbar-track"><div class="hbar-fill blue" style="width: 7%;">39 млрд ₽ (+24%)</div></div>
+                </div>
+                <div style="font-size: 11px; color: #166534; margin-top: 8px;">Общий объём рынка рекламы и продвижения в интернете — 1,569 трлн ₽ (+28%). Источник: АРИР, 2026.</div>
+            </div>
+
+            <!-- TOP ADVERTISERS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px;">🏆 Топ-7 рекламодателей России (2025)</div>
+                <table class="top-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Рекламодатель</th>
+                            <th>Всего (млн ₽)</th>
+                            <th>Интернет (млн ₽)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="rank">1</td><td><strong>Сбер</strong></td><td class="money">54 003</td><td>27 210</td></tr>
+                        <tr><td class="rank">2</td><td>ВТБ</td><td class="money">28 248</td><td>10 233</td></tr>
+                        <tr><td class="rank">3</td><td>Яндекс</td><td class="money">26 570</td><td>10 920</td></tr>
+                        <tr><td class="rank">4</td><td>Интернет Решения (Ozon)</td><td class="money">20 302</td><td>9 669</td></tr>
+                        <tr><td class="rank">5</td><td>Т-Технологии</td><td class="money">18 344</td><td>7 598</td></tr>
+                        <tr><td class="rank">6</td><td>Wildberries</td><td class="money">17 600</td><td>7 764</td></tr>
+                        <tr><td class="rank">7</td><td>КЕХ Екоммерц</td><td class="money">16 648</td><td>7 882</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RTB SCHEMA -->
+            <div class="rtb-card">
+                <div class="rtb-title">⚡ Как работает RTB-аукцион (Real-Time Bidding)</div>
+                <div class="rtb-flow">
+                    <div class="rtb-node">
+                        <div class="rtb-icon">👤</div>
+                        <div class="rtb-name">Пользователь</div>
+                        <div class="rtb-desc">Заходит на сайт паблишера</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">📤</div>
+                        <div class="rtb-name">SSP</div>
+                        <div class="rtb-desc">Отправляет запрос на аукцион</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">⚡</div>
+                        <div class="rtb-name">Ad Exchange</div>
+                        <div class="rtb-desc">Аукцион за 100 мс</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">📥</div>
+                        <div class="rtb-name">DSP</div>
+                        <div class="rtb-desc">Ставка от рекламодателя</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">🖼️</div>
+                        <div class="rtb-name">Показ</div>
+                        <div class="rtb-desc">Победитель показывает рекламу</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROLE COMPARE -->
+            <div class="role-grid">
+                <div class="role-card seller">
+                    <h5 style="color: #1d4ed8;">📤 Медиаселлер</h5>
+                    <ul>
+                        <li>Продаёт рекламные площади медиа</li>
+                        <li>Имеет эксклюзивное право на продажу</li>
+                        <li>Примеры: Mail.ru, СберСеллер, Яндекс</li>
+                        <li>Работает с паблишерами и агентствами</li>
+                    </ul>
+                </div>
+                <div class="role-card buyer">
+                    <h5 style="color: #b91c1c;">📥 Медиабайер</h5>
+                    <ul>
+                        <li>Закупает рекламу для рекламодателей</li>
+                        <li>Оптимизирует медиапланы</li>
+                        <li>Работает с DSP и прямыми площадками</li>
+                        <li>Следит за ROI и эффективностью</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PROGRESS RINGS -->
+            <div class="progress-grid">
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#3b82f6 0deg 187deg, #dbeafe 187deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">52%</div>
+                            <div class="ring-cap">рынка</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Доля интерактивной рекламы в общем рынке (рекорд)</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#22c55e 0deg 198deg, #dcfce7 198deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">55%</div>
+                            <div class="ring-cap">рост</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">E-com и ритейл-медиа: ожидаемый прирост в 2026</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#f59e0b 0deg 209deg, #fef3c7 209deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">48</div>
+                            <div class="ring-cap">новых</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Участников присоединились к карте E-Retail Media 2026</div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Экосистема рекламы</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: RTB-аукционы</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Участники рынка</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 9 из 10
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0f1a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e293b; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали преимущества интернет-рекламы. Сегодня мы погрузимся в устройство экосистемы интерактивной рекламы — разберём, кто её участники, как они взаимодействуют и какие технологии лежат в основе размещения рекламы.</p>
+
+            <div class="action-hint">Обратите внимание студентов на карту экосистемы на слайде.</div>
+
+            <h3>📌 Сложность процесса размещения рекламы</h3>
+
+            <p>Процесс размещения интернет-рекламы значительно сложнее, чем может показаться на первый взгляд. Когда вы видите рекламный баннер на сайте, за этим показом стоит целая цепочка взаимодействий: от рекламодателя, который хочет продвинуть товар, до паблишера, который предоставляет площадку.</p>
+
+            <p>Ключевые стороны экосистемы — интернет-аудитория и рекламодатели. Аудитория интернет-рекламы в России насчитывает более 105 млн человек. Рекламодатели — это юридические и физические лица, покупающие продукты и услуги рынка цифрового маркетинга.</p>
+
+            <p>Ключевой принцип взаимодействия: рекламодатели платят за действия аудитории — интерес, просмотр сайтов, клики на рекламу, заполнение анкет, оставление электронных адресов, покупки. Стрелка вверх символизирует движение денег, стрелка вниз — действия аудитории.</p>
+
+            <h3>📌 Участники экосистемы интерактивной рекламы</h3>
+
+            <p>Экосистема интерактивной рекламы включает несколько ключевых категорий участников.</p>
+
+            <p><strong>Рекламодатели.</strong> Это компании, которые инвестируют в продвижение своих продуктов. По итогам 2025 года крупнейшим рекламодателем России стал «Сбер» — его рекламные затраты достигли 54 млрд рублей, из которых 27,2 млрд пришлись на интернет. Второе место занял ВТБ (28,2 млрд руб.), третье — Яндекс (26,6 млрд руб.). Замыкают топ-7 Ozon (20,3 млрд руб.), Т-Технологии (18,3 млрд руб.), Wildberries (17,6 млрд руб.) и КЕХ Екоммерц (16,6 млрд руб.).</p>
+
+            <p><strong>Рекламные агентства.</strong> Предоставляют комплексные услуги: планирование, подготовка кампаний, маркетинговые концепции, медиапланы. Агентства получают средства от рекламодателей и часть оставляют себе. По данным Digital Index 2025, лидерами по узнаваемости стали Realweb, MGCom и Nectarin. Среди SMM-агентств седьмой год подряд лидирует Setters.</p>
+
+            <p><strong>Медиаселлеры.</strong> Специализируются на продаже рекламных площадей и имеют эксклюзивное право на продажу услуг медиа. Примеры: Mail.ru, СберСеллер, Яндекс. В 2025 году к ним присоединились МТС, «ЭКРАН», Билайн, getads network, Buzzoola, Between Exchange.</p>
+
+            <p><strong>Медиабайеры.</strong> Закупают рекламу для рекламодателей, оптимизируют медиапланы, работают с DSP и прямыми площадками.</p>
+
+            <p><strong>Паблишеры и медиа.</strong> Предоставляют рекламные площади. Крупнейшими игроками являются маркетплейсы — Wildberries, Ozon, Avito — которые контролируют более 95% сегмента retail media.</p>
+
+            <div class="action-hint">Перейдите к разбору RTB-технологий.</div>
+
+            <h3>📌 RTB — биржи реального времени</h3>
+
+            <p>RTB (Real-Time Bidding) — это система автоматизированных торгов, позволяющая в режиме реального времени продавать и покупать онлайн-рекламу через аукцион. Весь процесс занимает около 100 миллисекунд.</p>
+
+            <p>Как это работает:</p>
+
+            <ul>
+                <li><strong>Пользователь</strong> заходит на сайт паблишера.</li>
+                <li><strong>SSP-платформа</strong> (Supply-Side Platform) отправляет запрос на аукцион. Примеры SSP на российском рынке: Yandex SSP, RTBSape, Adlook, Between Digital.</li>
+                <li><strong>Ad Exchange</strong> — биржа реального времени — проводит аукцион.</li>
+                <li><strong>DSP-платформы</strong> (Demand-Side Platform) делают ставки от имени рекламодателей. В Яндексе это Директ.</li>
+                <li><strong>Победитель</strong> показывает рекламу пользователю.</li>
+            </ul>
+
+            <p>Один из крупнейших игроков на рынке RTB — Madnet, первая российская мобильная рекламная сеть нового поколения, которая разработала собственные DSP-, SSP- и DMP-платформы, интегрированные с мировыми RTB-сетями. Также на рынке работают WapStart (DSP/DMP-провайдер), Tinkoff Digital, CityAds Media.</p>
+
+            <p>По данным исследования Russia Real-time Bidding Market, рынок RTB в России steadily растёт, driven by the increasing adoption of programmatic advertising и расширением цифровых рекламных платформ.</p>
+
+            <h3>📌 Карта рынка E-Retail Media 2026</h3>
+
+            <p>В 2026 году АРИР обновила карту рынка E-Retail Media. К экосистеме присоединились 48 новых участников. Появилась новая категория Click In — возможность размещать рекламу, ведущую внутрь сайта или приложения игрока E-Retail Media.</p>
+
+            <p>В разделе «Инструменты оптимизации» появились блоки «Отзывы», «Биддеры», «SEO» и «Работа с репутацией». В разделе Click In представлены Retail Rocket, Yandex Retail Media, SIMB-AD и UMG.</p>
+
+            <p>Карта включает блоки Agencies (агентства, предлагающие закупать E-Retail Media для клиентов) и Placements (все игроки E-Retail Media, разделённые на 13 категорий: Classified, E-Grocery, Pharma, Fast Delivery, Marketplaces, Electronics, Kids, Fashion и другие).</p>
+
+            <p>Как отметила Надежда Шилова, сопредседатель комитета по E-Retail Media, «наиболее важные обновления карты отражают переход рынка E-Retail Media от этапа экстенсивного роста к формированию зрелой рыночной структуры. Рекламодателям уже недостаточно просто получить доступ к полке — критически важным становится управление ставками в реальном времени и интеграция рекламы с пользовательским контентом и репутационными факторами».</p>
+
+            <h3>📌 Национальные экосистемы</h3>
+
+            <p>Российский рынок цифровых коммуникаций переживает масштабную трансформацию под влиянием укрепления национальных экосистем — VK, Яндекс и Сбера. Эти технологические структуры уже давно перестали быть набором отдельных сервисов: сегодня они формируют многоуровневые цифровые платформы, объединяющие социальные сети, финансовые решения, инструменты продвижения, торговые площадки, модульную аналитику и сервисы на основе искусственного интеллекта.</p>
+
+            <p>Компании всё чаще переходят от работы с отдельными каналами продвижения к интегрированным экосистемам, которые позволяют управлять полным жизненным циклом коммуникации — от формирования интереса и привлечения пользователя до продаж, сопровождения услуг и развития программ лояльности.</p>
+
+            <p>Одним из наиболее влиятельных игроков остаётся Яндекс. Компания активно развивает инструменты автоматизации и искусственного интеллекта, которые становятся фундаментом рекламных продуктов экосистемы. Интеграция ИИ делает рекламные кампании более точными — система автоматически подбирает аудитории, корректирует ставки, анализирует намерения пользователей и прогнозирует конверсию.</p>
+
+            <h3>📌 Услуги в экосистеме</h3>
+
+            <p>В экосистеме интерактивной рекламы выделяются внутренние и внешние услуги. Внутренние услуги — это технологии и сервисы, которые участники предоставляют друг другу внутри экосистемы. Внешние услуги — это работа с рекламодателями и аудиторией.</p>
+
+            <p>Важную роль играют научно-исследовательские проекты. Компании продают исследования, которые увеличивают отдачу инвестиций в онлайн-маркетинг. Клиентами таких компаний часто являются рекламные агентства, а не рекламодатели.</p>
+
+            <p>Также в экосистеме работают классифайды — Яндекс.Маркет, Прайс.ру, Опорт — которые классифицируют объявления по тематическим спискам. И компании-посредники, которые собирают сайты в единую сеть и осуществляют их взаимное продвижение.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали экосистему интерактивной рекламы. Ключевые выводы:</p>
+
+            <ul>
+                <li>Экосистема включает рекламодателей, агентства, медиаселлеров, медиабайеров, DSP/SSP/DMP-платформы, паблишеров и аудиторию.</li>
+                <li>RTB-аукционы позволяют продавать рекламу в реальном времени за ~100 миллисекунд.</li>
+                <li>Ключевые игроки RTB: Madnet, WapStart, Yandex SSP, RTBSape, Adlook, Between Digital.</li>
+                <li>Карта E-Retail Media 2026 включает 48 новых участников и новую категорию Click In.</li>
+                <li>Национальные экосистемы (VK, Яндекс, Сбер) становятся ключевой инфраструктурой маркетинга.</li>
+                <li>Крупнейший рекламодатель России — Сбер (54 млрд руб. в 2025 году).</li>
+            </ul>
+
+            <p>На следующей, заключительной лекции мы разберём элементы экосистемы цифрового маркетинга и их взаимодействие. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Ad Exchange</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Рекламная биржа</div>
+                            <div class="gloss-def">Платформа, где встречаются покупатели и продавцы рекламного инвентаря</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">DMP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Data Management Platform</div>
+                            <div class="gloss-def">Платформа управления данными — собирает и сегментирует аудиторию</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">DSP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Demand-Side Platform</div>
+                            <div class="gloss-def">Платформа со стороны спроса — автоматизирует закупку рекламы для рекламодателей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">E-Retail Media</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Ритейл-медиа в электронной коммерции</div>
+                            <div class="gloss-def">Реклама на маркетплейсах и площадках ритейлеров</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">RTB</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Real-Time Bidding</div>
+                            <div class="gloss-def">Аукцион рекламных показов в реальном времени</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SSP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Supply-Side Platform</div>
+                            <div class="gloss-def">Платформа со стороны предложения — управляет рекламными ресурсами издателей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">АРИР</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Ассоциация развития интерактивной рекламы</div>
+                            <div class="gloss-def">Ключевая организация, публикующая данные по объёму рынка интернет-рекламы в России</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Классифайды</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Classified Advertising</div>
+                            <div class="gloss-def">Тематические объявления, аналог газетных рубрик (Avito, Яндекс.Маркет)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Медиаселлер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Media Seller</div>
+                            <div class="gloss-def">Компания, продающая рекламные площади медиа на эксклюзивной основе</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Медиабайер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Media Buyer</div>
+                            <div class="gloss-def">Компания, закупающая рекламу для рекламодателей и оптимизирующая медиапланы</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Паблишер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Publisher</div>
+                            <div class="gloss-def">Владелец сайта или приложения, предоставляющий рекламные площади</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏗️ Экосистема и рынок</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">АРИР: Российский рынок рекламы и продвижения в интернете в 2025 году вырос на 28% — до 1,569 трлн руб. — <a href="https://interactivead.ru" target="_blank">InteractiveAd.ru</a> <span class="src-date">09.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Коммерсантъ: Рынок интернет-рекламы в России замедлился почти в два раза. — <a href="https://www.kommersant.ru/doc/8572217" target="_blank">Kommersant.ru</a> <span class="src-date">09.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Sostav.ru: АРИР обновила карту рынка E-Retail Media 2026 — 48 новых участников. — <a href="https://www.sostav.ru/blogs2/268196/82401" target="_blank">Sostav.ru</a> <span class="src-date">07.04.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏆 Рекламодатели и агентства</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Sostav.ru: Рейтинг крупнейших рекламодателей России 2026. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">06.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">AdIndex: Digital Index 2025 — лучшие агентства по продвижению. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">26.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Likeni.ru: Лайкни подвёл итоги рейтинга известности SMM-компаний 2025. — <a href="https://www.likeni.ru" target="_blank">Likeni.ru</a> <span class="src-date">11.09.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚡ RTB и технологии</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Yandex: Что такое RTB-система и как она работает. — <a href="https://yandex.ru" target="_blank">Yandex.ru</a> <span class="src-date">17.04.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Sostav.ru: Как SSP соединяют бренды с паблишерами. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">CB Insights: Madnet — DSP, SSP и DMP-платформы. — <a href="https://www.cbinsights.com" target="_blank">CBInsights.com</a> <span class="src-date">15.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">6W Research: Russia Real-time Bidding Market (2025-2031). — <a href="https://www.6wresearch.com" target="_blank">6WResearch.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🌐 Национальные экосистемы</div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Ведомости: Национальные экосистемы усиливают влияние на цифровой маркетинг. — <a href="https://www.vedomosti.ru" target="_blank">Vedomosti.ru</a> <span class="src-date">20.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Финансовый университет: Трансформация рынка цифровых коммуникаций под влиянием экосистем. — <a href="https://www.fa.ru" target="_blank">FA.ru</a> <span class="src-date">20.11.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Медиа и селлеры</div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">VC.ru: Как новая инфраструктура телесмотрения меняет способы планирования медиа. — <a href="https://vc.ru" target="_blank">VC.ru</a> <span class="src-date">09.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">Adpass.ru: Топ рекламодателей категории Интернет-торговля в 2025. — <a href="https://adpass.ru" target="_blank">Adpass.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

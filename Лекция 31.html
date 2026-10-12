@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 31. Типы социальных сетей и их использование в интернет-маркетинге</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #042f2e; color: #ccfbf1; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #134e4a; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #14b8a6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #134e4a 0%, #0d9488 60%, #2dd4bf 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(13, 148, 136, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 34px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* ECOSYSTEM SVG */
+        .chart-card { background: #ffffff; border: 2px solid #99f6e4; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* PLATFORM GRID */
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .platform-card { border-radius: 12px; padding: 16px; }
+        .platform-card.vk { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .platform-card.tg { background: linear-gradient(135deg, #e0f2fe, #bae6fd); border: 2px solid #0284c7; }
+        .platform-card.ok { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .platform-card.dzen { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .platform-card.max { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 2px solid #8b5cf6; }
+        .platform-card.rutube { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 2px solid #dc2626; }
+        .platform-card .p-icon { font-size: 24px; margin-bottom: 6px; }
+        .platform-card .p-name { font-size: 13px; font-weight: 900; margin-bottom: 5px; }
+        .platform-card.vk .p-name { color: #1e3a8a; }
+        .platform-card.tg .p-name { color: #0c4a6e; }
+        .platform-card.ok .p-name { color: #78350f; }
+        .platform-card.dzen .p-name { color: #831843; }
+        .platform-card.max .p-name { color: #5b21b6; }
+        .platform-card.rutube .p-name { color: #991b1b; }
+        .platform-card .p-desc { font-size: 10.5px; color: #1e293b; line-height: 1.45; margin-bottom: 6px; }
+        .platform-card .p-metric { font-size: 10px; color: #7c3aed; font-weight: 600; }
+
+        /* FUNCTIONS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #134e4a; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #f0fdfa; }
+        .metrics-table .yes { color: #059669; font-weight: bold; }
+        .metrics-table .no { color: #e11d48; font-weight: bold; }
+
+        /* SMM TOOLS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .tool-card { border-radius: 10px; padding: 12px 10px; text-align: center; }
+        .tool-card.m1 { background: #dbeafe; border: 1.5px solid #3b82f6; }
+        .tool-card.m2 { background: #fef3c7; border: 1.5px solid #f59e0b; }
+        .tool-card.m3 { background: #dcfce7; border: 1.5px solid #10b981; }
+        .tool-card.m4 { background: #fce7f3; border: 1.5px solid #ec4899; }
+        .tool-card .t-icon { font-size: 20px; margin-bottom: 4px; }
+        .tool-card .t-name { font-size: 11px; font-weight: bold; color: #1e293b; margin-bottom: 3px; }
+        .tool-card .t-desc { font-size: 9.5px; color: #475569; line-height: 1.35; }
+
+        /* SOCIAL COMMERCE */
+        .commerce-card { background: #fef3c7; border: 2px solid #fde68a; border-radius: 14px; padding: 20px 24px; }
+        .commerce-card .comm-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 14px; }
+        .commerce-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .commerce-node { flex: 1; min-width: 105px; background: white; border: 2px solid #f59e0b; border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .commerce-node .cn-icon { font-size: 20px; margin-bottom: 4px; }
+        .commerce-node .cn-name { font-size: 11px; font-weight: bold; color: #78350f; line-height: 1.25; }
+        .commerce-node .cn-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+        .commerce-arrow { font-size: 16px; color: #f59e0b; font-weight: bold; }
+
+        /* CROWDSOURCING */
+        .crowd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .crowd-card { border-radius: 12px; padding: 16px; }
+        .crowd-card.g1 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .crowd-card.g2 { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .crowd-card .cc-icon { font-size: 22px; margin-bottom: 5px; }
+        .crowd-card .cc-name { font-size: 12.5px; font-weight: 900; margin-bottom: 5px; }
+        .crowd-card.g1 .cc-name { color: #1e3a8a; }
+        .crowd-card.g2 .cc-name { color: #065f46; }
+        .crowd-card .cc-desc { font-size: 10.5px; color: #1e293b; line-height: 1.45; }
+        .crowd-card .cc-examples { font-size: 10px; color: #7c3aed; margin-top: 6px; font-weight: 600; }
+
+        /* ANALYTICS TABLE */
+        .analytics-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .analytics-card .an-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 14px; }
+        .analytics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .analytics-block { background: white; border-radius: 10px; padding: 12px; border: 1.5px solid #cbd5e1; }
+        .analytics-block .ab-icon { font-size: 18px; margin-bottom: 4px; }
+        .analytics-block .ab-name { font-size: 11.5px; font-weight: bold; color: #1e3a5f; margin-bottom: 3px; }
+        .analytics-block .ab-desc { font-size: 10px; color: #475569; line-height: 1.4; }
+        .analytics-block .ab-tools { font-size: 10px; color: #7c3aed; margin-top: 6px; font-weight: 600; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #14b8a6; }
+        .rt-btn:hover { background: #0d9488; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #5eead4; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #115e59; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #ccfbf1; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #5eead4; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #115e59; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #134e4a; color: #5eead4; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #5eead4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #14b8a6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #14b8a6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #5eead4; font-size: 13px; min-width: 100px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #5eead4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #14b8a6; color: #042f2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #5eead4; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 31. Типы социальных сетей и их использование в интернет-маркетинге
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🇷🇺</div>
+                <div class="hero-data">
+                    <div class="hero-number">105 млн</div>
+                    <div class="hero-label">Пользователей интернета в России (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">4 ч 26 м</div>
+                    <div class="hero-label">Среднее время онлайн в сутки</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">> 50%</div>
+                    <div class="hero-label">Времени в интернете — соцмедиа</div>
+                </div>
+            </div>
+
+            <!-- PLATFORM GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 10px;">📱 Ключевые российские платформы 2025–2026</div>
+                <div class="platform-grid">
+                    <div class="platform-card vk">
+                        <div class="p-icon">🔵</div>
+                        <div class="p-name">ВКонтакте</div>
+                        <div class="p-desc">Крупнейшая соцсеть России. Универсальная платформа: контент, сообщества, магазины, реклама</div>
+                        <div class="p-metric">91,8 млн MAU · 59,5 млн DAU</div>
+                    </div>
+                    <div class="platform-card tg">
+                        <div class="p-icon">✈️</div>
+                        <div class="p-name">Telegram</div>
+                        <div class="p-desc">Мессенджер и платформа для каналов. Главный канал для контент-маркетинга и рекламы</div>
+                        <div class="p-metric">46% россиян · 45 мин в день</div>
+                    </div>
+                    <div class="platform-card ok">
+                        <div class="p-icon">🟠</div>
+                        <div class="p-name">Одноклассники</div>
+                        <div class="p-desc">Соцсеть для старшей аудитории. Программы лояльности, товары, видеоконтент</div>
+                        <div class="p-metric">34 млн DAU · 42 мин в день</div>
+                    </div>
+                    <div class="platform-card dzen">
+                        <div class="p-icon">🔴</div>
+                        <div class="p-name">Дзен</div>
+                        <div class="p-desc">Платформа для контента. Статьи, видео, рекомендательная система</div>
+                        <div class="p-metric">Лидер по охвату контента</div>
+                    </div>
+                    <div class="platform-card max">
+                        <div class="p-icon">💬</div>
+                        <div class="p-name">Max</div>
+                        <div class="p-desc">Новый российский мессенджер. Интеграция с Госуслугами, бизнес-инструменты</div>
+                        <div class="p-metric">75 млн зарегистрированных</div>
+                    </div>
+                    <div class="platform-card rutube">
+                        <div class="p-icon">📺</div>
+                        <div class="p-name">Rutube</div>
+                        <div class="p-desc">Российский видеохостинг. Обогнал YouTube по дневной аудитории</div>
+                        <div class="p-metric">80 млн MAU</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ECOSYSTEM SVG -->
+            <div class="chart-card">
+                <div class="chart-title">🌐 Экосистема российских социальных медиа: три уровня <span>Платформы → Инструменты → Аудитория</span></div>
+                <svg viewBox="0 0 600 300" style="width: 100%; height: auto;">
+                    <!-- Уровень 1: Платформы -->
+                    <rect x="20" y="20" width="560" height="75" rx="12" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2"/>
+                    <text x="300" y="42" font-size="12" fill="#134e4a" text-anchor="middle" font-weight="bold">📱 Платформы (пользовательские)</text>
+
+                    <rect x="40" y="55" width="80" height="32" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="80" y="75" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">ВКонтакте</text>
+
+                    <rect x="130" y="55" width="80" height="32" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+                    <text x="170" y="75" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Telegram</text>
+
+                    <rect x="220" y="55" width="80" height="32" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="260" y="75" font-size="9" fill="#78350f" text-anchor="middle" font-weight="bold">Одноклассники</text>
+
+                    <rect x="310" y="55" width="80" height="32" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+                    <text x="350" y="75" font-size="9" fill="#831843" text-anchor="middle" font-weight="bold">Дзен</text>
+
+                    <rect x="400" y="55" width="80" height="32" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+                    <text x="440" y="75" font-size="9" fill="#5b21b6" text-anchor="middle" font-weight="bold">Max</text>
+
+                    <rect x="490" y="55" width="80" height="32" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+                    <text x="530" y="75" font-size="9" fill="#991b1b" text-anchor="middle" font-weight="bold">Rutube</text>
+
+                    <!-- Стрелка вниз -->
+                    <text x="300" y="115" font-size="20" fill="#14b8a6" text-anchor="middle">↓</text>
+
+                    <!-- Уровень 2: Инструменты -->
+                    <rect x="20" y="130" width="560" height="75" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+                    <text x="300" y="152" font-size="12" fill="#7c2d12" text-anchor="middle" font-weight="bold">🔧 Инструменты и сервисы</text>
+
+                    <rect x="40" y="165" width="130" height="32" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="105" y="185" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">SMMplanner, Postmypost</text>
+
+                    <rect x="185" y="165" width="130" height="32" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="250" y="185" font-size="9" fill="#78350f" text-anchor="middle" font-weight="bold">VK Ads, Telegram Ads</text>
+
+                    <rect x="330" y="165" width="130" height="32" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="395" y="185" font-size="9" fill="#065f46" text-anchor="middle" font-weight="bold">Brand Analytics, YouScan</text>
+
+                    <rect x="475" y="165" width="95" height="32" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+                    <text x="522" y="185" font-size="9" fill="#831843" text-anchor="middle" font-weight="bold">Ozon, WB</text>
+
+                    <!-- Стрелка вниз -->
+                    <text x="300" y="225" font-size="20" fill="#14b8a6" text-anchor="middle">↓</text>
+
+                    <!-- Уровень 3: Аудитория -->
+                    <rect x="20" y="240" width="560" height="50" rx="12" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="300" y="262" font-size="12" fill="#831843" text-anchor="middle" font-weight="bold">👥 Аудитория</text>
+                    <text x="300" y="280" font-size="10" fill="#475569" text-anchor="middle">Пользователи, авторы контента, покупатели, продавцы, инфлюенсеры</text>
+                </svg>
+            </div>
+
+            <!-- FUNCTIONS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 8px;">📋 Базовые функции российских соцсетей</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Функция</th>
+                            <th>ВКонтакте</th>
+                            <th>Telegram</th>
+                            <th>Одноклассники</th>
+                            <th>Max</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Публикация контента (UGC)</strong></td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Взаимодействие (комментарии, реакции)</strong></td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Контакт-лист (друзья, подписки)</strong></td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                            <td class="yes">✓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Поиск по интересам</strong></td>
+                            <td class="yes">✓</td>
+                            <td>Частично</td>
+                            <td class="yes">✓</td>
+                            <td>Частично</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Магазины / товары</strong></td>
+                            <td class="yes">✓</td>
+                            <td>Частично</td>
+                            <td class="yes">✓</td>
+                            <td>В развитии</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SMM TOOLS -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 10px;">🛠️ Российские SMM-инструменты и платформы</div>
+                <div class="tools-grid">
+                    <div class="tool-card m1">
+                        <div class="t-icon">📅</div>
+                        <div class="t-name">SMMplanner</div>
+                        <div class="t-desc">Отложенный постинг, автопостинг, аналитика для VK, OK, Telegram</div>
+                    </div>
+                    <div class="tool-card m2">
+                        <div class="t-icon">📊</div>
+                        <div class="t-name">Brand Analytics</div>
+                        <div class="t-desc">Мониторинг соцмедиа, sentiment-анализ, отчёты по упоминаниям</div>
+                    </div>
+                    <div class="tool-card m3">
+                        <div class="t-icon">🔍</div>
+                        <div class="t-name">YouScan</div>
+                        <div class="t-desc">Анализ русскоязычных соцмедиа. Включён в международный рейтинг G2 Crowd</div>
+                    </div>
+                    <div class="tool-card m4">
+                        <div class="t-icon">📢</div>
+                        <div class="t-name">VK Ads</div>
+                        <div class="t-desc">Рекламный кабинет ВКонтакте. Таргетинг, ретаргетинг, лид-формы</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOCIAL COMMERCE -->
+            <div class="commerce-card">
+                <div class="comm-title">🛒 Социальная коммерция в России: рынок и механика</div>
+                <div class="commerce-flow">
+                    <div class="commerce-node">
+                        <div class="cn-icon">🏢</div>
+                        <div class="cn-name">Бизнес</div>
+                        <div class="cn-desc">Создаёт товарные карточки в соцсетях</div>
+                    </div>
+                    <div class="commerce-arrow">→</div>
+                    <div class="commerce-node">
+                        <div class="cn-icon">✍️</div>
+                        <div class="cn-name">Автор</div>
+                        <div class="cn-desc">Встраивает товары в посты, клипы, истории</div>
+                    </div>
+                    <div class="commerce-arrow">→</div>
+                    <div class="commerce-node">
+                        <div class="cn-icon">🛍️</div>
+                        <div class="cn-name">Покупатель</div>
+                        <div class="cn-desc">Покупает прямо в соцсети</div>
+                    </div>
+                    <div class="commerce-arrow">→</div>
+                    <div class="commerce-node">
+                        <div class="cn-icon">💰</div>
+                        <div class="cn-name">Платформа</div>
+                        <div class="cn-desc">PPA-модель: бизнес платит за продажу</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #78350f; margin-top: 12px;">Рынок социальной коммерции в России: $10,9 млрд (2025), рост 22% в год. Прогноз VK: до 300 млрд ₽ GMV в 2026, удвоение в 2027.</div>
+            </div>
+
+            <!-- CROWDSOURCING -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 10px;">🤝 Краудсорсинг в России: государственные и коммерческие платформы</div>
+                <div class="crowd-grid">
+                    <div class="crowd-card g1">
+                        <div class="cc-icon">🏛️</div>
+                        <div class="cc-name">«Город идей» (Москва)</div>
+                        <div class="cc-desc">Краудсорсинговая платформа Правительства Москвы. Жители предлагают идеи по улучшению жизни в столице: транспорт, экология, благоустройство.</div>
+                        <div class="cc-examples">Реализовано 9 300+ предложений</div>
+                    </div>
+                    <div class="crowd-card g2">
+                        <div class="cc-icon">💡</div>
+                        <div class="cc-name">Идея.росконгресс.рф</div>
+                        <div class="cc-desc">Крауд-платформа форума «Сильные идеи для нового времени». Каждый может подать предложение, получить обратную связь и помощь экспертов.</div>
+                        <div class="cc-examples">Форум «Сильные идеи — 2025»</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS TABLE -->
+            <div class="analytics-card">
+                <div class="an-title">📊 Социальная аналитика в России: инструменты и задачи</div>
+                <div class="analytics-grid">
+                    <div class="analytics-block">
+                        <div class="ab-icon">🔍</div>
+                        <div class="ab-name">Мониторинг упоминаний</div>
+                        <div class="ab-desc">Отслеживание брендов в соцсетях, блогах, форумах, мессенджерах</div>
+                        <div class="ab-tools">Brand Analytics, IQBuzz, YouScan, «Медиалогия»</div>
+                    </div>
+                    <div class="analytics-block">
+                        <div class="ab-icon">😊</div>
+                        <div class="ab-name">Sentiment-анализ</div>
+                        <div class="ab-desc">Оценка тональности высказываний: позитив, негатив, нейтрал</div>
+                        <div class="ab-tools">Brand Analytics, YouScan</div>
+                    </div>
+                    <div class="analytics-block">
+                        <div class="ab-icon">📈</div>
+                        <div class="ab-name">Оценка эффективности</div>
+                        <div class="ab-desc">ROI кампаний, охват, вовлечённость, конверсия</div>
+                        <div class="ab-tools">VK Ads, Telegram Ads, Яндекс.Метрика</div>
+                    </div>
+                    <div class="analytics-block">
+                        <div class="ab-icon">🎯</div>
+                        <div class="ab-name">Социальный рейтинг</div>
+                        <div class="ab-desc">Оценка влияния пользователя: последователи, друзья, активность</div>
+                        <div class="ab-tools">HypeAuditor, LiveDune</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Российские соцсети</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Инструменты SMM</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Социальная коммерция</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 31 из 33
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #042f2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #115e59; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня мы разберём типы социальных сетей и их использование в интернет-маркетинге. Мы сосредоточимся на российском сегменте — отечественных платформах, инструментах и особенностях работы.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми метриками.</div>
+
+            <h3>📌 Масштаб российского сегмента</h3>
+
+            <p>В ноябре 2025 года интернетом в России пользовались около <span class="stat-inline">105 млн человек</span> — 86% населения старше 12 лет. Ежедневно в сеть выходили 103 млн пользователей, а среднее время онлайн-активности достигло <span class="stat-inline">4 часов 26 минут</span> в сутки. Более половины этого времени приходится на социальные медиа.</p>
+
+            <p>Это огромный рынок для маркетинга. Лидерами среди платформ остаются ВКонтакте, TikTok и Дзен, а среди мессенджеров — WhatsApp, Telegram и Max.</p>
+
+            <div class="action-hint">Перейдите к ключевым российским платформам.</div>
+
+            <h3>📌 Ключевые российские платформы</h3>
+
+            <p><strong>ВКонтакте</strong> — крупнейшая соцсеть России. Аудитория выросла до <span class="stat-inline">91,8 млн</span> пользователей в месяц и 59,5 млн в день. ВКонтакте сохранил лидерство по числу авторов и публикаций — почти 320 млн сообщений в месяц. Среднее время — 64 минуты в сутки. Это универсальная платформа: контент, сообщества, магазины, реклама.</p>
+
+            <p><strong>Telegram</strong> — мессенджер и платформа для каналов. Им пользуются 46% россиян, среднее время — 45 минут в день. Это главный канал для контент-маркетинга и рекламы в 2025–2026 годах.</p>
+
+            <p><strong>Одноклассники</strong> — соцсеть для старшей аудитории. 34 млн пользователей в день, 42 минуты в сутки. Программы лояльности, товары, видеоконтент.</p>
+
+            <p><strong>Дзен</strong> — платформа для контента. Статьи, видео, рекомендательная система. Лидер по охвату контента.</p>
+
+            <p><strong>Max</strong> — новый российский мессенджер. К декабрю 2025 года собрал <span class="stat-inline">75 млн</span> зарегистрированных пользователей и 45 млн среднесуточной аудитории. Интегрирован с Госуслугами, расширяет возможности для бизнеса.</p>
+
+            <p><strong>Rutube</strong> — российский видеохостинг. Увеличил месячную аудиторию до <span class="stat-inline">80 млн</span> пользователей и обогнал YouTube по дневной аудитории.</p>
+
+            <div class="action-hint">Перейдите к экосистеме российских соцмедиа.</div>
+
+            <h3>📌 Экосистема российских социальных медиа</h3>
+
+            <p>Экосистема включает три уровня. <strong>Платформы</strong> — ВКонтакте, Telegram, Одноклассники, Дзен, Max, Rutube. <strong>Инструменты и сервисы</strong> — SMMplanner, VK Ads, Telegram Ads, Brand Analytics, YouScan, Ozon, Wildberries. <strong>Аудитория</strong> — пользователи, авторы контента, покупатели, продавцы, инфлюенсеры.</p>
+
+            <p>Ключевая особенность российского рынка — доминирование отечественных платформ. После ограничений западных соцсетей российские пользователи и бизнес переориентировались на локальные экосистемы.</p>
+
+            <div class="action-hint">Перейдите к функциям российских соцсетей.</div>
+
+            <h3>📌 Базовые функции российских соцсетей</h3>
+
+            <p>Все ключевые российские платформы поддерживают четыре базовые функции: публикация контента (UGC), взаимодействие (комментарии, реакции), контакт-лист (друзья, подписки) и поиск по интересам. Дополнительно ВКонтакте и Одноклассники имеют встроенные магазины и товарные карточки.</p>
+
+            <div class="action-hint">Перейдите к SMM-инструментам.</div>
+
+            <h3>📌 Российские SMM-инструменты</h3>
+
+            <p><strong>SMMplanner</strong> — отложенный постинг, автопостинг, аналитика для VK, OK, Telegram. <strong>Brand Analytics</strong> — мониторинг соцмедиа, sentiment-анализ, отчёты по упоминаниям. <strong>YouScan</strong> — анализ русскоязычных соцмедиа, единственная российская система, включённая в международный рейтинг G2 Crowd. <strong>VK Ads</strong> — рекламный кабинет ВКонтакте с таргетингом, ретаргетингом и лид-формами.</p>
+
+            <div class="action-hint">Перейдите к социальной коммерции.</div>
+
+            <h3>📌 Социальная коммерция в России</h3>
+
+            <p>Социальная коммерция — покупки через контент, где автор становится партнёром бизнеса. Товары встраиваются в посты, клипы и истории, а автор получает долю с каждой продажи. Бизнес платит за продажу (PPA-модель), а платформа берёт на себя инфраструктуру: каталог, аналитику, отчётность и выплаты.</p>
+
+            <p>Рынок социальной коммерции в России в 2025 году достиг <span class="stat-inline">$10,9 млрд</span>, рост 22% в год. По оценке VK, объём может достигнуть до 300 млрд ₽ GMV в 2026 и удвоиться в 2027. ВКонтакте запустил «шопсы» — публикации с товарными карточками, позволяющие покупать напрямую из контента.</p>
+
+            <div class="action-hint">Перейдите к краудсорсингу.</div>
+
+            <h3>📌 Краудсорсинг в России</h3>
+
+            <p>В России краудсорсинг активно используется на государственном уровне. Платформа <strong>«Город идей»</strong> Правительства Москвы позволяет жителям предлагать идеи по улучшению жизни в столице: транспорт, экология, благоустройство. Реализовано более 9 300 предложений. Платформа <strong>«Активный гражданин»</strong> позволяет участвовать в голосованиях по развитию территорий.</p>
+
+            <p>Крауд-платформа <strong>идея.росконгресс.рф</strong> форума «Сильные идеи для нового времени» — каждый может подать предложение, получить обратную связь и помощь экспертов.</p>
+
+            <div class="action-hint">Перейдите к социальной аналитике.</div>
+
+            <h3>📌 Социальная аналитика в России</h3>
+
+            <p>Для мониторинга упоминаний используются Brand Analytics, IQBuzz, YouScan, «Медиалогия», «СКАН-Интерфакс». Sentiment-анализ позволяет оценивать тональность высказываний. Оценка эффективности кампаний ведётся через VK Ads, Telegram Ads, Яндекс.Метрику. Социальный рейтинг (влияние пользователя) измеряется через HypeAuditor, LiveDune.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали типы социальных сетей и их использование в российском интернет-маркетинге. Ключевые выводы:</p>
+
+            <ul>
+                <li>Российский сегмент: 105 млн пользователей, 4ч26м в интернете, >50% — соцмедиа.</li>
+                <li>Ключевые платформы: ВКонтакте (91,8 млн MAU), Telegram (46% россиян), Одноклассники, Дзен, Max, Rutube.</li>
+                <li>Экосистема: платформы → инструменты (SMMplanner, Brand Analytics, VK Ads) → аудитория.</li>
+                <li>Социальная коммерция: $10,9 млрд, рост 22%, PPA-модель, «шопсы» ВКонтакте.</li>
+                <li>Краудсорсинг: «Город идей», «Активный гражданин», идея.росконгресс.рф.</li>
+                <li>Аналитика: Brand Analytics, YouScan, IQBuzz, «Медиалогия».</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём медиапланирование. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ВКонтакте</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">VK</div>
+                            <div class="gloss-def">Крупнейшая российская социальная сеть, экосистема сервисов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Telegram</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Telegram</div>
+                            <div class="gloss-def">Мессенджер и платформа для каналов, главный канал контент-маркетинга</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Max</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Max</div>
+                            <div class="gloss-def">Новый российский мессенджер с интеграцией с Госуслугами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Дзен</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Дзен</div>
+                            <div class="gloss-def">Платформа для контента: статьи, видео, рекомендации</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Rutube</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Rutube</div>
+                            <div class="gloss-def">Российский видеохостинг, обогнал YouTube по дневной аудитории</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PPA</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Pay Per Action</div>
+                            <div class="gloss-def">Оплата за целевое действие — модель социальной коммерции</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMMplanner</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">SMMplanner</div>
+                            <div class="gloss-def">Российский сервис отложенного постинга и аналитики для соцсетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Brand Analytics</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Brand Analytics</div>
+                            <div class="gloss-def">Система мониторинга соцмедиа и sentiment-анализа</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">YouScan</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">YouScan</div>
+                            <div class="gloss-def">Платформа анализа русскоязычных соцмедиа, включена в G2 Crowd</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">MAU / DAU</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Monthly / Daily Active Users</div>
+                            <div class="gloss-def">Месячная и дневная активная аудитория платформы</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Российские соцсети: статистика</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Mediascope: ВКонтакте — самая посещаемая соцсеть в России (64 мин/сутки). — <a href="https://www.gazeta.ru/amp/social/news/2026/01/30/27744589.shtml" target="_blank">Gazeta.ru</a> <span class="src-date">30.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">ФОМ: Мессенджеры и социальные сети — WhatsApp (57%), Telegram (46%), ВКонтакте (41%). — <a href="https://fom.ru/SMI-i-internet/15239/" target="_blank">FOM.ru</a> <span class="src-date">12.09.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Rambler: Российские онлайн-сервисы укрепили позиции в 2025 году — ВКонтакте 91,8 млн MAU, Max 75 млн. — <a href="https://news.rambler.ru/tech/55905942-populyarnye-rossiyskie-onlayn-servisy-ukrepili-pozitsii-v-2025-godu/" target="_blank">News.Rambler.ru</a> <span class="src-date">16.01.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🛒 Социальная коммерция</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">PayNXT360: Russia Social Commerce Market — $10,9 млрд (2025), рост 22%. — <a href="https://www.marketresearch.com/PayNXT360-v4075/Russia-Social-Commerce-Intelligence-Future-41108894/" target="_blank">MarketResearch.com</a> <span class="src-date">30.04.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">VK Реклама: Социальная коммерция ВКонтакте — прогноз 300 млрд ₽ GMV в 2026. — <a href="https://ads.vk.ru/insights/trendy-socialnoj-kommercii" target="_blank">Ads.VK.ru</a> <span class="src-date">14.08.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">РАЭК: рынок социальной коммерции может достичь 1,5 трлн рублей в 2027 году. — <a href="https://hi-tech.mail.ru" target="_blank">Hi-Tech.Mail.ru</a> <span class="src-date">29.04.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Аналитика и SMM-инструменты</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">T-Bank Secrets: Системы мониторинга соцмедиа — Brand Analytics, IQBuzz, YouScan, «Медиалогия». — <a href="https://secrets.tbank.ru/blogi-kompanij/kak-nahodit-nezanyatye-nishi/" target="_blank">Secrets.TBank.ru</a> <span class="src-date">10.07.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Sostav.ru: Реестр ключевых диджитал-инструментов 2025 года. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">31.07.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤝 Краудсорсинг</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Ren.tv: Платформа «Город идей» — реализовано 9,3 тыс. предложений москвичей. — <a href="https://ren.tv" target="_blank">Ren.tv</a> <span class="src-date">06.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Форум «Сильные идеи для нового времени-2025»: крауд-платформа идея.росконгресс.рф. — <a href="https://newalexandrovsk.gosuslugi.ru" target="_blank">Gosuslugi.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

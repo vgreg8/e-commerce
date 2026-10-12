@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 13. CMS — Content Management System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a1f2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #4c1d95; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #8b5cf6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* DONUT: CMS MARKET SHARE */
+        .donut-card { display: flex; gap: 24px; align-items: center; background: #faf5ff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 20px 24px; }
+        .donut-chart { width: 160px; height: 160px; border-radius: 50%; position: relative; flex-shrink: 0;
+            background: conic-gradient(#7c3aed 0deg 108deg, #ec4899 108deg 155deg, #f59e0b 155deg 198deg, #10b981 198deg 234deg, #3b82f6 234deg 360deg); }
+        .donut-chart::after { content: ''; position: absolute; inset: 32px; background: #faf5ff; border-radius: 50%; }
+        .donut-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .donut-center .donut-pct { font-size: 20px; font-weight: 900; color: #4c1d95; }
+        .donut-center .donut-cap { font-size: 8px; color: #4c1d95; text-transform: uppercase; letter-spacing: 0.4px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 7px; font-size: 11.5px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .donut-legend .legend-color { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+        .donut-legend .legend-text strong { color: #4c1d95; font-size: 12px; }
+        .donut-legend .legend-text small { color: #64748b; display: block; font-size: 10px; }
+
+        /* CMS CARD GRID */
+        .cms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .cms-card { border-radius: 12px; padding: 14px 16px; transition: transform 0.15s; }
+        .cms-card:hover { transform: translateY(-2px); }
+        .cms-card.wp { background: #eff6ff; border: 2px solid #93c5fd; }
+        .cms-card.bitrix { background: #fef2f2; border: 2px solid #fca5a5; }
+        .cms-card.tilda { background: #fdf4ff; border: 2px solid #e9d5ff; }
+        .cms-card.saas { background: #f0fdf4; border: 2px solid #86efac; }
+        .cms-card .cms-icon { font-size: 22px; margin-bottom: 4px; }
+        .cms-card .cms-name { font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 3px; }
+        .cms-card .cms-share { font-size: 11px; font-weight: 900; color: #7c3aed; margin-bottom: 5px; }
+        .cms-card .cms-desc { font-size: 10.5px; color: #475569; line-height: 1.4; }
+
+        /* FUNCTIONS GRID */
+        .functions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .func-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px 10px; text-align: center; }
+        .func-card .func-icon { font-size: 20px; margin-bottom: 5px; }
+        .func-card .func-name { font-size: 11px; font-weight: bold; color: #4c1d95; line-height: 1.25; }
+        .func-card .func-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+
+        /* COMPARE TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #4c1d95; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #faf5ff; }
+        .metrics-table .positive { color: #059669; font-weight: bold; }
+        .metrics-table .negative { color: #e11d48; font-weight: bold; }
+
+        /* SVG CHART */
+        .chart-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* SAAS VS SELF-HOSTED */
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .compare-card { border-radius: 12px; padding: 16px; }
+        .compare-card.self { background: #fef3c7; border: 2px solid #fcd34d; }
+        .compare-card.saas { background: #d1fae5; border: 2px solid #6ee7b7; }
+        .compare-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .compare-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .compare-card li { margin-bottom: 4px; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #8b5cf6; }
+        .rt-btn:hover { background: #7c3aed; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #c4b5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #c4b5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #334155; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #4c1d95; color: #c4b5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #8b5cf6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #8b5cf6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #c4b5fd; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #8b5cf6; color: #1a1f2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #c4b5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 13. CMS — Content Management System
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">⚙️</div>
+                <div class="hero-data">
+                    <div class="hero-number">30%</div>
+                    <div class="hero-label">сайтов в России на WordPress</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">43%</div>
+                    <div class="hero-label">сайтов в мире на WordPress</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">15%</div>
+                    <div class="hero-label">корпоративный сегмент — 1С-Битрикс</div>
+                </div>
+            </div>
+
+            <!-- DONUT: CMS MARKET SHARE -->
+            <div class="donut-card">
+                <div class="donut-chart">
+                    <div class="donut-center">
+                        <div class="donut-pct">CMS</div>
+                        <div class="donut-cap">рынок</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div style="font-size: 13px; font-weight: bold; color: #4c1d95; margin-bottom: 4px;">Доли CMS на российском рынке (2025)</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #7c3aed;"></div>
+                        <div class="legend-text">
+                            <strong>WordPress — 30%</strong>
+                            <small>Блоги, корпоративные сайты, интернет-магазины (WooCommerce)</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ec4899;"></div>
+                        <div class="legend-text">
+                            <strong>1С-Битрикс — 13%</strong>
+                            <small>Корпоративный сегмент, крупные интернет-магазины</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <div class="legend-text">
+                            <strong>Tilda — 12%</strong>
+                            <small>Лендинги, промо-сайты, портфолио</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <div class="legend-text">
+                            <strong>Joomla / Drupal — 10%</strong>
+                            <small>Устаревшие корпоративные платформы</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b82f6;"></div>
+                        <div class="legend-text">
+                            <strong>Другие — 35%</strong>
+                            <small>MODX, Opencart, Craftum, Nethouse, inSales, 1С-УНФ</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CMS CARDS -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 10px;">🏆 Популярные CMS в России: сравнение платформ</div>
+                <div class="cms-grid">
+                    <div class="cms-card wp">
+                        <div class="cms-icon">🌐</div>
+                        <div class="cms-name">WordPress</div>
+                        <div class="cms-share">30% рынка РФ / 43% мира</div>
+                        <div class="cms-desc">Универсальная CMS. Огромная экосистема плагинов. WooCommerce для интернет-магазинов. Бесплатна, но требует технических навыков.</div>
+                    </div>
+                    <div class="cms-card bitrix">
+                        <div class="cms-icon">🏢</div>
+                        <div class="cms-name">1С-Битрикс</div>
+                        <div class="cms-share">13% рынка РФ</div>
+                        <div class="cms-desc">Лидер корпоративного сегмента. Встроенная интеграция с 1С, CRM, складом. Подходит для крупных интернет-магазинов и B2B.</div>
+                    </div>
+                    <div class="cms-card tilda">
+                        <div class="cms-icon">🎨</div>
+                        <div class="cms-name">Tilda</div>
+                        <div class="cms-share">12% рынка РФ</div>
+                        <div class="cms-desc">Конструктор лендингов и промо-сайтов. Визуальный редактор, быстрый запуск. Минус — ограниченная масштабируемость.</div>
+                    </div>
+                    <div class="cms-card saas">
+                        <div class="cms-icon">☁️</div>
+                        <div class="cms-name">SaaS-платформы</div>
+                        <div class="cms-share">~5% и растёт</div>
+                        <div class="cms-desc">inSales, AdvantShop, Shop-Script. Всё включено: хостинг, обновления, поддержка. Оплата по подписке.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FUNCTIONS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 10px;">🛠️ Ключевые функции CMS</div>
+                <div class="functions-grid">
+                    <div class="func-card">
+                        <div class="func-icon">✍️</div>
+                        <div class="func-name">Создание контента</div>
+                        <div class="func-desc">Редактор, медиа, шаблоны</div>
+                    </div>
+                    <div class="func-card">
+                        <div class="func-icon">👥</div>
+                        <div class="func-name">Совместная работа</div>
+                        <div class="func-desc">Роли, права, комментарии</div>
+                    </div>
+                    <div class="func-card">
+                        <div class="func-icon">📚</div>
+                        <div class="func-name">Управление версиями</div>
+                        <div class="func-desc">История, откат, черновики</div>
+                    </div>
+                    <div class="func-card">
+                        <div class="func-icon">🔐</div>
+                        <div class="func-name">Контроль доступа</div>
+                        <div class="func-desc">Администраторы, редакторы, авторы</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARE TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 8px;">📊 Сравнение CMS: скорость, SEO, стоимость</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Платформа</th>
+                            <th>Скорость запуска</th>
+                            <th>SEO-возможности</th>
+                            <th>Стоимость</th>
+                            <th>Сложность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>WordPress</strong></td>
+                            <td>Средняя</td>
+                            <td class="positive">Отличные (Yoast, RankMath)</td>
+                            <td>Бесплатно + хостинг</td>
+                            <td>Средняя</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1С-Битрикс</strong></td>
+                            <td>Долгая</td>
+                            <td class="positive">Хорошие</td>
+                            <td>От 5 400 ₽ (лицензия)</td>
+                            <td class="negative">Высокая</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tilda</strong></td>
+                            <td class="positive">Быстрая</td>
+                            <td>Базовые</td>
+                            <td>750 ₽/мес (Business)</td>
+                            <td class="positive">Низкая</td>
+                        </tr>
+                        <tr>
+                            <td><strong>inSales</strong></td>
+                            <td class="positive">Быстрая</td>
+                            <td>Средние</td>
+                            <td>От 1 800 ₽/мес</td>
+                            <td class="positive">Низкая</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MODX</strong></td>
+                            <td>Средняя</td>
+                            <td class="positive">Отличные</td>
+                            <td>Бесплатно</td>
+                            <td class="negative">Высокая</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SAAS VS SELF-HOSTED -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #4c1d95; margin-bottom: 10px;">⚖️ Self-hosted CMS vs SaaS-платформа</div>
+                <div class="compare-grid">
+                    <div class="compare-card self">
+                        <h5 style="color: #92400e;">🖥️ Self-hosted (WordPress, Bitrix)</h5>
+                        <ul>
+                            <li>Полный контроль над кодом и данными</li>
+                            <li>Свобода в кастомизации</li>
+                            <li>Нужен разработчик и хостинг</li>
+                            <li>Обновления и безопасность — на вас</li>
+                        </ul>
+                    </div>
+                    <div class="compare-card saas">
+                        <h5 style="color: #15803d;">☁️ SaaS (inSales, Tilda, Shop-Script)</h5>
+                        <ul>
+                            <li>Всё включено: хостинг, обновления, поддержка</li>
+                            <li>Быстрый запуск без разработчика</li>
+                            <li>Оплата по подписке</li>
+                            <li>Меньше гибкости в кастомизации</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG CHART -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Тренды CMS: рост Headless CMS и AI-интеграций <span>2024 → 2028</span></div>
+                <svg viewBox="0 0 600 160" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="130" x2="580" y2="130" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="90" x2="580" y2="90" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="50" x2="580" y2="50" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Headless CMS рост -->
+                    <polyline points="90,110 220,95 350,72 480,45 580,25"
+                              fill="none" stroke="#8b5cf6" stroke-width="3" stroke-linejoin="round"/>
+                    <circle cx="90" cy="110" r="4" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="95" r="4" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="72" r="4" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="45" r="4" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="25" r="6" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <!-- SaaS рост -->
+                    <polyline points="90,120 220,108 350,92 480,72 580,52"
+                              fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="6 3"/>
+                    <circle cx="580" cy="52" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+
+                    <!-- Подписи -->
+                    <text x="90" y="125" font-size="9" fill="#4c1d95" text-anchor="middle">$1,5B</text>
+                    <text x="350" y="65" font-size="9" fill="#4c1d95" text-anchor="middle" font-weight="bold">$2,8B</text>
+                    <text x="580" y="18" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">$6,4B</text>
+
+                    <text x="90" y="145" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="220" y="145" font-size="10" fill="#475569" text-anchor="middle">2025</text>
+                    <text x="350" y="145" font-size="10" fill="#475569" text-anchor="middle">2026</text>
+                    <text x="480" y="145" font-size="10" fill="#475569" text-anchor="middle">2027</text>
+                    <text x="580" y="145" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2028</text>
+
+                    <text x="555" y="45" font-size="10" fill="#7c3aed" text-anchor="end" font-weight="bold">Headless CMS</text>
+                    <text x="555" y="58" font-size="9" fill="#64748b" text-anchor="end">CAGR 22,5%</text>
+                    <text x="555" y="80" font-size="10" fill="#10b981" text-anchor="end" font-weight="bold">SaaS-платформы</text>
+                    <text x="555" y="93" font-size="9" fill="#64748b" text-anchor="end">CAGR 17,3%</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Мировой рынок Headless CMS растёт на 22,5% в год. К 2028 году объём достигнет $6,4 млрд.</div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Что такое CMS</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Обзор платформ</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Выбор CMS для бизнеса</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 13 из 15
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a1f2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #334155; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали хостинг веб-сайтов. Сегодня мы поговорим о CMS — системах управления контентом. Это тот инструмент, с которым маркетолог работает ежедневно: добавляет страницы, меняет тексты, публикует акции, настраивает SEO-метатеги.</p>
+
+            <div class="action-hint">Обратите внимание студентов на круговую диаграмму долей CMS.</div>
+
+            <h3>📌 Что такое CMS</h3>
+
+            <p>CMS (Content Management System) — это система управления контентом, автоматизирующая добавление, редактирование и публикацию контента на сайте. Без CMS каждая новая страница требовала бы участия программиста. С CMS редактор может добавить статью, товар или акцию за пару минут.</p>
+
+            <p>Ключевые функции CMS включают: создание содержимого (визуальный редактор, медиатека), совместную работу (роли, права, комментарии), управление версиями (история изменений, откат) и контроль доступа (администраторы, редакторы, авторы, гости).</p>
+
+            <p>Шаблоны и стандарты позволяют соблюдать единый стиль издания. Все страницы автоматически наследуют дизайн, что критически важно для бренда.</p>
+
+            <h3>📌 Зачем маркетологу понимать CMS</h3>
+
+            <p>От выбора CMS зависят скорость запуска сайта, стоимость поддержки и возможности оптимизации. CMS напрямую влияет на SEO-возможности (метатеги, структура URL, скорость загрузки), интеграции с аналитикой и CRM, а также на масштабируемость проекта.</p>
+
+            <p>Маркетологу не нужно программировать на PHP или JavaScript. Но он должен знать, какие задачи решает CMS «из коробки», а какие требуют доработки, и уметь ставить задачи разработчикам.</p>
+
+            <h3>📌 Простые веб-сайты и конструкторы</h3>
+
+            <p>Для простых веб-сайтов можно использовать конструкторы сайтов на бесплатном хостинге. В начале 2000-х популярностью пользовался сервис Яндекса «Народ.ру». Сегодня эту нишу занимают Tilda, Craftum, Nethouse, Wix.</p>
+
+            <p>Стандартные шаблоны позволяют быстро создать брошюрный сайт — лендинг, портфолио или визитку. Запуск возможен за день, но масштабируемость ограничена: при росте проекта придётся мигрировать на полноценную CMS.</p>
+
+            <h3>📌 Доли CMS на российском рынке</h3>
+
+            <p>По данным W3Techs и Рейтинга Рунета, лидером в России остаётся WordPress — около 30% рынка. В мире его доля составляет 43%. Это универсальная CMS с огромной экосистемой плагинов. WooCommerce (плагин WordPress) позволяет создавать интернет-магазины.</p>
+
+            <p>На втором месте в России — 1С-Битрикс (около 13%). Это лидер корпоративного сегмента: крупные интернет-магазины, B2B-порталы, системы с интеграцией 1С, CRM и складского учёта. Лицензия стоит от 5 400 рублей, но для крупного бизнеса это оправданные инвестиции.</p>
+
+            <p>Третье место занимает Tilda (около 12%). Это конструктор лендингов и промо-сайтов с визуальным редактором. Запуск сайта занимает часы, но масштабируемость ограничена.</p>
+
+            <p>Устаревшие платформы Joomla и Drupal занимают около 10% совокупно. Ещё 35% рынка приходится на MODX, Opencart, Craftum, Nethouse, inSales и другие нишевые решения.</p>
+
+            <div class="action-hint">Перейдите к сравнению self-hosted и SaaS-платформ.</div>
+
+            <h3>📌 Self-hosted CMS vs SaaS-платформа</h3>
+
+            <p>Ключевое различие — уровень управления. Self-hosted CMS (WordPress, Bitrix, MODX) устанавливается на ваш хостинг. Вы получаете полный контроль над кодом и данными, свободу в кастомизации, но должны сами отвечать за обновления, безопасность и хостинг.</p>
+
+            <p>SaaS-платформы (inSales, AdvantShop, Shop-Script, Tilda) работают в облаке. Всё включено: хостинг, обновления, поддержка. Оплата по подписке. Минус — меньше гибкости в кастомизации и привязка к провайдеру.</p>
+
+            <p>По данным исследования CMSWire, в 2025 году 67% компаний предпочитают SaaS-модель для быстрого запуска проектов, тогда как 43% сохраняют self-hosted решения для долгосрочных стратегических проектов.</p>
+
+            <h3>📌 Специализированные CMS для интернет-магазинов</h3>
+
+            <p>Для интернет-магазинов существуют специализированные CMS. 1С-Битрикс — лидер корпоративного сегмента. WooCommerce на WordPress — самое популярное решение для малых и средних магазинов. OpenCart — простая и бесплатная CMS.</p>
+
+            <p>SaaS-решения для e-commerce: inSales (от 1 800 ₽/мес), AdvantShop, Shop-Script. Они позволяют запустить интернет-магазин без разработчика и хостинга, но с ограничениями по кастомизации.</p>
+
+            <h3>📌 Тренды CMS в 2025–2026</h3>
+
+            <p>Несколько ключевых трендов определяют развитие рынка CMS.</p>
+
+            <p><strong>Headless CMS.</strong> Это архитектура, при которой CMS управляет контентом, а фронтенд-часть разрабатывается отдельно (на React, Vue, Angular). Такой подход позволяет доставлять контент на любые устройства: сайт, мобильное приложение, умные часы. Мировой рынок Headless CMS растёт на <span class="stat-inline">22,5%</span> в год и достигнет $6,4 млрд к 2028 году.</p>
+
+            <p><strong>AI-интеграции.</strong> В 2025 году большинство ведущих CMS интегрировали AI-функции: генерация контента, автоматическое создание метатегов, анализ тональности текста, рекомендации по SEO. По данным HubSpot, 76% маркетологов используют AI-инструменты внутри CMS для ускорения публикаций.</p>
+
+            <p><strong>Контейнеризация и DevOps.</strong> Всё больше CMS развёртывается через Docker и Kubernetes. Это упрощает миграцию между хостингами и обеспечивает стабильность при пиковых нагрузках.</p>
+
+            <p><strong>Безопасность и суверенитет данных.</strong> В условиях геополитической турбулентности российский бизнес активно мигрирует с зарубежных CMS (Wix, Squarespace) на отечественные платформы. Рост доли Tilda, Craftum, Nethouse и 1С-Битрикс — прямое следствие этого тренда.</p>
+
+            <h3>📌 Как выбрать CMS: практические рекомендации</h3>
+
+            <p>Четыре вопроса помогут определиться с выбором:</p>
+
+            <ul>
+                <li><strong>Какой тип сайта?</strong> Лендинг → Tilda. Корпоративный сайт → WordPress или 1С-Битрикс. Интернет-магазин → Bitrix, WooCommerce или SaaS.</li>
+                <li><strong>Есть ли команда разработчиков?</strong> Да → self-hosted CMS с кастомизацией. Нет → SaaS или конструктор.</li>
+                <li><strong>Какой бюджет?</strong> Минимальный → Tilda, Craftum. Средний → WordPress. Высокий → Bitrix или кастомная разработка.</li>
+                <li><strong>Какие планы на масштабирование?</strong> Долгосрочные → self-hosted с возможностью кастомизации. Быстрый старт → SaaS.</li>
+            </ul>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали CMS — системы управления контентом. Ключевые выводы:</p>
+
+            <ul>
+                <li>CMS автоматизирует добавление и редактирование контента. Ключевые функции: создание, совместная работа, версии, контроль доступа.</li>
+                <li>Лидеры рынка в России: WordPress (30%), 1С-Битрикс (13%), Tilda (12%).</li>
+                <li>Self-hosted CMS даёт полный контроль, SaaS — быстрый запуск и поддержку.</li>
+                <li>Специализированные CMS для e-commerce: Bitrix, WooCommerce, OpenCart, inSales.</li>
+                <li>Ключевые тренды: Headless CMS (+22,5% CAGR), AI-интеграции (76% маркетологов), контейнеризация, суверенитет данных.</li>
+                <li>Выбор CMS зависит от типа сайта, наличия команды, бюджета и планов на масштабирование.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём, как работает поисковая машина. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CMS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Content Management System</div>
+                            <div class="gloss-def">Система управления контентом сайта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CRM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Customer Relationship Management</div>
+                            <div class="gloss-def">Система управления взаимоотношениями с клиентами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">DevOps</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Development & Operations</div>
+                            <div class="gloss-def">Методология автоматизации процессов разработки и эксплуатации</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Headless CMS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Headless Content Management System</div>
+                            <div class="gloss-def">CMS без фронтенда — управляет контентом, доставляя его через API на любые устройства</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SaaS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Software as a Service</div>
+                            <div class="gloss-def">Программное обеспечение как услуга по подписке</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">WooCommerce</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Плагин WordPress для e-commerce</div>
+                            <div class="gloss-def">Бесплатный плагин, превращающий WordPress в интернет-магазин</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">API</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Application Programming Interface</div>
+                            <div class="gloss-def">Интерфейс программирования приложений</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CAGR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Compound Annual Growth Rate</div>
+                            <div class="gloss-def">Среднегодовой темп роста</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок CMS</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">W3Techs: Usage Statistics of Content Management Systems (2025). — <a href="https://w3techs.com/technologies/overview/content_management" target="_blank">W3Techs.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">«Рейтинг Рунета»: Рейтинг CMS 2025 — WordPress, 1С-Битрикс, Tilda. — <a href="https://ratingruneta.ru/cms" target="_blank">RatingRuneta.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">CMS Magazine: Итоги рынка CMS в России 2025. — <a href="https://cmsmagazine.ru" target="_blank">CMSMagazine.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 Headless CMS и тренды</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Grand View Research: Headless CMS Market Size Report, 2024–2030. — <a href="https://www.grandviewresearch.com" target="_blank">GrandViewResearch.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">CMSWire: State of the CMS Market 2025. — <a href="https://www.cmswire.com" target="_blank">CMSWire.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">HubSpot: State of Marketing 2025 — AI in CMS. — <a href="https://www.hubspot.com" target="_blank">HubSpot.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏢 1С-Битрикс и корпоративные CMS</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">1С-Битрикс: Официальные данные о лицензиях и внедрениях. — <a href="https://www.1c-bitrix.ru" target="_blank">1C-Bitrix.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">TAdviser: Российский рынок CMS и ECM-систем. — <a href="https://www.tadviser.ru" target="_blank">TAdviser.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">☁️ SaaS и конструкторы</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">InSales: Обзор рынка SaaS-платформ для e-commerce. — <a href="https://www.insales.ru" target="_blank">InSales.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Tilda Publishing: Обзор тарифов и возможностей. — <a href="https://tilda.cc" target="_blank">Tilda.cc</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 32. Медиапланирование</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0c1a3a; color: #dbeafe; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #1e3a8a; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #2563eb; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #0c1a3a 0%, #1e40af 60%, #3b82f6 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* CYCLE */
+        .cycle-card { background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 20px 24px; }
+        .cycle-card .cycle-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 14px; }
+        .cycle-flow { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .cycle-node { flex: 1; min-width: 120px; background: white; border: 2px solid #3b82f6; border-radius: 10px; padding: 12px 10px; text-align: center; }
+        .cycle-node .cn-icon { font-size: 20px; margin-bottom: 4px; }
+        .cycle-node .cn-name { font-size: 11px; font-weight: bold; color: #1e3a8a; line-height: 1.3; }
+        .cycle-node .cn-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+        .cycle-arrow { font-size: 18px; color: #3b82f6; font-weight: bold; }
+        .cycle-return { text-align: center; font-size: 11px; color: #1e40af; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #93c5fd; font-weight: bold; }
+
+        /* PLANNING TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #1e3a8a; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #eff6ff; }
+        .metrics-table .cat { color: #1e3a8a; font-weight: bold; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+
+        /* MATRIX SVG */
+        .chart-card { background: #ffffff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* CAMPAIGN TYPES */
+        .campaign-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .campaign-card { border-radius: 12px; padding: 16px; }
+        .campaign-card.image { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .campaign-card.product { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .campaign-card.trade { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .campaign-card .cc-icon { font-size: 22px; margin-bottom: 6px; }
+        .campaign-card .cc-name { font-size: 13px; font-weight: 900; margin-bottom: 5px; }
+        .campaign-card.image .cc-name { color: #1e3a8a; }
+        .campaign-card.product .cc-name { color: #78350f; }
+        .campaign-card.trade .cc-name { color: #065f46; }
+        .campaign-card .cc-desc { font-size: 10.5px; color: #1e293b; line-height: 1.45; margin-bottom: 6px; }
+        .campaign-card .cc-metric { font-size: 10px; color: #7c3aed; font-weight: 600; }
+
+        /* MEDIAPLAN EXAMPLE */
+        .mediaplan-card { background: #fff7ed; border: 2px solid #fed7aa; border-radius: 14px; padding: 20px 24px; }
+        .mediaplan-card .mp-title { font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 14px; }
+        .mediaplan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .mp-item { background: white; border: 1.5px solid #fdba74; border-radius: 10px; padding: 12px; }
+        .mp-item .mp-icon { font-size: 18px; margin-bottom: 4px; }
+        .mp-item .mp-name { font-size: 11.5px; font-weight: bold; color: #7c2d12; margin-bottom: 3px; }
+        .mp-item .mp-val { font-size: 11px; color: #475569; line-height: 1.4; }
+        .mp-item .mp-metric { font-size: 10px; color: #7c3aed; margin-top: 4px; font-weight: 600; }
+
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .tool-card { border-radius: 10px; padding: 12px 10px; text-align: center; }
+        .tool-card.m1 { background: #dbeafe; border: 1.5px solid #3b82f6; }
+        .tool-card.m2 { background: #fef3c7; border: 1.5px solid #f59e0b; }
+        .tool-card.m3 { background: #dcfce7; border: 1.5px solid #10b981; }
+        .tool-card.m4 { background: #fce7f3; border: 1.5px solid #ec4899; }
+        .tool-card .t-icon { font-size: 20px; margin-bottom: 4px; }
+        .tool-card .t-name { font-size: 11px; font-weight: bold; color: #1e293b; margin-bottom: 3px; }
+        .tool-card .t-desc { font-size: 9.5px; color: #475569; line-height: 1.35; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #2563eb; }
+        .rt-btn:hover { background: #1e40af; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #93c5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e3a8a; padding-bottom: 10px; }
+        .timer-badge { background: #fbbf24; color: #0c1a3a; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; font-weight: bold; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #dbeafe; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #93c5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e3a8a; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #1e3a8a; color: #93c5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #2563eb; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #2563eb; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #93c5fd; font-size: 13px; min-width: 100px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #2563eb; color: #0c1a3a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #93c5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 32. Медиапланирование
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">📊</div>
+                <div class="hero-data">
+                    <div class="hero-number">1,57 трлн ₽</div>
+                    <div class="hero-label">Рынок интернет-рекламы в России (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">96,7%</div>
+                    <div class="hero-label">Performance-бюджетов</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">×36</div>
+                    <div class="hero-label">ROI e-mail-маркетинга</div>
+                </div>
+            </div>
+
+            <!-- CYCLE -->
+            <div class="cycle-card">
+                <div class="cycle-title">🔄 Цикл планирования и анализа интернет-маркетинга</div>
+                <div class="cycle-flow">
+                    <div class="cycle-node">
+                        <div class="cn-icon">🎯</div>
+                        <div class="cn-name">1. Бизнес-цели и ЦА</div>
+                        <div class="cn-desc">Определение целей и аудитории</div>
+                    </div>
+                    <div class="cycle-arrow">→</div>
+                    <div class="cycle-node">
+                        <div class="cn-icon">🧭</div>
+                        <div class="cn-name">2. Стратегия</div>
+                        <div class="cn-desc">Уточнение стратегии интернет-маркетинга</div>
+                    </div>
+                    <div class="cycle-arrow">→</div>
+                    <div class="cycle-node">
+                        <div class="cn-icon">⚙️</div>
+                        <div class="cn-name">3. Реализация</div>
+                        <div class="cn-desc">Запуск кампаний и инструментов</div>
+                    </div>
+                    <div class="cycle-arrow">→</div>
+                    <div class="cycle-node">
+                        <div class="cn-icon">📈</div>
+                        <div class="cn-name">4. Измерение</div>
+                        <div class="cn-desc">Оценка эффективности</div>
+                    </div>
+                </div>
+                <div class="cycle-return">🔁 Малый цикл: измерение → уточнение стратегии. Большой цикл: периодическая ревизия бизнес-целей и ЦА</div>
+            </div>
+
+            <!-- PLANNING TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 8px;">📋 Таблица планирования по «Индра»: 7 этапов</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Этап</th>
+                            <th>Что решаем</th>
+                            <th>Примеры</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cat">Proposition</td>
+                            <td>Особенности бренда, что нового в продукте</td>
+                            <td>«Изюминка», преимущества для клиента</td>
+                        </tr>
+                        <tr>
+                            <td class="cat">KPIs</td>
+                            <td>Ключевые показатели производительности</td>
+                            <td>ROMI, CPO, ДРР, охват, частота</td>
+                        </tr>
+                        <tr>
+                            <td class="cat">Целевая аудитория</td>
+                            <td>Образ жизни, возраст, цифровые привычки</td>
+                            <td>Mediascope, ФОМ, Brand Analytics</td>
+                        </tr>
+                        <tr>
+                            <td class="cat">Медиа</td>
+                            <td>Какие каналы дадут лучший результат</td>
+                            <td>Яндекс.Директ, VK Ads, Telegram Ads</td>
+                        </tr>
+                        <tr>
+                            <td class="cat">Контент</td>
+                            <td>Что публиковать, кто разрабатывает</td>
+                            <td>In-house или аутсорс, форматы</td>
+                        </tr>
+                        <tr>
+                            <td class="cat">Аналитика</td>
+                            <td>Системы мониторинга и оптимизации</td>
+                            <td>Яндекс.Метрика, GA4, BI-платформы</td>
+                        </tr>
+                        <tr>
+                            <td class="cat">Поддержка развития</td>
+                            <td>Направления развития программы</td>
+                            <td>Персонализация, AI, новые каналы</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MATRIX AUDIENCE -->
+            <div class="chart-card">
+                <div class="chart-title">🎯 Матрица: тип аудитории × место размещения рекламы <span>Оси: концентрация × размер</span></div>
+                <svg viewBox="0 0 600 300" style="width: 100%; height: auto;">
+                    <!-- Оси -->
+                    <line x1="60" y1="260" x2="580" y2="260" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="60" y1="20" x2="60" y2="260" stroke="#94a3b8" stroke-width="1.5"/>
+
+                    <text x="35" y="30" font-size="10" fill="#64748b" font-weight="bold">Размер ↑</text>
+                    <text x="580" y="280" font-size="10" fill="#64748b" font-weight="bold" text-anchor="end">Концентрация →</text>
+
+                    <!-- Квадранты -->
+                    <rect x="70" y="30" width="250" height="110" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5 3"/>
+                    <text x="195" y="55" font-size="11" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Малая концентрированная</text>
+                    <text x="195" y="75" font-size="9.5" fill="#475569" text-anchor="middle">Внутренние страницы тематических сайтов,</text>
+                    <text x="195" y="90" font-size="9.5" fill="#475569" text-anchor="middle">поиск, тематические рассылки</text>
+                    <text x="195" y="110" font-size="9" fill="#7c3aed" text-anchor="middle" font-style="italic">Пример: фанаты марки авто</text>
+
+                    <rect x="330" y="30" width="250" height="110" rx="8" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" stroke-dasharray="5 3"/>
+                    <text x="455" y="55" font-size="11" fill="#065f46" text-anchor="middle" font-weight="bold">Большая концентрированная</text>
+                    <text x="455" y="75" font-size="9.5" fill="#475569" text-anchor="middle">Тематические сайты, разделы,</text>
+                    <text x="455" y="90" font-size="9.5" fill="#475569" text-anchor="middle">рассылки, партнёрские программы</text>
+                    <text x="455" y="110" font-size="9" fill="#7c3aed" text-anchor="middle" font-style="italic">Пример: автомобилисты, смотрящие пробки</text>
+
+                    <rect x="70" y="150" width="250" height="110" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 3"/>
+                    <text x="195" y="175" font-size="11" fill="#78350f" text-anchor="middle" font-weight="bold">Малая рассеянная</text>
+                    <text x="195" y="195" font-size="9.5" fill="#475569" text-anchor="middle">Поиск по ключевым словам,</text>
+                    <text x="195" y="210" font-size="9.5" fill="#475569" text-anchor="middle">поведенческий таргетинг</text>
+                    <text x="195" y="230" font-size="9" fill="#7c3aed" text-anchor="middle" font-style="italic">Пример: узкие нишевые запросы</text>
+
+                    <rect x="330" y="150" width="250" height="110" rx="8" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="5 3"/>
+                    <text x="455" y="175" font-size="11" fill="#831843" text-anchor="middle" font-weight="bold">Большая рассеянная</text>
+                    <text x="455" y="195" font-size="9.5" fill="#475569" text-anchor="middle">Крупнейшие сайты с максимальным охватом,</text>
+                    <text x="455" y="210" font-size="9.5" fill="#475569" text-anchor="middle">развлекательные сайты и рассылки</text>
+                    <text x="455" y="230" font-size="9" fill="#7c3aed" text-anchor="middle" font-style="italic">Пример: покупатели мебели, телефонов</text>
+                </svg>
+            </div>
+
+            <!-- CAMPAIGN TYPES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px;">📢 Типы рекламных кампаний</div>
+                <div class="campaign-grid">
+                    <div class="campaign-card image">
+                        <div class="cc-icon">🏢</div>
+                        <div class="cc-name">Имиджевая</div>
+                        <div class="cc-desc">Создание благоприятного образа компании или бренда. Работает на узнаваемость и доверие.</div>
+                        <div class="cc-metric">Цель: охват и частота</div>
+                    </div>
+                    <div class="campaign-card product">
+                        <div class="cc-icon">📦</div>
+                        <div class="cc-name">Товарная (продуктовая)</div>
+                        <div class="cc-desc">Продвижение конкретных товаров или услуг. Фокус на характеристиках и выгодах.</div>
+                        <div class="cc-metric">Цель: конверсия в покупку</div>
+                    </div>
+                    <div class="campaign-card trade">
+                        <div class="cc-icon">🛒</div>
+                        <div class="cc-name">Торговая (продающая)</div>
+                        <div class="cc-desc">Помощь в выборе места покупки. Стимулирует выбор конкретного магазина или продавца.</div>
+                        <div class="cc-metric">Цель: увеличение продаж</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOOLS -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px;">🛠️ Инструменты медиапланирования и аналитики</div>
+                <div class="tools-grid">
+                    <div class="tool-card m1">
+                        <div class="t-icon">📊</div>
+                        <div class="t-name">Mediascope</div>
+                        <div class="t-desc">Измерение аудитории, кросс-медийные исследования</div>
+                    </div>
+                    <div class="tool-card m2">
+                        <div class="t-icon">📈</div>
+                        <div class="t-name">Яндекс.Аудитории</div>
+                        <div class="t-desc">Сегментация аудитории для таргетинга, аналитика</div>
+                    </div>
+                    <div class="tool-card m3">
+                        <div class="t-icon">🎯</div>
+                        <div class="t-name">VK Ads / Telegram Ads</div>
+                        <div class="t-desc">Прогноз охвата, CPM, конверсии до запуска</div>
+                    </div>
+                    <div class="tool-card m4">
+                        <div class="t-icon">💰</div>
+                        <div class="t-name">Roistat, Calltouch</div>
+                        <div class="t-desc">Сквозная аналитика, оценка ROI каналов</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEDIAPLAN EXAMPLE -->
+            <div class="mediaplan-card">
+                <div class="mp-title">📄 Пример медиаплана: интернет-магазин электроники (месяц)</div>
+                <div class="mediaplan-grid">
+                    <div class="mp-item">
+                        <div class="mp-icon">💳</div>
+                        <div class="mp-name">Бюджет</div>
+                        <div class="mp-val">1 500 000 ₽ распределены по каналам с учётом целей кампании и целевой аудитории</div>
+                        <div class="mp-metric">ДРР ≤ 15%</div>
+                    </div>
+                    <div class="mp-item">
+                        <div class="mp-icon">🎯</div>
+                        <div class="mp-name">Яндекс.Директ</div>
+                        <div class="mp-val">Поиск + РСЯ: 700 000 ₽. Фокус на транзакционные и коммерческие запросы</div>
+                        <div class="mp-metric">CPO ≤ 1 200 ₽</div>
+                    </div>
+                    <div class="mp-item">
+                        <div class="mp-icon">📱</div>
+                        <div class="mp-name">VK Ads</div>
+                        <div class="mp-val">500 000 ₽. Таргетинг по интересам, ретаргетинг, лид-формы</div>
+                        <div class="mp-metric">CPM ≤ 250 ₽</div>
+                    </div>
+                    <div class="mp-item">
+                        <div class="mp-icon">✈️</div>
+                        <div class="mp-name">Telegram Ads</div>
+                        <div class="mp-val">300 000 ₽. Реклама в тематических каналах, посевы</div>
+                        <div class="mp-metric">CPC ≤ 45 ₽</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Медиапланирование</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Матрица аудиторий</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Пример медиаплана</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 32 из 33
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0c1a3a; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e3a8a; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали типы российских социальных сетей. Сегодня мы поговорим о медиапланировании — это системный подход к выбору каналов, форматов и бюджета для рекламной кампании.</p>
+
+            <div class="action-hint">Обратите внимание студентов на цикл планирования.</div>
+
+            <h3>📌 Цикл планирования и анализа интернет-маркетинга</h3>
+
+            <p>Медиапланирование — это часть замкнутого цикла. На первом этапе мы определяем бизнес-цели и целевую аудиторию. На втором — уточняем стратегию интернет-маркетинга. Затем реализуем эту стратегию. И переходим к измерению эффективности. Далее — малый замкнутый круг: от измерения эффективности к уточнению стратегии, и снова повторяем итерационный процесс. А время от времени нужно проводить ревизию бизнес-целей и смотреть, как меняется целевая аудитория.</p>
+
+            <h3>📌 Таблица планирования по «Индра»: 7 этапов</h3>
+
+            <p>Для структурирования работы используется таблица, которую можно найти на сайте «Индра». Разберём её сверху вниз.</p>
+
+            <p><strong>Proposition.</strong> Особенности нашего бренда. Что нового в нашем продукте? В чём изюминка? Что создаёт преимущества для потенциальных пользователей?</p>
+
+            <p><strong>KPIs.</strong> Ключевые показатели производительности. Это мерило достижения результата. Каких бизнес-результатов мы должны достичь?</p>
+
+            <p><strong>Анализ целевой аудитории.</strong> Что за аудитория, какой образ жизни, возраст, особенности работы с цифровыми медиа, какими площадками они пользуются.</p>
+
+            <p><strong>Медиа.</strong> Какие медиаканалы наиболее предпочтительны для нашей аудитории, где мы можем достичь лучших результатов.</p>
+
+            <p><strong>Контент.</strong> Какой контент нужен для продвижения, какими силами мы его разработаем — in-house или аутсорс.</p>
+
+            <p><strong>Аналитика.</strong> Какие аналитические системы будем использовать, как мониторить, интерпретировать и оптимизировать процесс.</p>
+
+            <p><strong>Поддержка развития.</strong> В каком направлении будем развивать программу цифрового маркетинга, как увеличить персонализацию.</p>
+
+            <p>Эту таблицу тоже можно закольцевать, соединив последний пункт с первым. После анализа эффективности необходима корректировка маркетинговой кампании, и этот процесс идёт непрерывно.</p>
+
+            <div class="action-hint">Перейдите к определению медиапланирования.</div>
+
+            <h3>📌 Медиапланирование: узкое и широкое определение</h3>
+
+            <p>В узком смысле медиапланирование отвечает на два вопроса: какую аудиторию можно привлечь с помощью той или иной рекламной площадки и где, с какой частотой показывать наши рекламные объявления, сколько денег должно быть потрачено в каждой из рассматриваемых медиа.</p>
+
+            <p>В широком смысле — включает практически все вопросы из таблицы выше. Этапы медиапланирования по Power Branding: анализ текущего положения бренда, рынка, трендов, конкурентов и потребителей. Затем — бриф, в котором отражаются бизнес-цели, маркетинговые цели, цели коммуникации и медиацели. Затем — медиастратегия: каналы коммуникации, период, география, охват, частота, периодичность и интенсивность. И последняя стадия — тактическое планирование: выбор носителей, форматов сообщения, оптимизация размещения. В результате формируется медиаплан.</p>
+
+            <div class="action-hint">Перейдите к матрице аудиторий.</div>
+
+            <h3>📌 Матрица: тип аудитории × место размещения рекламы</h3>
+
+            <p>Для выбора правильных каналов используется матрица Фёдора Вирина из книги «Интернет-маркетинг». По оси X — концентрация, по оси Y — размер аудитории. Получаем четыре квадранта.</p>
+
+            <p><strong>Малая концентрированная аудитория.</strong> Трудно отловить на одном тематическом сайте. Реклама размещается в результатах поиска по тематическим ключевым словам, на внутренних страницах тематических сайтов, в тематических рассылках.</p>
+
+            <p><strong>Большая концентрированная аудитория.</strong> Например, автомобилисты, которые смотрят пробки на определённых сайтах. Реклама в тематических разделах крупнейших сайтов, на первых страницах тематических сайтов, в тематических рассылках, партнёрские программы.</p>
+
+            <p><strong>Большая рассеянная аудитория.</strong> Покупатели мебели, мобильных телефонов, компьютеров. Их трудно найти на отдельных сайтах — таких сайтов огромное количество. Реклама на крупнейших сайтах на позициях, обеспечивающих максимальный охват, развлекательные сайты и рассылки, соответствующие социально-демографическому составу аудитории.</p>
+
+            <p><strong>Малая рассеянная аудитория.</strong> Например, узкие нишевые запросы. Реклама в поиске по ключевым словам, контекстная реклама с поведенческим таргетингом.</p>
+
+            <h3>📌 Тип рекламы под тип аудитории</h3>
+
+            <p>Для каждого типа аудитории — свой тип рекламы. Для <strong>большой концентрированной</strong> — медийная реклама на тематических сайтах, оптимизация по торговым маркам. Для <strong>малой концентрированной</strong> — медийная реклама с поведенческим таргетингом, контекстная реклама. Для <strong>малой рассеянной</strong> — контекстная реклама, поведенческий таргетинг, PR, ограниченная работа в соцсетях. Для <strong>большой рассеянной</strong> — медийная реклама, маркетинг по социально-демографическим характеристикам, вирусный маркетинг, ad gaming, PR, соцсети.</p>
+
+            <h3>📌 Типы рекламных кампаний</h3>
+
+            <p>Напомню три типа рекламных кампаний. <strong>Имиджевая</strong> — создание благоприятного образа. <strong>Товарная (продуктовая)</strong> — продвижение конкретных товаров. <strong>Торговая (продающая)</strong> — помощь в выборе места покупки. Стрелка вверх на схеме показывает рост охвата и частоты: от имиджевой к торговой.</p>
+
+            <h3>📌 Пример медиаплана</h3>
+
+            <p>Приведу пример медиаплана для интернет-магазина электроники на месяц. Бюджет 1 500 000 ₽. Яндекс.Директ — 700 000 ₽ (поиск и РСЯ, фокус на транзакционные и коммерческие запросы), VK Ads — 500 000 ₽ (таргетинг по интересам, ретаргетинг, лид-формы), Telegram Ads — 300 000 ₽ (реклама в тематических каналах, посевы). Целевые метрики: ДРР ≤ 15%, CPO ≤ 1 200 ₽, CPM ≤ 250 ₽, CPC ≤ 45 ₽.</p>
+
+            <p>Важно: медиаплан — это живой документ. По ходу кампании метрики анализируются, бюджеты перераспределяются между каналами. Например, если Telegram Ads даёт CPC ниже планового при высоком качестве трафика — бюджет увеличивается за счёт менее эффективных каналов.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали медиапланирование. Ключевые выводы:</p>
+
+            <ul>
+                <li>Медиапланирование — часть замкнутого цикла: цели → стратегия → реализация → измерение.</li>
+                <li>Таблица планирования по «Индра»: proposition, KPIs, ЦА, медиа, контент, аналитика, поддержка развития.</li>
+                <li>Медиапланирование в узком смысле: аудитория, частота, бюджет. В широком — все вопросы планирования.</li>
+                <li>Матрица аудиторий: 4 квадранта (малая/большая × концентрированная/рассеянная).</li>
+                <li>Типы кампаний: имиджевая, товарная, торговая.</li>
+                <li>Инструменты: Mediascope, Яндекс.Аудитории, VK Ads, Telegram Ads, Roistat, Calltouch.</li>
+            </ul>
+
+            <p>На следующей, заключительной лекции мы разберём анализ эффективности. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Медиаплан</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Media Plan</div>
+                            <div class="gloss-def">Документ, описывающий каналы, бюджеты, сроки и KPI рекламной кампании</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">KPI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Key Performance Indicator</div>
+                            <div class="gloss-def">Ключевой показатель эффективности кампании</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ДРР</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Доля рекламных расходов</div>
+                            <div class="gloss-def">Отношение рекламных затрат к выручке. Целевое значение для e-commerce: 10–15%</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Order</div>
+                            <div class="gloss-def">Стоимость оформленного заказа</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Mille</div>
+                            <div class="gloss-def">Стоимость за тысячу показов рекламного объявления</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Click</div>
+                            <div class="gloss-def">Стоимость клика по рекламному объявлению</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROMI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Marketing Investment</div>
+                            <div class="gloss-def">Возврат инвестиций в маркетинг — ключевая метрика оценки эффективности</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Mediascope</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Mediascope</div>
+                            <div class="gloss-def">Российская компания — лидер по измерению аудитории медиа</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Roistat</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Roistat</div>
+                            <div class="gloss-def">Платформа сквозной аналитики для оценки ROI маркетинговых каналов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Calltouch</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Calltouch</div>
+                            <div class="gloss-def">Сервис коллтрекинга и сквозной аналитики для оценки офлайн-конверсий</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок интернет-рекламы</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">АРИР: Российский рынок рекламы и продвижения в интернете в 2025 году вырос на 28% — до 1,569 трлн руб. — <a href="https://interactivead.ru" target="_blank">InteractiveAd.ru</a> <span class="src-date">09.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">АКАР: Объём рекламного рынка России в 2025 году — 981,6 млрд руб. — <a href="https://www.akarussia.ru" target="_blank">AKARussia.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Медиапланирование</div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Вирин Ф. Интернет-маркетинг: полный практический курс. — М.: Эксмо, 2024.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Power Branding: Этапы медиапланирования. — <a href="https://powerbranding.ru" target="_blank">PowerBranding.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Sostav.ru: Как правильно построить медиаплан в 2026 году. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🛠️ Инструменты</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Mediascope: Измерение аудитории и кросс-медийные исследования. — <a href="https://www.mediascope.net" target="_blank">Mediascope.net</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Яндекс.Аудитории: Сегментация аудитории для таргетинга. — <a href="https://yandex.ru/audience" target="_blank">Yandex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Roistat: Сквозная аналитика для оценки ROI каналов. — <a href="https://roistat.com" target="_blank">Roistat.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Calltouch: Коллтрекинг и сквозная аналитика. — <a href="https://calltouch.ru" target="_blank">Calltouch.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 Практика</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">eLama: Пример медиаплана для интернет-магазина. — <a href="https://elama.ru" target="_blank">eLama.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">AdIndex: Кейсы российских компаний по медиапланированию. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

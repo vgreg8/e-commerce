@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 17. Оптимизация контента и структуры сайта</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0f172a; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #0c4a6e; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #0ea5e9; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 60%, #38bdf8 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* E-E-A-T GRID */
+        .eeat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .eeat-card { background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 12px; padding: 16px 12px; text-align: center; }
+        .eeat-card .eeat-icon { font-size: 26px; margin-bottom: 6px; }
+        .eeat-card .eeat-name { font-size: 12px; font-weight: bold; color: #0c4a6e; margin-bottom: 4px; }
+        .eeat-card .eeat-desc { font-size: 10px; color: #475569; line-height: 1.35; }
+
+        /* CORE WEB VITALS TABLE */
+        .cwv-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 18px 22px; }
+        .cwv-card .cwv-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 12px; }
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #0c4a6e; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #f0f9ff; }
+        .metrics-table .good { color: #059669; font-weight: bold; }
+        .metrics-table .need { color: #f59e0b; font-weight: bold; }
+        .metrics-table .poor { color: #e11d48; font-weight: bold; }
+
+        /* HUB-AND-SPOKE SVG */
+        .chart-card { background: #ffffff; border: 2px solid #bae6fd; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* SCHEMA TABLE */
+        .schema-card { background: #fefce8; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .schema-card .schema-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 12px; }
+        .schema-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 11.5px; }
+        .schema-type { font-weight: bold; color: #92400e; width: 130px; flex-shrink: 0; }
+        .schema-desc { color: #475569; flex: 1; line-height: 1.4; }
+
+        /* CONTENT EVOLUTION */
+        .evolution-card { background: #f0fdf4; border: 2px solid #a7f3d0; border-radius: 14px; padding: 20px 24px; }
+        .evolution-card .evo-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 14px; }
+        .evo-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .evo-node { flex: 1; min-width: 110px; background: white; border: 2px solid #10b981; border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .evo-node.old { border-color: #94a3b8; background: #f8fafc; }
+        .evo-node .en-icon { font-size: 20px; margin-bottom: 4px; }
+        .evo-node .en-name { font-size: 11px; font-weight: bold; color: #1e293b; margin-bottom: 3px; }
+        .evo-node .en-desc { font-size: 9.5px; color: #64748b; line-height: 1.3; }
+        .evo-arrow { font-size: 18px; color: #10b981; font-weight: bold; }
+
+        /* TRENDS GRID */
+        .trends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .trend-card { border-radius: 12px; padding: 16px; }
+        .trend-card.t1 { background: #eff6ff; border: 2px solid #93c5fd; }
+        .trend-card.t2 { background: #fdf2f8; border: 2px solid #f9a8d4; }
+        .trend-card.t3 { background: #f5f3ff; border: 2px solid #c4b5fd; }
+        .trend-card.t4 { background: #fef3c7; border: 2px solid #fcd34d; }
+        .trend-card h5 { font-size: 12.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .trend-card p { font-size: 11px; color: #475569; line-height: 1.45; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #0ea5e9; }
+        .rt-btn:hover { background: #0284c7; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #7dd3fc; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #7dd3fc; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #0c4a6e; color: #7dd3fc; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #0ea5e9; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #0ea5e9; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #7dd3fc; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #0ea5e9; color: #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #7dd3fc; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 17. Оптимизация контента и структуры сайта
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🏗️</div>
+                <div class="hero-data">
+                    <div class="hero-number">62%</div>
+                    <div class="hero-label">сайтов проваливают LCP</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">77%</div>
+                    <div class="hero-label">сайтов проходят INP</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">30–40%</div>
+                    <div class="hero-label">рост видимости в AI при связной перелинковке</div>
+                </div>
+            </div>
+
+            <!-- E-E-A-T GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">🎯 E-E-A-T: четыре столпа качества контента (2026)</div>
+                <div class="eeat-grid">
+                    <div class="eeat-card">
+                        <div class="eeat-icon">🧪</div>
+                        <div class="eeat-name">Experience</div>
+                        <div class="eeat-desc">Опыт: реальные кейсы, личные примеры, демонстрация практики</div>
+                    </div>
+                    <div class="eeat-card">
+                        <div class="eeat-icon">📚</div>
+                        <div class="eeat-name">Expertise</div>
+                        <div class="eeat-desc">Экспертиза: глубокие знания, подтверждённые факты, ссылки на исследования</div>
+                    </div>
+                    <div class="eeat-card">
+                        <div class="eeat-icon">🏆</div>
+                        <div class="eeat-name">Authoritativeness</div>
+                        <div class="eeat-desc">Авторитетность: цитируемость, упоминания от отраслевых лидеров</div>
+                    </div>
+                    <div class="eeat-card">
+                        <div class="eeat-icon">🔒</div>
+                        <div class="eeat-name">Trustworthiness</div>
+                        <div class="eeat-desc">Надёжность: прозрачность, достоверность, безопасность — ключевой фактор 2026</div>
+                    </div>
+                </div>
+                <div style="font-size: 10.5px; color: #64748b; margin-top: 8px;">Google Quality Rater Guidelines, сентябрь 2025. Trustworthiness признан самым важным элементом E-E-A-T.</div>
+            </div>
+
+            <!-- CORE WEB VITALS TABLE -->
+            <div class="cwv-card">
+                <div class="cwv-title">⚡ Core Web Vitals: бенчмарки 2026</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Метрика</th>
+                            <th>Хорошо</th>
+                            <th>Нужно улучшить</th>
+                            <th>Плохо</th>
+                            <th>Что измеряет</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LCP</strong></td>
+                            <td class="good">≤ 2,5 сек</td>
+                            <td class="need">2,6–4,0 сек</td>
+                            <td class="poor">&gt; 4,0 сек</td>
+                            <td>Скорость загрузки основного контента</td>
+                        </tr>
+                        <tr>
+                            <td><strong>INP</strong></td>
+                            <td class="good">≤ 200 мс</td>
+                            <td class="need">201–500 мс</td>
+                            <td class="poor">&gt; 500 мс</td>
+                            <td>Отзывчивость на взаимодействие</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CLS</strong></td>
+                            <td class="good">≤ 0,1</td>
+                            <td class="need">0,11–0,25</td>
+                            <td class="poor">&gt; 0,25</td>
+                            <td>Визуальная стабильность</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-size: 11px; color: #64748b; margin-top: 8px;">INP заменил FID 12 марта 2024 года. Сайты с провалом CWV теряют показы нового контента, даже если тематическая авторитетность высокая.</div>
+            </div>
+
+            <!-- HUB-AND-SPOKE SVG -->
+            <div class="chart-card">
+                <div class="chart-title">🔗 Архитектура хаб-и-спицы: как перелинковка строит авторитет <span>Pillar → Cluster</span></div>
+                <svg viewBox="0 0 600 200" style="width: 100%; height: auto;">
+                    <!-- Pillar (центральная страница) -->
+                    <circle cx="300" cy="100" r="40" fill="#0c4a6e" stroke="#0ea5e9" stroke-width="3"/>
+                    <text x="300" y="95" font-size="11" fill="white" text-anchor="middle" font-weight="900">PILLAR</text>
+                    <text x="300" y="110" font-size="8" fill="#7dd3fc" text-anchor="middle">Хаб-страница</text>
+
+                    <!-- Cluster pages -->
+                    <circle cx="120" cy="40" r="26" fill="#eff6ff" stroke="#0ea5e9" stroke-width="2"/>
+                    <text x="120" y="38" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Статья 1</text>
+                    <text x="120" y="50" font-size="7" fill="#475569" text-anchor="middle">What is</text>
+
+                    <circle cx="480" cy="40" r="26" fill="#eff6ff" stroke="#0ea5e9" stroke-width="2"/>
+                    <text x="480" y="38" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Статья 2</text>
+                    <text x="480" y="50" font-size="7" fill="#475569" text-anchor="middle">How to</text>
+
+                    <circle cx="120" cy="160" r="26" fill="#eff6ff" stroke="#0ea5e9" stroke-width="2"/>
+                    <text x="120" y="158" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Статья 3</text>
+                    <text x="120" y="170" font-size="7" fill="#475569" text-anchor="middle">Best</text>
+
+                    <circle cx="480" cy="160" r="26" fill="#eff6ff" stroke="#0ea5e9" stroke-width="2"/>
+                    <text x="480" y="158" font-size="9" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Статья 4</text>
+                    <text x="480" y="170" font-size="7" fill="#475569" text-anchor="middle">FAQ</text>
+
+                    <!-- Arrows -->
+                    <line x1="145" y1="52" x2="270" y2="82" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+                    <line x1="455" y1="52" x2="330" y2="82" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+                    <line x1="145" y1="148" x2="270" y2="118" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+                    <line x1="455" y1="148" x2="330" y2="118" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+                    <defs>
+                        <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Legend -->
+                    <text x="300" y="185" font-size="9" fill="#475569" text-anchor="middle">Внутренние ссылки от кластеров к хабу → передача веса + сигнал авторитетности для AI</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Стратегическая перелинковка создаёт больше прироста, чем создание нового контента. Сайты с чёткой структурой хаб-и-спицы показывают на 30–40% более высокую видимость в AI-ответах.</div>
+            </div>
+
+            <!-- SCHEMA TABLE -->
+            <div class="schema-card">
+                <div class="schema-title">📋 Schema.org: пять ключевых типов разметки для AI-поиска</div>
+                <div class="schema-row">
+                    <div class="schema-type">Organization</div>
+                    <div class="schema-desc">Название компании, логотип, контакты, соцсети — базовая сущность бренда</div>
+                </div>
+                <div class="schema-row">
+                    <div class="schema-type">Product</div>
+                    <div class="schema-desc">Название, описание, цена, наличие, бренд, рейтинг — для e-commerce</div>
+                </div>
+                <div class="schema-row">
+                    <div class="schema-type">Article</div>
+                    <div class="schema-desc">Заголовок, автор, дата, категория — для контентных проектов</div>
+                </div>
+                <div class="schema-row">
+                    <div class="schema-type">FAQ</div>
+                    <div class="schema-desc">Вопрос-ответ — AI优先检索FAQ для ответов на запросы пользователей</div>
+                </div>
+                <div class="schema-row">
+                    <div class="schema-type">BreadcrumbList</div>
+                    <div class="schema-desc">Иерархия страниц — помогает AI понять структуру сайта</div>
+                </div>
+                <div style="font-size: 10.5px; color: #78350f; margin-top: 8px;">Schema разметка не提升排名, а устраняет двусмысленность: AI точно понимает, что это за контент, а не угадывает. JSON-LD — рекомендуемый формат.</div>
+            </div>
+
+            <!-- CONTENT EVOLUTION -->
+            <div class="evolution-card">
+                <div class="evo-title">🔄 Эволюция контент-стратегии: от объёма к стратегическому интенту</div>
+                <div class="evo-flow">
+                    <div class="evo-node old">
+                        <div class="en-icon">📝</div>
+                        <div class="en-name">2018–2022</div>
+                        <div class="en-desc">Больше контента<br>Высокая частота публикаций<br>Оптимизация под ключи</div>
+                    </div>
+                    <div class="evo-arrow">→</div>
+                    <div class="evo-node old">
+                        <div class="en-icon">📊</div>
+                        <div class="en-name">2023–2024</div>
+                        <div class="en-desc">Качество контента<br>E-E-A-T<br>Поведенческие факторы</div>
+                    </div>
+                    <div class="evo-arrow">→</div>
+                    <div class="evo-node">
+                        <div class="en-icon">🎯</div>
+                        <div class="en-name">2025–2026</div>
+                        <div class="en-desc">Стратегический интент<br>Тематические кластеры<br>AI-цитируемость</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #065f46; margin-top: 10px;">March 2025 Helpful Content Update ударил по сайтам с высокой частотой публикаций, но низкой вовлечённостью. Google 2025 наградил стратегический интент, а не объём контента.</div>
+            </div>
+
+            <!-- TRENDS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">🔥 Ключевые тренды 2025–2026</div>
+                <div class="trends-grid">
+                    <div class="trend-card t1">
+                        <h5>🔍 Query Fan-Out</h5>
+                        <p>Google AI Mode разбивает один вопрос на 8–12 подзапросов и ищет их параллельно. Тематические кластеры, покрывающие смежные вопросы, — обязательны для AI-видимости</p>
+                    </div>
+                    <div class="trend-card t2">
+                        <h5>📏 Atomic Answers</h5>
+                        <p>AI-движки предпочитают структурированные ответы. Оптимальный формат: вопросный заголовок + ответ в 40–60 слов. 44,2% AI-цитирований берутся из первой трети статьи</p>
+                    </div>
+                    <div class="trend-card t3">
+                        <h5>🔗 Семантическая перелинковка</h5>
+                        <p>Внутренние ссылки — не только передача PageRank, но и семантические мосты для AI. NLP-алгоритмы подбирают естественные анкоры и строят связи между сущностями</p>
+                    </div>
+                    <div class="trend-card t4">
+                        <h5>📄 llms.txt</h5>
+                        <p>Новый стандарт для AI-навигации: структурированный Markdown-файл в корне сайта, указывающий AI-системам ключевые страницы и их иерархию</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Оптимизация контента</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Внутренняя перелинковка</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Schema.org и структура</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 17 из 20
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0f172a; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e293b; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали подбор ключевых слов и формирование семантического ядра. Сегодня мы поговорим о том, как оптимизировать контент и структуру сайта, чтобы он был понятен и людям, и поисковым системам, и AI-ассистентам.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми метриками Core Web Vitals.</div>
+
+            <h3>📌 Роль дизайна и оформления сайта</h3>
+
+            <p>Дизайн и оформление страницы напрямую влияют на восприятие качества информации. Пользователь за доли секунды формирует мнение о сайте, и если дизайн выглядит устаревшим или неаккуратным, он уходит, даже не прочитав контент. Соблюдение фирменного стиля и единого оформления всех страниц особенно важно для корпоративных сайтов — это создаёт ощущение надёжности и профессионализма.</p>
+
+            <p>Стиль текста должен соответствовать целевой аудитории. Для B2B-аудитории уместен сдержанный деловой язык, для молодёжной аудитории — более живой и неформальный. Единство визуального стиля и тональности коммуникации укрепляет доверие пользователей.</p>
+
+            <h3>📌 Core Web Vitals: технический фундамент 2026</h3>
+
+            <p>Core Web Vitals — это три ключевых метрики, которые Google использует для оценки пользовательского опыта. <strong>LCP</strong> (Largest Contentful Paint) измеряет скорость загрузки основного контента. Хороший показатель — 2,5 секунды или меньше. <strong>INP</strong> (Interaction to Next Paint) заменил FID 12 марта 2024 года и измеряет отзывчивость на взаимодействие. Хороший показатель — 200 миллисекунд или меньше. <strong>CLS</strong> (Cumulative Layout Shift) измеряет визуальную стабильность. Хороший показатель — 0,1 или меньше.</p>
+
+            <p>По данным HTTP Archive Web Almanac 2025, только 62% сайтов проходят LCP, 77% проходят INP и 81% проходят CLS. LCP — метрика, которую сайты проваливают чаще всего. Google в 2026 году усилил эти сигналы: сайты с провалом Core Web Vitals теряют показы нового контента, даже если тематическая авторитетность высокая.</p>
+
+            <p>Мобильные пользователи покидают сайты с задержкой взаимодействия выше 100 миллисекунд, но алгоритм Google теперь учитывает этот уход в ранжировании ещё до того, как пользователь достигнет контента. Публикация новых статей на технически сломанном сайте только усугубляет проблему, создавая больше страниц, проваливающих CWV.</p>
+
+            <div class="action-hint">Перейдите к схеме хаб-и-спицы.</div>
+
+            <h3>📌 Оптимизация внутренних ссылок</h3>
+
+            <p>Внутренние ссылки — это самый недооценённый инструмент SEO. Многие команды месяцами работают над внешними ссылками, игнорируя ссылочный вес внутри собственного домена. В 2026 году внутренняя перелинковка стала трёхуровневой задачей: она должна работать одновременно для Google PageRank, для AI-движков и для пользовательской навигации.</p>
+
+            <p>Google использует внутренние ссылки для обнаружения новых страниц, оценки важности страницы и распределения авторитета по домену. AI-движки, такие как ChatGPT и Gemini, не ранжируют страницы линейно — они определяют кластеры семантически связанного контента и решают, какая страница в кластере является авторитетным хабом. Если структура внутренних ссылок не сигнализирует чётко о связи «хаб-спица», LLM считает все страницы одинаково неважными и не цитирует ни одну из них.</p>
+
+            <p>Стратегическая перелинковка создаёт больше прироста, чем создание нового контента. Сайты с чёткой структурой хаб-и-спицы показывают на 30–40% более высокую видимость в AI-ответах. Карта сайта (sitemap.xml) помогает поисковым роботам быстрее обходить страницы, а правильная навигация улучшает пользовательский опыт.</p>
+
+            <div class="action-hint">Обратите внимание студентов на таблицу Schema.org.</div>
+
+            <h3>📌 Структурированные данные и Schema.org</h3>
+
+            <p>Schema.org — это стандарт структурированной разметки, который помогает поисковым системам и AI-движкам точно понимать, что находится на странице. Для AI-систем Schema-разметка — это «шпаргалка для чтения»: она устраняет двусмысленность и позволяет машине понять, что перед ней — товар, статья, организация или вопрос-ответ.</p>
+
+            <p>Пять ключевых типов разметки: <strong>Organization</strong> — название компании, логотип, контакты, соцсети. <strong>Product</strong> — для e-commerce: название, цена, наличие, рейтинг. <strong>Article</strong> — для контентных проектов: заголовок, автор, дата. <strong>FAQ</strong> — вопрос-ответ, которые AI优先检索 при формировании ответов. <strong>BreadcrumbList</strong> — иерархия страниц, помогающая AI понять структуру сайта.</p>
+
+            <p>Важно: Schema-разметка не повышает позиции напрямую. Она делает контент понятным для машин, что критически важно в эпоху AI-поиска. Рекомендуемый формат — JSON-LD, встраиваемый в HTML.</p>
+
+            <h3>📌 Эволюция контент-стратегии</h3>
+
+            <p>Подход к созданию контента радикально изменился. В 2018–2022 годах работала стратегия «больше контента»: сайты публиковали десятки статей в месяц, оптимизируя каждую под ключевые слова. Однако March 2025 Helpful Content Update нанёс удар именно по таким сайтам — с высокой частотой публикаций, но низкой вовлечённостью на страницу.</p>
+
+            <p>Google 2025 наградил стратегический интент, а не объём. Сайты с меньшим количеством страниц, но с более высокой вовлечённостью на каждую, стали обгонять сайты с большим объёмом контента. Алгоритм теперь оценивает контентные кластеры на предмет тематической авторитетности, а не отдельные страницы.</p>
+
+            <p>В 2025–2026 годах ключевыми стали три принципа: стратегический интент (каждый материал отвечает на конкретный запрос аудитории), тематические кластеры (вместо разрозненных статей — связанные группы контента) и AI-цитируемость (контент должен быть структурирован так, чтобы AI мог его процитировать).</p>
+
+            <h3>📌 Ключевые тренды 2025–2026</h3>
+
+            <p><strong>Query Fan-Out.</strong> Google AI Mode разбивает один вопрос пользователя на 8–12 подзапросов и ищет их параллельно. Это означает, что для AI-видимости необходимо строить тематические кластеры, покрывающие смежные вопросы и сценарии.</p>
+
+            <p><strong>Atomic Answers.</strong> AI-движки предпочитают структурированные ответы в формате «вопросный заголовок + ответ в 40–60 слов». Исследования показывают, что 44,2% AI-цитирований берутся из первой трети статьи. Поэтому ключевые выводы должны быть в начале материала.</p>
+
+            <p><strong>Семантическая перелинковка.</strong> Внутренние ссылки теперь служат не только для передачи PageRank, но и как семантические мосты для AI. NLP-алгоритмы анализируют контекст и подбирают естественные анкоры, избегая переоптимизации.</p>
+
+            <p><strong>llms.txt.</strong> Новый стандарт для AI-навигации: структурированный Markdown-файл в корне сайта, который указывает AI-системам ключевые страницы, их иерархию и приоритеты. Однако важно отметить: Google не подтвердил, что его AI-системы читают llms.txt. Пока это инструмент для B2A (Business-to-Agent) взаимодействия.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали оптимизацию контента и структуры сайта. Ключевые выводы:</p>
+
+            <ul>
+                <li>Core Web Vitals 2026: LCP ≤ 2,5 сек, INP ≤ 200 мс, CLS ≤ 0,1. Сайты с провалом CWV теряют показы нового контента.</li>
+                <li>E-E-A-T: Trustworthiness (надёжность) — ключевой фактор 2026. Контент должен демонстрировать опыт, экспертизу, авторитет и надёжность.</li>
+                <li>Внутренняя перелинковка — трёхуровневая задача: PageRank + AI-цитируемость + навигация. Хаб-и-спица даёт +30–40% видимости в AI.</li>
+                <li>Schema.org устраняет двусмысленность для AI. Пять ключевых типов: Organization, Product, Article, FAQ, BreadcrumbList.</li>
+                <li>Эволюция контента: от объёма к стратегическому интенту и тематическим кластерам.</li>
+                <li>Тренды: Query Fan-Out, Atomic Answers, семантическая перелинковка, llms.txt.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём легальные и нелегальные методы оптимизации. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">LCP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Largest Contentful Paint</div>
+                            <div class="gloss-def">Скорость загрузки основного контента — ключевая метрика Core Web Vitals</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">INP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Interaction to Next Paint</div>
+                            <div class="gloss-def">Отзывчивость на взаимодействие. Заменил FID 12 марта 2024 года</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CLS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cumulative Layout Shift</div>
+                            <div class="gloss-def">Визуальная стабильность — смещение элементов при загрузке</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CWV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Core Web Vitals</div>
+                            <div class="gloss-def">Набор ключевых метрик пользовательского опыта: LCP, INP, CLS</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">E-E-A-T</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Experience, Expertise, Authoritativeness, Trustworthiness</div>
+                            <div class="gloss-def">Опыт, экспертиза, авторитет, надёжность — критерии качества контента</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Schema.org</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Структурированные данные</div>
+                            <div class="gloss-def">Стандарт разметки контента для поисковых систем и AI</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">JSON-LD</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">JavaScript Object Notation for Linked Data</div>
+                            <div class="gloss-def">Рекомендуемый формат структурированной разметки</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">FAQ</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Frequently Asked Questions</div>
+                            <div class="gloss-def">Структура «вопрос-ответ» — AI优先检索 такой разметки</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Query Fan-Out</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Разветвление запроса</div>
+                            <div class="gloss-def">Google AI Mode разбивает один вопрос на 8–12 подзапросов для параллельного поиска</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">llms.txt</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">LLM-навигация</div>
+                            <div class="gloss-def">Markdown-файл в корне сайта для указания AI-системам ключевых страниц</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">NLP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Natural Language Processing</div>
+                            <div class="gloss-def">Обработка естественного языка — технологии анализа текста</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚡ Core Web Vitals</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">HTTP Archive Web Almanac 2025: 62% сайтов проходят LCP, 77% — INP, 81% — CLS. — <a href="https://httparchive.org" target="_blank">HTTPArchive.org</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Google Search Central: Core Web Vitals thresholds unchanged as of mid-2026. — <a href="https://developers.google.com/search/docs/appearance/core-web-vitals" target="_blank">Google Developers</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 E-E-A-T и качество контента</div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Google Quality Rater Guidelines, September 11, 2025 — Trustworthiness as the core element of E-E-A-T. — <a href="https://developers.google.com/search/docs/fundamentals/creating-helpful-content" target="_blank">Google Developers</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Ranktracker: Why E-E-A-T is non-negotiable for SMB websites in 2026. — <a href="https://www.ranktracker.com" target="_blank">Ranktracker.com</a> <span class="src-date">27.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">BrightonSEO: E-E-A-T 2.0 — The Trust Layers That Drive Rankings in Modern Search. — <a href="https://brightonseo.com" target="_blank">BrightonSEO.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🔗 Внутренняя перелинковка и структура</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Fuel Online: Internal Linking Strategy for SEO in 2026 — Link Reasoning Architecture. — <a href="https://fuelonline.com/seo/internal-linking-strategy-seo-guide/" target="_blank">FuelOnline.com</a> <span class="src-date">04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Link Whisper: The Ultimate Guide to Internal Linking for SEO and GEO. — <a href="https://linkwhisper.com/the-ultimate-guide-to-internal-linking-for-seo-and-geo/" target="_blank">LinkWhisper.com</a> <span class="src-date">06.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Ahrefs: Strategic internal linking creates more ranking lift than content expansion. — <a href="https://ahrefs.com/blog/internal-links-for-seo/" target="_blank">Ahrefs.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📋 Schema.org и AI-оптимизация</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Alibaba Cloud: 网页代码层次 — 结构化数据与AI友好型网站建设. — <a href="https://developer.aliyun.com/article/1741518" target="_blank">Aliyun.com</a> <span class="src-date">15.06.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Google Search Central: A new resource for optimizing for generative AI in Google Search. — <a href="https://developers.google.com/search/blog/2026/05/a-new-resource-for-optimizing" target="_blank">Google Developers</a> <span class="src-date">15.05.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🔄 Эволюция контент-стратегии</div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Silktide: Your SEO Rankings Aren't Suffering From Lack of Volume — March 2025 Helpful Content Update. — <a href="https://silktide.com/blog/your-seo-rankings-arent-suffering-from-lack-of-volume/" target="_blank">Silktide.com</a> <span class="src-date">02.07.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">LinkSurge: SEO in 2026 — A Beginner's Guide to Modern Search Optimization in the AI Era. — <a href="https://linksurge.jp/blog/en/seo-latest-guide-2026/" target="_blank">LinkSurge.jp</a> <span class="src-date">25.02.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📄 llms.txt и GEO</div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">Security Boulevard: llms.txt Is the Meta Keywords of 2026 — Google clarifies it's not needed for AI Search. — <a href="https://securityboulevard.com" target="_blank">SecurityBoulevard.com</a> <span class="src-date">09.10.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">Alibaba Cloud: llms.txt如何助力GEO优化 — 写法与部署. — <a href="https://developer.aliyun.com" target="_blank">Aliyun.com</a> <span class="src-date">28.07.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

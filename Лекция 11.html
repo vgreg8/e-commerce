@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 11. Стратегия сайта и этапы его создания</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #042f2e; color: #ccfbf1; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #134e4a; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #14b8a6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #134e4a 0%, #0d9488 50%, #14b8a6 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(20, 184, 166, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* GOALS GRID */
+        .goals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .goal-card { background: #f0fdfa; border: 2px solid #99f6e4; border-radius: 12px; padding: 14px 12px; text-align: center; transition: transform 0.15s; }
+        .goal-card:hover { transform: translateY(-2px); }
+        .goal-card .goal-icon { font-size: 24px; margin-bottom: 6px; }
+        .goal-card .goal-name { font-size: 11.5px; font-weight: bold; color: #134e4a; line-height: 1.3; }
+        .goal-card .goal-desc { font-size: 10px; color: #475569; margin-top: 4px; line-height: 1.3; }
+
+        /* TIMELINE OF CREATION */
+        .timeline-card { background: #f0fdfa; border: 2px solid #99f6e4; border-radius: 14px; padding: 22px 24px; }
+        .timeline-card .tl-title { font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 16px; }
+        .process-line { display: flex; flex-direction: column; gap: 10px; }
+        .process-step { display: flex; align-items: center; gap: 14px; }
+        .process-num { width: 32px; height: 32px; background: #14b8a6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(20, 184, 166, 0.3); }
+        .process-content { flex: 1; background: #ffffff; border: 1.5px solid #ccfbf1; border-radius: 8px; padding: 10px 14px; }
+        .process-content .pc-title { font-size: 12.5px; font-weight: bold; color: #134e4a; margin-bottom: 3px; }
+        .process-content .pc-desc { font-size: 11px; color: #475569; line-height: 1.4; }
+
+        /* AUDIENCE PERSONA */
+        .persona-card { background: #fffbeb; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .persona-card .p-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 12px; }
+        .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .persona { background: white; border-radius: 10px; padding: 14px 12px; border: 1.5px solid #fde68a; text-align: center; }
+        .persona .p-avatar { font-size: 30px; margin-bottom: 6px; }
+        .persona .p-name { font-size: 12px; font-weight: bold; color: #78350f; margin-bottom: 4px; }
+        .persona .p-trait { font-size: 10px; color: #475569; line-height: 1.4; }
+
+        /* FIRST IMPRESSION */
+        .impression-card { background: #fef2f2; border: 2px solid #fecaca; border-radius: 14px; padding: 18px 22px; }
+        .impression-card .imp-title { font-size: 14px; font-weight: bold; color: #991b1b; margin-bottom: 10px; }
+        .impression-row { display: flex; gap: 14px; align-items: center; }
+        .impression-metric { flex: 1; text-align: center; padding: 10px; background: white; border-radius: 10px; border: 1.5px solid #fecaca; }
+        .impression-metric .im-val { font-size: 26px; font-weight: 900; color: #be123c; line-height: 1; }
+        .impression-metric .im-cap { font-size: 10px; color: #991b1b; margin-top: 4px; line-height: 1.3; }
+
+        /* STRATEGY COMPARE */
+        .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .strategy-card { border-radius: 12px; padding: 18px; }
+        .strategy-card.high-margin { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .strategy-card.mass { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .strategy-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .strategy-card ul { margin: 0 0 0 16px; font-size: 11.5px; line-height: 1.55; color: #1e293b; }
+        .strategy-card li { margin-bottom: 4px; }
+
+        /* OPTIMIZATION SVG */
+        .chart-card { background: #ffffff; border: 2px solid #99f6e4; border-radius: 14px; padding: 18px 22px; }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #14b8a6; }
+        .rt-btn:hover { background: #0d9488; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #5eead4; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #115e59; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #ccfbf1; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #5eead4; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #115e59; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #115e59; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #134e4a; color: #5eead4; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #5eead4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #14b8a6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #115e59; border-left: 3px solid #14b8a6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #134e4a; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #5eead4; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #a7f3d0; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #5eead4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #115e59; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #14b8a6; color: #042f2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #a7f3d0; line-height: 1.5; }
+        .source-body a { color: #5eead4; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 11. Стратегия сайта и этапы его создания
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-def">
+                <div class="hd-icon">🎯</div>
+                <div class="hd-body">
+                    <div class="hd-title">Сайт — это не просто «страница в интернете», а инструмент достижения бизнес-целей</div>
+                    <div class="hd-text">Прежде чем заказывать разработку, маркетолог должен определить функции сайта, проанализировать конкурентов, изучить целевую аудиторию и выбрать стратегию продаж. Сайт без стратегии — это дорогая брошюра, которая не приносит денег.</div>
+                    <div class="hd-quote">«Маркетинг — это не про то, что вы продаёте, а про то, какую проблему клиента вы решаете» — Филип Котлер</div>
+                </div>
+            </div>
+
+            <!-- GOALS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 10px;">🎯 Четыре ключевые цели веб-сайта</div>
+                <div class="goals-grid">
+                    <div class="goal-card">
+                        <div class="goal-icon">💰</div>
+                        <div class="goal-name">Снижение издержек на коммуникацию</div>
+                        <div class="goal-desc">Автоматизация типовых ответов клиентам</div>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-icon">📞</div>
+                        <div class="goal-name">Вывод на личный контакт</div>
+                        <div class="goal-desc">Для товаров с высокой маржой</div>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-icon">🔄</div>
+                        <div class="goal-name">Повышение лояльности</div>
+                        <div class="goal-desc">Повторные продажи и удержание</div>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-icon">📊</div>
+                        <div class="goal-name">Маркетинговые исследования</div>
+                        <div class="goal-desc">Сбор данных о клиентах и спросе</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIMELINE OF CREATION -->
+            <div class="timeline-card">
+                <div class="tl-title">🛠️ Этапы создания сайта: от брифа до тестирования</div>
+                <div class="process-line">
+                    <div class="process-step">
+                        <div class="process-num">1</div>
+                        <div class="process-content">
+                            <div class="pc-title">Общение с заказчиком и бриф</div>
+                            <div class="pc-desc">Определение целей, задач, бюджета, сроков, целевой аудитории</div>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-num">2</div>
+                        <div class="process-content">
+                            <div class="pc-title">Выбор CMS и доменного имени</div>
+                            <div class="pc-desc">Платформа под задачи бизнеса + уникальный домен</div>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-num">3</div>
+                        <div class="process-content">
+                            <div class="pc-title">Договор и предварительная оплата</div>
+                            <div class="pc-desc">Юридическое закрепление этапов и стоимости</div>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-num">4</div>
+                        <div class="process-content">
+                            <div class="pc-title">Разработка структуры и ТЗ</div>
+                            <div class="pc-desc">Прототип, логика навигации, техническое задание</div>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-num">5</div>
+                        <div class="process-content">
+                            <div class="pc-title">Утверждение концепции, дизайна и ТЗ</div>
+                            <div class="pc-desc">Согласование визуальной концепции и функционала</div>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-num">6</div>
+                        <div class="process-content">
+                            <div class="pc-title">Разработка, наполнение и перенос на хостинг</div>
+                            <div class="pc-desc">Дизайн, вёрстка, установка CMS, наполнение контентом</div>
+                        </div>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-num">7</div>
+                        <div class="process-content">
+                            <div class="pc-title">Тестирование и запуск</div>
+                            <div class="pc-desc">Проверка основных параметров работы, запуск проекта</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUDIENCE PERSONA -->
+            <div class="persona-card">
+                <div class="p-title">👥 Анализ целевой аудитории: три ключевых портрета</div>
+                <div class="persona-grid">
+                    <div class="persona">
+                        <div class="p-avatar">👨‍💼</div>
+                        <div class="p-name">Профессионал (B2B)</div>
+                        <div class="p-trait">35–50 лет • ищет решение задачи • ценит экспертизу, кейсы, цифры</div>
+                    </div>
+                    <div class="persona">
+                        <div class="p-avatar">👩‍💻</div>
+                        <div class="p-name">Молодой специалист</div>
+                        <div class="p-trait">25–35 лет • ищет быстрое решение • ценит удобство, мобильность</div>
+                    </div>
+                    <div class="persona">
+                        <div class="p-avatar">👵</div>
+                        <div class="p-name">Покупатель-новичок</div>
+                        <div class="p-trait">45+ лет • нуждается в пояснениях • ценит простоту и доверие</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FIRST IMPRESSION -->
+            <div class="impression-card">
+                <div class="imp-title">⏱️ Первые секунды взаимодействия с сайтом</div>
+                <div class="impression-row">
+                    <div class="impression-metric">
+                        <div class="im-val">0,05 сек</div>
+                        <div class="im-cap">Первое визуальное впечатление</div>
+                    </div>
+                    <div class="impression-metric">
+                        <div class="im-val">2,6 сек</div>
+                        <div class="im-cap">Время до формирования мнения</div>
+                    </div>
+                    <div class="impression-metric">
+                        <div class="im-val">94%</div>
+                        <div class="im-cap">Причина отказов — дизайн и скорость</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #991b1b; margin-top: 10px;">Пользователь должен понять за 3 секунды: что это, для кого, что делать. Источник: Google Research, 2024.</div>
+            </div>
+
+            <!-- STRATEGY COMPARE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 10px;">⚖️ Стратегии продаж через сайт</div>
+                <div class="strategy-grid">
+                    <div class="strategy-card high-margin">
+                        <h5 style="color: #92400e;">💎 Товары с высокой маржой</h5>
+                        <ul>
+                            <li>Быстрый вывод покупателя на контакт с продавцом</li>
+                            <li>Персональные коммуникации как основа</li>
+                            <li>Формы заявок, обратный звонок, чаты</li>
+                            <li>Примеры: недвижимость, B2B-услуги, премиум-товары</li>
+                        </ul>
+                    </div>
+                    <div class="strategy-card mass">
+                        <h5 style="color: #1d4ed8;">📦 Массовые продукты</h5>
+                        <ul>
+                            <li>Стандартная процедура покупки</li>
+                            <li>Дешёвые коммуникации с компьютером</li>
+                            <li>Продажа без участия продавца (софт-товары)</li>
+                            <li>Примеры: интернет-магазины, подписки, SaaS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPTIMIZATION SVG -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Параллельность создания контента и его оптимизации <span>Циклический процесс</span></div>
+                <svg viewBox="0 0 600 180" style="width: 100%; height: auto;">
+                    <!-- Фон спирали -->
+                    <path d="M 100 90 Q 150 30, 220 60 T 340 90 Q 400 120, 460 90 T 560 90"
+                          fill="none" stroke="#ccfbf1" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M 100 90 Q 150 30, 220 60 T 340 90 Q 400 120, 460 90 T 560 90"
+                          fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 3"/>
+
+                    <!-- Точки цикла -->
+                    <circle cx="100" cy="90" r="16" fill="#14b8a6" stroke="white" stroke-width="3"/>
+                    <text x="100" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="900">1</text>
+
+                    <circle cx="220" cy="60" r="16" fill="#0d9488" stroke="white" stroke-width="3"/>
+                    <text x="220" y="65" font-size="14" fill="white" text-anchor="middle" font-weight="900">2</text>
+
+                    <circle cx="340" cy="90" r="16" fill="#0f766e" stroke="white" stroke-width="3"/>
+                    <text x="340" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="900">3</text>
+
+                    <circle cx="460" cy="90" r="16" fill="#134e4a" stroke="white" stroke-width="3"/>
+                    <text x="460" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="900">4</text>
+
+                    <circle cx="560" cy="90" r="16" fill="#e11d48" stroke="white" stroke-width="3"/>
+                    <text x="560" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="900">5</text>
+
+                    <!-- Подписи -->
+                    <text x="100" y="135" font-size="10" fill="#134e4a" text-anchor="middle" font-weight="bold">Создание</text>
+                    <text x="220" y="105" font-size="10" fill="#134e4a" text-anchor="middle" font-weight="bold">Оптимизация</text>
+                    <text x="340" y="135" font-size="10" fill="#134e4a" text-anchor="middle" font-weight="bold">Анализ</text>
+                    <text x="460" y="135" font-size="10" fill="#134e4a" text-anchor="middle" font-weight="bold">Коррекция</text>
+                    <text x="560" y="135" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">Повтор</text>
+
+                    <!-- Стрелки направления -->
+                    <text x="160" y="55" font-size="14" fill="#14b8a6">↗</text>
+                    <text x="280" y="110" font-size="14" fill="#0d9488">↘</text>
+                    <text x="400" y="105" font-size="14" fill="#0f766e">→</text>
+                    <text x="510" y="75" font-size="14" fill="#134e4a">↗</text>
+                </svg>
+                <div style="font-size: 11px; color: #134e4a; margin-top: 4px;">Внутренняя и внешняя оптимизация должны идти параллельно. Процесс циклический: создание → оптимизация → анализ → коррекция → повтор.</div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Стратегия сайта</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Этапы создания сайта</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Анализ аудитории</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 11 из 15
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #042f2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #115e59; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Мы начинаем новую часть курса, посвящённую сайтостроению и SEO. Сегодня мы разберём стратегию сайта и этапы его создания. Для маркетолога понимание этого процесса критически важно: даже если вы не пишете код, вы формируете требования к сайту, оцениваете его эффективность и управляете его развитием.</p>
+
+            <div class="action-hint">Обратите внимание студентов на блок целей сайта.</div>
+
+            <h3>📌 Введение: важность веб-сайта как инструмента маркетинга</h3>
+
+            <p>Веб-сайт — это центральный элемент экосистемы интернет-маркетинга. Он аккумулирует весь трафик: из поиска, социальных сетей, рекламы, email-рассылок. Если сайт не выполняет свою функцию — все усилия по привлечению трафика уходят впустую.</p>
+
+            <p>Маркетолог должен понимать процесс создания сайта, даже если он не является разработчиком. Это позволяет корректно ставить задачи подрядчикам, оценивать качество их работы и принимать решения о развитии проекта.</p>
+
+            <h3>📌 Определение функций сайта</h3>
+
+            <p>Прежде чем заказывать разработку, необходимо ответить на ключевые вопросы. Первое — определение функций сайта. Какие задачи он должен решать: продавать, генерировать лиды, информировать, поддерживать существующих клиентов?</p>
+
+            <p>Второй аспект — анализ конкурентов. Как сайт будет выделяться на их фоне? Какие функции есть у конкурентов, а какие — уникальны для вас?</p>
+
+            <p>Третий аспект — формулировка цели. Сайт может преследовать одну из четырёх ключевых целей: снижение издержек на коммуникацию с клиентами, вывод покупателя на личный контакт с продавцом, повышение лояльности для повторных продаж или проведение маркетинговых исследований.</p>
+
+            <h3>📌 Анализ целевой аудитории</h3>
+
+            <p>Следующий этап — определение профиля целевой аудитории. Мы должны понимать возраст, профессию, хобби, интересы наших потенциальных клиентов. Это позволит выбрать дизайн и стиль сайта, соответствующие аудитории.</p>
+
+            <p>На слайде представлены три ключевых портрета: профессионал B2B (35–50 лет, ищет решение задачи, ценит экспертизу и цифры), молодой специалист (25–35 лет, ищет быстрое решение, ценит удобство и мобильность) и покупатель-новичок (45+, нуждается в пояснениях, ценит простоту и доверие). Для каждой аудитории — свой дизайн, свой язык, свои акценты.</p>
+
+            <div class="action-hint">Обратите внимание студентов на блок «Первые секунды».</div>
+
+            <h3>📌 Первые впечатления от сайта</h3>
+
+            <p>Значение первых секунд взаимодействия пользователя с сайтом критически важно. По данным Google Research, первое визуальное впечатление формируется за 0,05 секунды. Полное мнение о сайте складывается за 2,6 секунды. И если впечатление негативное — 94% отказов связаны именно с дизайном и скоростью загрузки.</p>
+
+            <p>Пользователь должен понять за 3 секунды: что это за сайт, для кого он, и что ему нужно сделать. Если этого не происходит — он уходит. Соответственно, главная задача дизайна — быстро донести ценность предложения.</p>
+
+            <h3>📌 Оптимизация и продвижение</h3>
+
+            <p>Создание контента и его оптимизация должны идти параллельно. Нельзя сначала написать все тексты, а потом «оптимизировать» их под поисковые системы. Ключевые слова необходимо внедрять уже на этапе создания контента.</p>
+
+            <p>Рерайтинг — переписывание текста с сохранением смысла, но изменением формулировок — помогает создавать уникальный контент. Это важно, потому что поисковые системы не любят дублированный контент.</p>
+
+            <p>Дополнительные аспекты оптимизации: карта сайта (sitemap.xml) помогает поисковым роботам обходить страницы, правильная навигация улучшает пользовательский опыт, актуальность данных и программного обеспечения — обязательное условие стабильной работы.</p>
+
+            <h3>📌 Стратегии продаж через сайт</h3>
+
+            <p>Стратегия продаж через сайт зависит от типа товара. Для товаров с высокой маржой оптимальна стратегия быстрого вывода покупателя на контакт с продавцом: формы заявок, обратный звонок, чаты. В этом случае важна не автоматизация, а персонализация.</p>
+
+            <p>Для массовых продуктов со стандартной процедурой покупки используется другой подход: дешёвые коммуникации с компьютером экономят время продавца. Для софт-товаров возможна продажа полностью без участия продавца.</p>
+
+            <h3>📌 Процесс создания сайта</h3>
+
+            <p>Процесс создания сайта включает семь ключевых этапов. Первый — общение с заказчиком и заполнение анкеты (брифа). Второй — выбор CMS-системы и доменного имени. Третий — подписание договора и предварительная оплата. Четвёртый — разработка структуры сайта и технического задания. Пятый — утверждение концепции, структуры и ТЗ. Шестой — разработка и восстановление дизайна, установка и настройка структуры данных, первоначальное наполнение сайта информацией, перенос на хостинг заказчика. Седьмой — тестирование основных параметров работы сайта.</p>
+
+            <p>Обратите внимание: процесс итеративный. На каждом этапе возможны корректировки. Чем раньше выявить проблему, тем дешевле её исправить.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали стратегию сайта и этапы его создания. Ключевые выводы:</p>
+
+            <ul>
+                <li>Сайт — это инструмент достижения бизнес-целей, а не просто «страница в интернете».</li>
+                <li>Определение функций сайта, анализ конкурентов и целевой аудитории — обязательные этапы перед разработкой.</li>
+                <li>Первые секунды взаимодействия критически важны: 94% отказов связаны с дизайном и скоростью.</li>
+                <li>Создание контента и его оптимизация должны идти параллельно, циклически.</li>
+                <li>Стратегия продаж зависит от типа товара: высокая маржа → личный контакт, массовый продукт → автоматизация.</li>
+                <li>Процесс создания сайта включает семь этапов — от брифа до тестирования.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём хостинг веб-сайтов: виды, особенности и выбор. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">B2B</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Business-to-Business</div>
+                            <div class="gloss-def">Модель продаж, при которой продавец и покупатель — юридические лица</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CMS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Content Management System</div>
+                            <div class="gloss-def">Система управления контентом сайта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SaaS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Software as a Service</div>
+                            <div class="gloss-def">Программное обеспечение как услуга по подписке</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Sitemap</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Sitemap.xml</div>
+                            <div class="gloss-def">Карта сайта для поисковых роботов — перечень всех страниц</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ТЗ</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Техническое задание</div>
+                            <div class="gloss-def">Документ, описывающий требования к сайту: функции, дизайн, структура</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">УТП</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Уникальное торговое предложение</div>
+                            <div class="gloss-def">Ключевое преимущество продукта, отличающее его от конкурентов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Стратегия и создание сайта</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Котлер Ф., Келлер К. Л. Маркетинг менеджмент. — 15-е изд. — СПб.: Питер, 2024.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Ash T., Page R., Ginty M. Landing Page Optimization. — Wiley, 2023.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Krug S. Don't Make Me Think, Revisited. — New Riders, 2024.</div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⏱️ Первые впечатления и UX</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Google Research: How Users Perceive Website Design — 0,05 сек на первое впечатление. — <a href="https://research.google" target="_blank">Research.Google</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Nielsen Norman Group: Website Response Times and User Perception. — <a href="https://www.nngroup.com" target="_blank">NNGroup.com</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Baymard Institute: 94% of First Impressions Relate to Design. — <a href="https://baymard.com" target="_blank">Baymard.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Российский рынок веб-разработки</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">«Рейтинг Рунета»: Разработка сайтов выросла на 26% в 2025 году. — <a href="https://ratingruneta.ru" target="_blank">RatingRuneta.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Workspace: Обзор рынка digital-услуг 2025. — <a href="https://workspace.ru" target="_blank">Workspace.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🛠️ Этапы создания сайта</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Skillbox: Этапы разработки сайта — от брифа до запуска. — <a href="https://skillbox.ru" target="_blank">Skillbox.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Habr: Техническое задание на разработку сайта — структура и примеры. — <a href="https://habr.com" target="_blank">Habr.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

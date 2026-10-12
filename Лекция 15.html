@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 15. SEO-факторы и эволюция их веса</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a1a2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #4a1d96; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #a855f7; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #4a1d96 0%, #7c3aed 60%, #a855f7 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* EVOLUTION TIMELINE */
+        .evolution-card { background: #faf5ff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 22px 26px; }
+        .evolution-card .ev-title { font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 16px; }
+        .evo-track { display: flex; justify-content: space-between; position: relative; padding: 0 10px; }
+        .evo-track::before { content: ''; position: absolute; top: 22px; left: 0; width: 100%; height: 4px; background: #ddd6fe; z-index: 1; }
+        .evo-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 18%; }
+        .evo-dot { width: 44px; height: 44px; border-radius: 50%; background: #a855f7; border: 4px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 900; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-bottom: 8px; }
+        .evo-item.active .evo-dot { background: #e11d48; transform: scale(1.1); box-shadow: 0 6px 12px rgba(225,29,72,0.3); }
+        .evo-year { font-size: 11px; font-weight: 900; color: #4a1d96; }
+        .evo-label { font-size: 10px; color: #475569; text-align: center; line-height: 1.3; margin-top: 3px; }
+
+        /* PAGERANK SVG */
+        .chart-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* LINK COMPARE */
+        .link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .link-card { border-radius: 12px; padding: 16px; }
+        .link-card.good { background: #f0fdf4; border: 2px solid #86efac; }
+        .link-card.bad { background: #fef2f2; border: 2px solid #fca5a5; }
+        .link-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .link-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #334155; }
+        .link-card li { margin-bottom: 4px; }
+
+        /* FACTOR BARS */
+        .factor-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .factor-card .factor-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 14px; }
+        .factor-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .factor-label { font-size: 11.5px; color: #1e293b; width: 190px; font-weight: 500; text-align: right; }
+        .factor-track { flex: 1; background: #ede9fe; height: 22px; border-radius: 6px; overflow: hidden; position: relative; }
+        .factor-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10.5px; font-weight: bold; color: white; }
+        .factor-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+        .factor-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .factor-fill.green { background: linear-gradient(90deg, #15803d, #22c55e); }
+        .factor-fill.violet { background: linear-gradient(90deg, #6d28d9, #a855f7); }
+        .factor-fill.slate { background: linear-gradient(90deg, #475569, #64748b); }
+
+        /* PREDICTIONS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #4a1d96; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #faf5ff; }
+        .metrics-table .up { color: #059669; font-weight: bold; }
+        .metrics-table .down { color: #e11d48; font-weight: bold; }
+        .metrics-table .stable { color: #f59e0b; font-weight: bold; }
+
+        /* SVG: EVOLUTION WEIGHT */
+        .svg-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; }
+        .svg-card .svg-title { font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .svg-card .svg-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* PARALLEL OPTIMIZATION */
+        .cycle-card { background: #fefce8; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .cycle-card .cycle-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 12px; }
+        .cycle-flow { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
+        .cycle-node { flex: 1; min-width: 80px; background: white; border: 2px solid #f59e0b; border-radius: 8px; padding: 10px 6px; text-align: center; }
+        .cycle-node .cn-icon { font-size: 18px; margin-bottom: 4px; }
+        .cycle-node .cn-name { font-size: 10.5px; font-weight: bold; color: #78350f; line-height: 1.3; }
+        .cycle-arrow { font-size: 16px; color: #f59e0b; font-weight: bold; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #a855f7; }
+        .rt-btn:hover { background: #7c3aed; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #c4b5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #c4b5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #334155; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #4a1d96; color: #c4b5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #a855f7; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #a855f7; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #c4b5fd; font-size: 13px; min-width: 80px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #a855f7; color: #1a1a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #c4b5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 15. SEO-факторы и эволюция их веса
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">📊</div>
+                <div class="hero-data">
+                    <div class="hero-number">12%</div>
+                    <div class="hero-label">рост SEO-рынка в России (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">73,2%</div>
+                    <div class="hero-label">SEO-специалистов: ссылки влияют</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">58%</div>
+                    <div class="hero-label">запросов без клика</div>
+                </div>
+            </div>
+
+            <!-- EVOLUTION TIMELINE -->
+            <div class="evolution-card">
+                <div class="ev-title">🕐 Эволюция SEO-факторов: от ключевых слов до AI-цитируемости</div>
+                <div class="evo-track">
+                    <div class="evo-item">
+                        <div class="evo-dot">📝</div>
+                        <div class="evo-year">1994–1997</div>
+                        <div class="evo-label">Ключевые слова<br>Meta-теги</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">🔗</div>
+                        <div class="evo-year">1998–2010</div>
+                        <div class="evo-label">PageRank<br>Ссылочный авторитет</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">📚</div>
+                        <div class="evo-year">2011–2018</div>
+                        <div class="evo-label">Контент<br>E-E-A-T</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">🖱️</div>
+                        <div class="evo-year">2019–2024</div>
+                        <div class="evo-label">Поведенческие<br>NavBoost</div>
+                    </div>
+                    <div class="evo-item active">
+                        <div class="evo-dot">🤖</div>
+                        <div class="evo-year">2025–2026</div>
+                        <div class="evo-label">AI-цитируемость<br>GEO</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGERANK SVG -->
+            <div class="chart-card">
+                <div class="chart-title">🔗 Как работает PageRank: передача авторитета <span>Аналогия с водой</span></div>
+                <svg viewBox="0 0 600 180" style="width: 100%; height: auto;">
+                    <!-- Страница A (высокий вес) -->
+                    <circle cx="100" cy="60" r="32" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="100" y="58" font-size="12" fill="#1e3a5f" text-anchor="middle" font-weight="900">A</text>
+                    <text x="100" y="72" font-size="9" fill="#475569" text-anchor="middle">PR=8</text>
+
+                    <!-- Страница B (средний вес) -->
+                    <circle cx="300" cy="60" r="26" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="300" y="58" font-size="11" fill="#1e3a5f" text-anchor="middle" font-weight="900">B</text>
+                    <text x="300" y="72" font-size="9" fill="#475569" text-anchor="middle">PR=5</text>
+
+                    <!-- Страница C (средний вес) -->
+                    <circle cx="500" cy="60" r="26" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="500" y="58" font-size="11" fill="#1e3a5f" text-anchor="middle" font-weight="900">C</text>
+                    <text x="500" y="72" font-size="9" fill="#475569" text-anchor="middle">PR=5</text>
+
+                    <!-- Страница D (низкий вес, получает) -->
+                    <circle cx="300" cy="140" r="20" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+                    <text x="300" y="138" font-size="10" fill="#065f46" text-anchor="middle" font-weight="900">D</text>
+                    <text x="300" y="152" font-size="8" fill="#475569" text-anchor="middle">PR=2,5</text>
+
+                    <!-- Стрелки: A → B, A → C, B → D, C → D -->
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                        </marker>
+                    </defs>
+                    <line x1="132" y1="55" x2="270" y2="55" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)"/>
+                    <line x1="132" y1="65" x2="470" y2="65" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="4 2"/>
+                    <line x1="300" y1="86" x2="300" y2="118" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)"/>
+                    <line x1="480" y1="80" x2="320" y2="128" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)"/>
+
+                    <!-- Подписи -->
+                    <text x="200" y="48" font-size="9" fill="#475569" text-anchor="middle">вес</text>
+                    <text x="400" y="58" font-size="9" fill="#475569" text-anchor="middle">вес</text>
+
+                    <!-- Вода аналогия -->
+                    <text x="300" y="175" font-size="10" fill="#4a1d96" text-anchor="middle" font-weight="bold">Страница с большим авторитетом передаёт свой вес другим. Меньший авторитет — меньший вес.</text>
+                </svg>
+            </div>
+
+            <!-- LINK COMPARE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 10px;">⚖️ Качественные vs некачественные ссылки</div>
+                <div class="link-grid">
+                    <div class="link-card good">
+                        <h5 style="color: #15803d;">✅ Качественные ссылки</h5>
+                        <ul>
+                            <li>От авторитетных новостных сайтов</li>
+                            <li>От правительственных организаций</li>
+                            <li>От тематических экспертных блогов</li>
+                            <li>Естественные, редакционные ссылки</li>
+                            <li>Якорный текст с ключевыми словами</li>
+                        </ul>
+                    </div>
+                    <div class="link-card bad">
+                        <h5 style="color: #b91c1c;">❌ Некачественные ссылки</h5>
+                        <ul>
+                            <li>Спамные блоги и PBN-сети</li>
+                            <li>Биржи ссылок и покупные ссылки</li>
+                            <li>Нерелевантные тематики</li>
+                            <li>Ссылки с явной переоптимизацией</li>
+                            <li>Могут привести к бану сайта</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FACTOR BARS -->
+            <div class="factor-card">
+                <div class="factor-title">📊 Вес SEO-факторов в 2025–2026 годах</div>
+                <div class="factor-row">
+                    <div class="factor-label">Поведенческие факторы</div>
+                    <div class="factor-track"><div class="factor-fill rose" style="width: 95%;">95%</div></div>
+                </div>
+                <div class="factor-row">
+                    <div class="factor-label">Качество контента (E-E-A-T)</div>
+                    <div class="factor-track"><div class="factor-fill violet" style="width: 90%;">90%</div></div>
+                </div>
+                <div class="factor-row">
+                    <div class="factor-label">Технические факторы</div>
+                    <div class="factor-track"><div class="factor-fill amber" style="width: 75%;">75%</div></div>
+                </div>
+                <div class="factor-row">
+                    <div class="factor-label">Структурированные данные</div>
+                    <div class="factor-track"><div class="factor-fill green" style="width: 70%;">70%</div></div>
+                </div>
+                <div class="factor-row">
+                    <div class="factor-label">Ссылочный авторитет</div>
+                    <div class="factor-track"><div class="factor-fill slate" style="width: 45%;">45%</div></div>
+                </div>
+                <div style="font-size: 10.5px; color: #64748b; margin-top: 8px;">Вес факторов — усреднённые экспертные оценки. Источник: Search Engine Journal, Editorial.Link, 2025–2026.</div>
+            </div>
+
+            <!-- PREDICTIONS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #4a1d96; margin-bottom: 8px;">📋 Прогнозы изменения веса факторов (по опросам экспертов)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Фактор</th>
+                            <th>Текущий вес</th>
+                            <th>Прогноз</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Поведенческие сигналы</strong></td>
+                            <td>Высокий</td>
+                            <td class="up">↑ Будет расти</td>
+                            <td>70% экспертов</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Структурированные данные</strong></td>
+                            <td>Средний</td>
+                            <td class="up">↑ Будет расти</td>
+                            <td>75% экспертов</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Важность дизайна</strong></td>
+                            <td>Средний</td>
+                            <td class="up">↑ Будет расти</td>
+                            <td>60% экспертов</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Якорный текст внутренних ссылок</strong></td>
+                            <td>Средний</td>
+                            <td class="up">↑ Будет расти</td>
+                            <td>60% экспертов</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Платные ссылки</strong></td>
+                            <td>Низкий</td>
+                            <td class="down">↓ Будет снижаться</td>
+                            <td>60% экспертов</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ссылочный авторитет</strong></td>
+                            <td>Средний</td>
+                            <td class="down">↓ Снижается</td>
+                            <td>Editorial.Link</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SVG WEIGHT EVOLUTION -->
+            <div class="svg-card">
+                <div class="svg-title">📈 Эволюция веса факторов 2010 → 2026 <span>Условные единицы</span></div>
+                <svg viewBox="0 0 600 180" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="150" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="150" x2="580" y2="150" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="110" x2="580" y2="110" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="70" x2="580" y2="70" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="30" x2="580" y2="30" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Поведенческие (растут) -->
+                    <polyline points="90,120 220,100 350,80 480,60 580,40" fill="none" stroke="#e11d48" stroke-width="2.5"/>
+                    <text x="90" y="115" font-size="9" fill="#e11d48" font-weight="bold">Поведенческие</text>
+
+                    <!-- Контент (растут) -->
+                    <polyline points="90,130 220,110 350,85 480,60 580,45" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+                    <text x="90" y="140" font-size="9" fill="#7c3aed" font-weight="bold">Контент</text>
+
+                    <!-- Ссылки (снижаются) -->
+                    <polyline points="90,40 220,50 350,65 480,80 580,95" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 3"/>
+                    <text x="480" y="78" font-size="9" fill="#64748b" font-weight="bold">Ссылки</text>
+
+                    <!-- Подписи X -->
+                    <text x="90" y="165" font-size="9" fill="#64748b" text-anchor="middle">2010</text>
+                    <text x="220" y="165" font-size="9" fill="#64748b" text-anchor="middle">2014</text>
+                    <text x="350" y="165" font-size="9" fill="#64748b" text-anchor="middle">2018</text>
+                    <text x="480" y="165" font-size="9" fill="#64748b" text-anchor="middle">2022</text>
+                    <text x="580" y="165" font-size="9" fill="#64748b" text-anchor="middle">2026</text>
+                </svg>
+                <div style="font-size: 10.5px; color: #64748b; margin-top: 4px;">Поведенческие факторы и качество контента растут. Ссылочный авторитет снижается. Это фундаментальный сдвиг в SEO.</div>
+            </div>
+
+            <!-- CYCLE OPTIMIZATION -->
+            <div class="cycle-card">
+                <div class="cycle-title">🔄 Параллельная оптимизация: циклический процесс</div>
+                <div class="cycle-flow">
+                    <div class="cycle-node">
+                        <div class="cn-icon">🔧</div>
+                        <div class="cn-name">Внутренняя<br>оптимизация</div>
+                    </div>
+                    <div class="cycle-arrow">+</div>
+                    <div class="cycle-node">
+                        <div class="cn-icon">🔗</div>
+                        <div class="cn-name">Внешняя<br>оптимизация</div>
+                    </div>
+                    <div class="cycle-arrow">→</div>
+                    <div class="cycle-node">
+                        <div class="cn-icon">📊</div>
+                        <div class="cn-name">Анализ<br>результатов</div>
+                    </div>
+                    <div class="cycle-arrow">→</div>
+                    <div class="cycle-node">
+                        <div class="cn-icon">🔁</div>
+                        <div class="cn-name">Корректировка<br>стратегии</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #78350f; margin-top: 10px; text-align: center;">Процесс оптимизации циклический: анализ → коррекция → повтор. SEO — не разовая акция, а постоянная работа.</div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: SEO-факторы</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: PageRank и ссылки</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Параллельная оптимизация</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 15 из 15
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a1a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #334155; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня — заключительная лекция нашего курса. На прошлой лекции мы разобрали, как работает поисковая машина. Сегодня мы детально поговорим об SEO-факторах и о том, как менялся их вес за последние двадцать лет.</p>
+
+            <div class="action-hint">Обратите внимание студентов на таймлайн эволюции SEO-факторов.</div>
+
+            <h3>📌 Интересы участников поисковой оптимизации</h3>
+
+            <p>Прежде чем говорить о факторах, важно понять, у кого какие интересы в этой игре. Пользователи хотят находить релевантный контент и избегать спама. Владельцы сайтов стремятся зарабатывать на рекламе и продвижении товаров. Поисковики должны ограничивать нелегальные методы продвижения и обеспечивать релевантность контента.</p>
+
+            <p>Это противоречие — двигатель эволюции SEO. Как только поисковики находят способ борьбы с одним методом обмана, оптимизаторы изобретают новый. Этот цикл продолжается уже больше двадцати лет.</p>
+
+            <h3>📌 Эволюция SEO-факторов: от ключевых слов до AI-цитируемости</h3>
+
+            <p>Давайте проследим эволюцию по этапам.</p>
+
+            <p><strong>1994–1997: ключевые слова и метатеги.</strong> В начале 90-х основным фактором была оптимизация под ключевые слова. Метатеги и ключевые слова в них потеряли своё значение из-за попыток обмануть поисковые системы. Оптимизаторы просто перечисляли в метатегах сотни ключевых слов, не имеющих отношения к контенту.</p>
+
+            <p><strong>1998–2010: PageRank и ссылочный авторитет.</strong> PageRank появился в 1998 году и стал независимым параметром от внутренней оптимизации. Авторитет сайта определяется количеством и качеством внешних ссылок. Ссылки от авторитетных источников повышают авторитет сайта. Страница с большим авторитетом передаёт свой вес другим страницам. Страницы с небольшим авторитетом передают меньший вес. Аналогия с количеством воды по вертикальной оси иллюстрирует передачу авторитета.</p>
+
+            <p><strong>2011–2018: контент и E-E-A-T.</strong> Google ввёл концепцию E-E-A-T: опыт, экспертиза, авторитет, надёжность. Качество и полезность контента становятся абсолютными ценностями для поисковых систем. Маркетинг в социальных сетях и таргетинговые ключевые слова также влияют на оценку сайта.</p>
+
+            <p><strong>2019–2024: поведенческие факторы и NavBoost.</strong> Поведение пользователей — регистрация, заполнение форм, покупки, клики — оценивается поисковыми системами. Google в рамках антимонопольного дела 2025 года подтвердил, что сигналы NavBoost — данные о кликах пользователей — играют центральную роль в ранжировании. Оптимизаторы пытаются имитировать поведение пользователей, что приводит к снижению веса параметра.</p>
+
+            <p><strong>2025–2026: AI-цитируемость и GEO.</strong> Мы находимся на пороге новой эпохи. AI Overviews на 48% запросов, 58% поисков без клика. Ключевым становится не позиция в выдаче, а цитируемость в AI-ответах. Появляется GEO (Generative Engine Optimization) — оптимизация для генеративных систем.</p>
+
+            <div class="action-hint">Обратите внимание студентов на схему PageRank.</div>
+
+            <h3>📌 Влияние ссылок на авторитет сайта</h3>
+
+            <p>Ссылки от авторитетных ресурсов — новостных сайтов, правительственных организаций — повышают авторитет страницы. Ссылки от сомнительных ресурсов — спамовых блогов, бирж ссылок — могут снизить авторитет или даже исключить страницу из базы данных поисковика.</p>
+
+            <p>Якорный текст, содержащий ключевые слова, увеличивает вес страницы. Пример: ссылка на сайт о филателии с ключевым словом «марки» повышает релевантность страницы. Но переоптимизация якорного текста может привести к санкциям.</p>
+
+            <p>Биржи ссылок — важный исторический феномен. Они позволяли клиентам устанавливать количество и цену ссылок. Более 90% сайтов на биржах созданы для заработка на ссылках и имеют риск быть забракованными поисковыми системами. Сегодня ссылочные биржи практически утратили эффективность: поисковики научились их распознавать.</p>
+
+            <p>Вес домена увеличивается с течением времени и репутацией сайта. Аналогия с выдачей кредита: длительный срок существования домена и его репутация важны для оценки авторитета страницы.</p>
+
+            <h3>📌 Рейтинг авторов и структурированные данные</h3>
+
+            <p>Поисковые системы отслеживают рейтинг авторов и связывают его с авторитетом продвигаемого источника. Это позволяет поисковикам более точно оценивать качество контента и его полезность. Если автор — эксперт в своей области, его контент получает дополнительный вес.</p>
+
+            <p>Структурированные данные — название компании, адрес, рейтинг, цена — имеют значение для поисковых систем. Около 75% респондентов считают, что вес этого фактора будет увеличиваться. В контексте AI-поиска структурированные данные становятся особенно важны: они помогают ИИ-системам понимать контент и цитировать его.</p>
+
+            <p>Социальные сигналы, по мнению 70% респондентов, будут иметь больший вес. Более 60% считают, что важность дизайна будет увеличиваться. Зарекламированность страниц также может учитываться поисковыми системами.</p>
+
+            <h3>📌 Прогнозы изменения веса факторов</h3>
+
+            <p>Опираясь на опросы экспертов, можно выделить ключевые тренды.</p>
+
+            <p>Влияние якорного текста внешних ссылок оценивается в 10%. Эффективность платных ссылок, по мнению 60% респондентов, уменьшится. Влияние якорного текста внутренних ссылок, по мнению того же количества респондентов, увеличится.</p>
+
+            <p>Поведенческие сигналы, структурированные данные, дизайн, внутренняя перелинковка — всё это будет расти в весе. Ссылочный авторитет и платные ссылки — снижаться.</p>
+
+            <h3>📌 Параллельная оптимизация</h3>
+
+            <p>Внутренняя и внешняя поисковая оптимизация должны проводиться параллельно. Все действия по оптимизации должны постоянно анализироваться и корректироваться. Процесс оптимизации является циклическим: анализ → коррекция → повтор. SEO — не разовая акция, а постоянная работа.</p>
+
+            <h3>📌 Итоги курса</h3>
+
+            <p>Сегодня мы завершили курс «Интернет-маркетинг». Мы прошли путь от введения в интернет-маркетинг до детального разбора SEO-факторов. Ключевые выводы курса:</p>
+
+            <ul>
+                <li>Интернет-маркетинг — это управляемая экосистема, а не набор разрозненных инструментов.</li>
+                <li>Рынок digital-услуг в России достиг 464,1 млрд рублей, интернет-рекламы — 1,57 трлн рублей.</li>
+                <li>Произошёл переход от SEO к GEO: 58% запросов без клика, AI Overviews на 48% запросов.</li>
+                <li>Поведенческие факторы и качество контента стали важнее ссылок.</li>
+                <li>Параллельная оптимизация — циклический процесс, требующий постоянного анализа и коррекции.</li>
+            </ul>
+
+            <p>Спасибо за внимание! Успехов в изучении интернет-маркетинга!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">E-E-A-T</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Experience, Expertise, Authoritativeness, Trustworthiness</div>
+                            <div class="gloss-def">Опыт, экспертиза, авторитет, надёжность — критерии качества контента</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Generative Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация для генеративных поисковых систем и нейросетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">NavBoost</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Сигналы NavBoost</div>
+                            <div class="gloss-def">Данные о кликах пользователей, используемые Google для ранжирования</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PageRank</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Алгоритм PageRank</div>
+                            <div class="gloss-def">Алгоритм оценки авторитетности страницы на основе внешних ссылок</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PBN</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Private Blog Network</div>
+                            <div class="gloss-def">Сеть сайтов, созданных для продажи ссылок — рискованная тактика</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Schema.org</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Структурированные данные</div>
+                            <div class="gloss-def">Стандарт разметки контента для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Click-Through Rate</div>
+                            <div class="gloss-def">Показатель кликабельности — отношение кликов к показам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AI Overviews</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">AI-обзоры</div>
+                            <div class="gloss-def">Сгенерированные ИИ ответы в поисковой выдаче Google</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок SEO в России</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">TopVisor: Рынок SEO в России вырос на 12% в 2025 году. — <a href="https://journal.topvisor.com/ru/news/17-08-2026-rynok-seo-v-rossii-vyros-na-12-v-2025-godu/" target="_blank">TopVisor.com</a> <span class="src-date">17.08.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">SEOnews: Рейтинг известности SEO-компаний 2025. — <a href="https://www.seonews.ru" target="_blank">SEONews.ru</a> <span class="src-date">05.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">«Рейтинг Рунета»: Рынок digital-услуг в 2025 году. — <a href="https://ratingruneta.ru" target="_blank">RatingRuneta.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 Эволюция SEO-факторов</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">ScienceDirect: Estimating Google's ranking function from SEO perspective. — <a href="https://www.sciencedirect.com" target="_blank">ScienceDirect.com</a> <span class="src-date">29.06.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Search Engine Journal: Google's Quality Rankings — 7 core content factors. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">10.07.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Editorial.Link: The Role of Backlinks in 2026. — <a href="https://editorial.link" target="_blank">Editorial.link</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🔗 PageRank и ссылки</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Google Research: The PageRank Citation Ranking. — <a href="https://research.google" target="_blank">Research.Google</a> <span class="src-date">1998</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Majestic: Trust Flow и Citation Flow — современная оценка ссылок. — <a href="https://majestic.com" target="_blank">Majestic.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Raptive: What Google's December 2025 core update tells us about quality. — <a href="https://raptive.com" target="_blank">Raptive.com</a> <span class="src-date">04.02.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 AI-поиск и GEO</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Peec AI: 70+ GEO Statistics for 2026. — <a href="https://peec.ai" target="_blank">Peec.ai</a> <span class="src-date">31.03.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Search Engine Journal: AI Overviews correlate with 58% CTR reduction. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">01.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Pew Research: Users click traditional results 8% of the time with AI Overviews. — <a href="https://www.pewresearch.org" target="_blank">PewResearch.org</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Опросы экспертов</div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">Search Engine Journal: State of SEO 2026 — опрос 3 500 специалистов. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">Ahrefs: SEO Trends 2026 — что изменится в ранжировании. — <a href="https://ahrefs.com" target="_blank">Ahrefs.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

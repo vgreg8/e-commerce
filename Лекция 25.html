@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 25. Реклама на мобильных платформах, видео реклама</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1c0a2e; color: #f3e8ff; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #6b21a8; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #a855f7; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #6b21a8 0%, #9333ea 60%, #c084fc 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 34px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* EVOLUTION TIMELINE */
+        .evolution-card { background: #faf5ff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 20px 24px; }
+        .evolution-card .evo-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 16px; }
+        .evo-track { display: flex; justify-content: space-between; position: relative; padding: 0 10px; }
+        .evo-track::before { content: ''; position: absolute; top: 22px; left: 0; width: 100%; height: 4px; background: #e9d5ff; z-index: 1; }
+        .evo-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 13%; }
+        .evo-dot { width: 42px; height: 42px; border-radius: 50%; background: #a855f7; border: 4px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-bottom: 8px; }
+        .evo-item.final .evo-dot { background: #e11d48; transform: scale(1.15); box-shadow: 0 6px 12px rgba(225,29,72,0.3); }
+        .evo-year { font-size: 10px; font-weight: 900; color: #6b21a8; }
+        .evo-label { font-size: 9.5px; color: #475569; text-align: center; line-height: 1.25; margin-top: 3px; }
+
+        /* MOBILE OPPORTUNITIES GRID */
+        .opp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .opp-card { border-radius: 12px; padding: 14px 10px; text-align: center; }
+        .opp-card.sms { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #16a34a; }
+        .opp-card.web { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .opp-card.loyalty { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .opp-card.display { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .opp-card.content { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 2px solid #8b5cf6; }
+        .opp-card.coupon { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 2px solid #dc2626; }
+        .opp-card.tag { background: linear-gradient(135deg, #cffafe, #a5f3fc); border: 2px solid #06b6d4; }
+        .opp-card.geo { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 2px solid #10b981; }
+        .opp-card .opp-icon { font-size: 22px; margin-bottom: 5px; }
+        .opp-card .opp-name { font-size: 11.5px; font-weight: bold; color: #1e293b; margin-bottom: 3px; }
+        .opp-card .opp-desc { font-size: 9.5px; color: #475569; line-height: 1.3; }
+
+        /* SVG QR CODE DEMO */
+        .chart-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* PROVIDERS GRID */
+        .providers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .provider-card { border-radius: 12px; padding: 16px; }
+        .provider-card.operators { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #16a34a; }
+        .provider-card.sellers { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .provider-card.media { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .provider-card.geo { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 2px solid #8b5cf6; }
+        .provider-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .provider-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .provider-card li { margin-bottom: 4px; }
+        .provider-card .p-companies { font-size: 10px; color: #7c3aed; font-weight: 600; margin-top: 6px; }
+
+        /* VIDEO MONETIZATION */
+        .video-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .video-card .video-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 14px; }
+        .video-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .video-node { flex: 1; min-width: 100px; background: white; border: 2px solid #a855f7; border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .video-node .vn-icon { font-size: 22px; margin-bottom: 5px; }
+        .video-node .vn-name { font-size: 11px; font-weight: bold; color: #6b21a8; line-height: 1.25; }
+        .video-node .vn-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+        .video-arrow { font-size: 16px; color: #a855f7; font-weight: bold; }
+
+        /* COUPON MODELS */
+        .coupon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .coupon-card { border-radius: 12px; padding: 18px; }
+        .coupon-card.group { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .coupon-card.time { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .coupon-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .coupon-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .coupon-card li { margin-bottom: 4px; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #6b21a8; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #faf5ff; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .mid { color: #f59e0b; font-weight: bold; }
+        .metrics-table .cat { color: #7c3aed; font-weight: bold; }
+
+        /* SVG CHART */
+        .svg-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; }
+        .svg-card .svg-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .svg-card .svg-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #a855f7; }
+        .rt-btn:hover { background: #9333ea; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #d8b4fe; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #581c87; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #f3e8ff; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #d8b4fe; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #581c87; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #6b21a8; color: #d8b4fe; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #d8b4fe; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #a855f7; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #a855f7; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #d8b4fe; font-size: 13px; min-width: 90px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #d8b4fe; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #a855f7; color: #1c0a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #d8b4fe; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 25. Реклама на мобильных платформах, видео реклама
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">📱</div>
+                <div class="hero-data">
+                    <div class="hero-number">$262,8 млрд</div>
+                    <div class="hero-label">Мировой рынок мобильной рекламы (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">+7%</div>
+                    <div class="hero-label">Рост год к году</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">$185 млрд</div>
+                    <div class="hero-label">Мировой рынок видеорекламы (2025)</div>
+                </div>
+            </div>
+
+            <!-- EVOLUTION TIMELINE -->
+            <div class="evolution-card">
+                <div class="evo-title">🧬 Эволюция технологий: от отдельных устройств к конвергенции в смартфоне</div>
+                <div class="evo-track">
+                    <div class="evo-item">
+                        <div class="evo-dot">📷</div>
+                        <div class="evo-year">1980-е</div>
+                        <div class="evo-label">Фотоаппарат<br>Плёнка</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">📟</div>
+                        <div class="evo-year">1990-е</div>
+                        <div class="evo-label">Пейджер<br>СМС</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">🎮</div>
+                        <div class="evo-year">1990-е</div>
+                        <div class="evo-label">Игровые<br>приставки</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">🗺️</div>
+                        <div class="evo-year">2000-е</div>
+                        <div class="evo-label">Навигация<br>GPS</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">🎵</div>
+                        <div class="evo-year">2000-е</div>
+                        <div class="evo-label">MP3-плеер<br>Музыка</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">📺</div>
+                        <div class="evo-year">2000-е</div>
+                        <div class="evo-label">ТВ + телефон<br>Конвергенция</div>
+                    </div>
+                    <div class="evo-item final">
+                        <div class="evo-dot">📱</div>
+                        <div class="evo-year">2010+</div>
+                        <div class="evo-label">Смартфон<br>Всё в одном</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #6b21a8; margin-top: 12px;">В 2013 году количество смартфонов в мире превысило 1 млрд единиц. К 2026 году — 7+ млрд устройств. Смартфон стал главным экраном потребителя.</div>
+            </div>
+
+            <!-- MOBILE OPPORTUNITIES GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 10px;">🎯 Восемь возможностей мобильного маркетинга</div>
+                <div class="opp-grid">
+                    <div class="opp-card sms">
+                        <div class="opp-icon">💬</div>
+                        <div class="opp-name">SMS-реклама</div>
+                        <div class="opp-desc">Традиционный канал, работает без интернета</div>
+                    </div>
+                    <div class="opp-card web">
+                        <div class="opp-icon">🌐</div>
+                        <div class="opp-name">Мобильный веб</div>
+                        <div class="opp-desc">Реклама на мобильных сайтах и в веб-приложениях</div>
+                    </div>
+                    <div class="opp-card loyalty">
+                        <div class="opp-icon">🎁</div>
+                        <div class="opp-name">Программы лояльности</div>
+                        <div class="opp-desc">Бонусы, скидки от операторов</div>
+                    </div>
+                    <div class="opp-card display">
+                        <div class="opp-icon">🖼️</div>
+                        <div class="opp-name">Дисплейная реклама</div>
+                        <div class="opp-desc">Баннеры в приложениях и мобильном вебе</div>
+                    </div>
+                    <div class="opp-card content">
+                        <div class="opp-icon">🎵</div>
+                        <div class="opp-name">Скачиваемый контент</div>
+                        <div class="opp-desc">Рингтоны, музыка, изображения</div>
+                    </div>
+                    <div class="opp-card coupon">
+                        <div class="opp-icon">🎫</div>
+                        <div class="opp-name">Мобильные купоны</div>
+                        <div class="opp-desc">Легко принести с собой и предъявить</div>
+                    </div>
+                    <div class="opp-card tag">
+                        <div class="opp-icon">📷</div>
+                        <div class="opp-name">Мобильный теггинг</div>
+                        <div class="opp-desc">Распознавание QR-кодов и штрих-кодов</div>
+                    </div>
+                    <div class="opp-card geo">
+                        <div class="opp-icon">📍</div>
+                        <div class="opp-name">Гео-реклама</div>
+                        <div class="opp-desc">На основе GPS-местоположения</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG QR CODE DEMO -->
+            <div class="chart-card">
+                <div class="chart-title">📷 Как работает мобильный теггинг: от печатной рекламы к покупке <span>4 шага</span></div>
+                <svg viewBox="0 0 600 240" style="width: 100%; height: auto;">
+                    <!-- Шаг 1 -->
+                    <rect x="20" y="30" width="120" height="120" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="80" y="55" font-size="12" fill="#78350f" text-anchor="middle" font-weight="bold">📰 Печатная</text>
+                    <text x="80" y="72" font-size="12" fill="#78350f" text-anchor="middle" font-weight="bold">реклама</text>
+                    <text x="80" y="95" font-size="9" fill="#475569" text-anchor="middle">Журнал, газета,</text>
+                    <text x="80" y="108" font-size="9" fill="#475569" text-anchor="middle">билборд с QR</text>
+
+                    <!-- QR-код схематично -->
+                    <rect x="45" y="115" width="70" height="28" rx="3" fill="white" stroke="#0f172a" stroke-width="1.5"/>
+                    <rect x="50" y="119" width="12" height="12" fill="black"/>
+                    <rect x="68" y="119" width="12" height="12" fill="black"/>
+                    <rect x="86" y="119" width="12" height="12" fill="black"/>
+                    <rect x="50" y="135" width="5" height="5" fill="black"/>
+                    <rect x="93" y="135" width="5" height="5" fill="black"/>
+
+                    <!-- Стрелка 1 -->
+                    <text x="160" y="95" font-size="20" fill="#a855f7" font-weight="bold">→</text>
+                    <circle cx="160" cy="78" r="10" fill="#a855f7"/>
+                    <text x="160" y="83" font-size="10" fill="white" text-anchor="middle" font-weight="bold">1</text>
+                    <text x="160" y="60" font-size="9" fill="#6b21a8" text-anchor="middle">Навести</text>
+                    <text x="160" y="48" font-size="9" fill="#6b21a8" text-anchor="middle">камеру</text>
+
+                    <!-- Шаг 2 -->
+                    <rect x="185" y="30" width="120" height="120" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="245" y="55" font-size="12" fill="#1e3a8a" text-anchor="middle" font-weight="bold">📱 Смартфон</text>
+                    <text x="245" y="72" font-size="12" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Декодирование</text>
+
+                    <!-- Схема камеры -->
+                    <circle cx="245" cy="115" r="22" fill="#0f172a"/>
+                    <circle cx="245" cy="115" r="12" fill="#3b82f6"/>
+                    <circle cx="245" cy="115" r="5" fill="#0f172a"/>
+                    <text x="245" y="155" font-size="9" fill="#475569" text-anchor="middle">Распознавание кода</text>
+
+                    <!-- Стрелка 2 -->
+                    <text x="325" y="95" font-size="20" fill="#a855f7" font-weight="bold">→</text>
+                    <circle cx="325" cy="78" r="10" fill="#a855f7"/>
+                    <text x="325" y="83" font-size="10" fill="white" text-anchor="middle" font-weight="bold">2</text>
+                    <text x="325" y="60" font-size="9" fill="#6b21a8" text-anchor="middle">Переход</text>
+                    <text x="325" y="48" font-size="9" fill="#6b21a8" text-anchor="middle">по ссылке</text>
+
+                    <!-- Шаг 3 -->
+                    <rect x="350" y="30" width="120" height="120" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                    <text x="410" y="55" font-size="12" fill="#14532d" text-anchor="middle" font-weight="bold">🌐 Мобильный</text>
+                    <text x="410" y="72" font-size="12" fill="#14532d" text-anchor="middle" font-weight="bold">сайт / приложение</text>
+                    <text x="410" y="95" font-size="9" fill="#475569" text-anchor="middle">Информация о товаре,</text>
+                    <text x="410" y="108" font-size="9" fill="#475569" text-anchor="middle">характеристики, отзывы</text>
+                    <text x="410" y="130" font-size="9" fill="#475569" text-anchor="middle">Кнопка «Купить»</text>
+
+                    <!-- Стрелка 3 -->
+                    <text x="490" y="95" font-size="20" fill="#a855f7" font-weight="bold">→</text>
+                    <circle cx="490" cy="78" r="10" fill="#a855f7"/>
+                    <text x="490" y="83" font-size="10" fill="white" text-anchor="middle" font-weight="bold">3</text>
+                    <text x="490" y="60" font-size="9" fill="#6b21a8" text-anchor="middle">Заказ</text>
+                    <text x="490" y="48" font-size="9" fill="#6b21a8" text-anchor="middle">и оплата</text>
+
+                    <!-- Шаг 4 -->
+                    <rect x="515" y="30" width="75" height="120" rx="10" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="552" y="55" font-size="12" fill="#831843" text-anchor="middle" font-weight="bold">✅</text>
+                    <text x="552" y="75" font-size="10" fill="#831843" text-anchor="middle" font-weight="bold">Покупка</text>
+                    <text x="552" y="90" font-size="10" fill="#831843" text-anchor="middle" font-weight="bold">совершена</text>
+                    <text x="552" y="120" font-size="16" text-anchor="middle">🎉</text>
+
+                    <!-- Ключевая идея -->
+                    <text x="300" y="200" font-size="11" fill="#6b21a8" text-anchor="middle" font-weight="bold">Мобильный теггинг объединяет офлайн-рекламу и онлайн-покупку</text>
+                    <text x="300" y="222" font-size="10" fill="#64748b" text-anchor="middle" font-style="italic">Печатный плакат становится точкой входа в цифровую воронку продаж</text>
+                </svg>
+            </div>
+
+            <!-- PROVIDERS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 10px;">👥 Поставщики мобильной рекламы: четыре категории</div>
+                <div class="providers-grid">
+                    <div class="provider-card operators">
+                        <h5 style="color: #14532d;">📡 Мобильные операторы</h5>
+                        <ul>
+                            <li>Регуляторы доступа к мобильным сайтам</li>
+                            <li>Сопровождение традиционных услуг: звонки, SMS</li>
+                            <li>Программы лояльности и бонусы</li>
+                        </ul>
+                        <div class="p-companies">Вымпелком (Билайн), МТС, Мегафон, Ростелеком</div>
+                    </div>
+                    <div class="provider-card sellers">
+                        <h5 style="color: #1e3a8a;">💼 Продавцы мобильной рекламы</h5>
+                        <ul>
+                            <li>Размещение и управление рекламой на мобильных сайтах</li>
+                            <li>Работа в сотрудничестве с операторами</li>
+                            <li>Мобильные баннеры, SMS-рассылки</li>
+                        </ul>
+                        <div class="p-companies">MegaLabs, Mobi</div>
+                    </div>
+                    <div class="provider-card media">
+                        <h5 style="color: #78350f;">🌐 Мобильные сети и медиа</h5>
+                        <ul>
+                            <li>Агрегаторы мобильных версий сайтов</li>
+                            <li>Рекламные места в мобильных приложениях</li>
+                            <li>Сбор и размещение рекламы клиентов</li>
+                        </ul>
+                        <div class="p-companies">Яндекс, Mail.ru, Google AdMob</div>
+                    </div>
+                    <div class="provider-card geo">
+                        <h5 style="color: #6b21a8;">📍 Гео-зависимая реклама</h5>
+                        <ul>
+                            <li>Доставка сообщений по местоположению</li>
+                            <li>Автоматически вычисленная геолокация</li>
+                            <li>Локальные предложения и акции</li>
+                        </ul>
+                        <div class="p-companies">Яндекс, Google, Alter</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIDEO MONETIZATION -->
+            <div class="video-card">
+                <div class="video-title">📺 Монетизация видеорекламы: три модели</div>
+                <div class="video-flow">
+                    <div class="video-node">
+                        <div class="vn-icon">📢</div>
+                        <div class="vn-name">Рекламная модель</div>
+                        <div class="vn-desc">Бесплатный просмотр с рекламой (прероллы, мидроллы, построллы)</div>
+                    </div>
+                    <div class="video-arrow">+</div>
+                    <div class="video-node">
+                        <div class="vn-icon">💎</div>
+                        <div class="vn-name">Подписка</div>
+                        <div class="vn-desc">Премиум-фильмы без рекламы по подписке</div>
+                    </div>
+                    <div class="video-arrow">+</div>
+                    <div class="video-node">
+                        <div class="vn-icon">📤</div>
+                        <div class="vn-name">Пользовательский контент</div>
+                        <div class="vn-desc">Загрузка видео пользователями расширяет аудиторию</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 12px;">Примеры платформ: Twitch, Амедиатека, RuTube. Большинство фильмов бесплатно с рекламой — это привлекает широкую аудиторию.</div>
+            </div>
+
+            <!-- COUPON MODELS -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 10px;">🎫 Сервисы купонных скидок: две модели</div>
+                <div class="coupon-grid">
+                    <div class="coupon-card group">
+                        <h5 style="color: #831843;">👥 Групповые купоны</h5>
+                        <ul>
+                            <li>Скидка предоставляется при наборе минимального количества людей</li>
+                            <li>Пользователь привлекает аудиторию через email и соцсети</li>
+                            <li>Для продавца — рост оборачиваемости товара</li>
+                            <li>Примеры: Groupon, KupiBonus</li>
+                        </ul>
+                    </div>
+                    <div class="coupon-card time">
+                        <h5 style="color: #92400e;">⏰ Ограниченное время продаж</h5>
+                        <ul>
+                            <li>Товар вывешивается на 24 часа с таймером</li>
+                            <li>Психологическое давление: успей купить</li>
+                            <li>Как правило, 1 товар или услуга, неизвестные заранее</li>
+                            <li>Прообраз: Woot (приобретён Google)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 8px;">📊 Рынок мобильной и видеорекламы (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Мировой рынок мобильной рекламы</td>
+                            <td class="high">$262,8 млрд</td>
+                            <td class="cat">+7%</td>
+                            <td>Fortune Business Insights</td>
+                        </tr>
+                        <tr>
+                            <td>Доля мобильной рекламы в digital</td>
+                            <td class="high">72,3%</td>
+                            <td class="cat">растёт</td>
+                            <td>eMarketer</td>
+                        </tr>
+                        <tr>
+                            <td>Мировой рынок видеорекламы</td>
+                            <td class="high">$185 млрд</td>
+                            <td class="cat">+8,5%</td>
+                            <td>Statista</td>
+                        </tr>
+                        <tr>
+                            <td>Доля CTV в видеорекламе</td>
+                            <td>28%</td>
+                            <td class="cat">+8 п.п.</td>
+                            <td>Magnite</td>
+                        </tr>
+                        <tr>
+                            <td>Рынок мобильной коммерции</td>
+                            <td class="high">$2,24 трлн</td>
+                            <td class="cat">растёт</td>
+                            <td>TAdviser</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SVG GROWTH -->
+            <div class="svg-card">
+                <div class="svg-title">📈 Рост мобильной рекламы в мире <span>2022 → 2027</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <polygon points="90,120 220,108 350,88 480,58 580,30 580,140 90,140"
+                             fill="url(#gradMobile)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="gradMobile" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#a855f7"/>
+                            <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <polyline points="90,120 220,108 350,88 480,58 580,30"
+                              fill="none" stroke="#a855f7" stroke-width="3" stroke-linejoin="round"/>
+
+                    <circle cx="90" cy="120" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="108" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="88" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="58" r="5" fill="#a855f7" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="30" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <text x="90" y="113" font-size="9" fill="#6b21a8" text-anchor="middle" font-weight="bold">$185</text>
+                    <text x="220" y="101" font-size="9" fill="#6b21a8" text-anchor="middle" font-weight="bold">$210</text>
+                    <text x="350" y="81" font-size="9" fill="#6b21a8" text-anchor="middle" font-weight="bold">$240</text>
+                    <text x="480" y="51" font-size="9" fill="#6b21a8" text-anchor="middle" font-weight="bold">$262</text>
+                    <text x="580" y="23" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">$340</text>
+
+                    <text x="90" y="158" font-size="10" fill="#475569" text-anchor="middle">2022</text>
+                    <text x="220" y="158" font-size="10" fill="#475569" text-anchor="middle">2023</text>
+                    <text x="350" y="158" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="480" y="158" font-size="10" fill="#475569" text-anchor="middle">2025</text>
+                    <text x="580" y="158" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2027</text>
+
+                    <text x="555" y="42" font-size="10" fill="#e11d48" text-anchor="end" font-weight="bold">CAGR 12,9%</text>
+                    <text x="555" y="55" font-size="9" fill="#64748b" text-anchor="end">$ млрд</text>
+                </svg>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Мобильный маркетинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Видеореклама</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Купонные сервисы</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 25 из 26
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1c0a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #581c87; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали, как работает RTB. Сегодня мы поговорим о мобильной рекламе и видеорекламе — двух самых динамичных сегментах digital-маркетинга. Мобильные устройства стали главным экраном потребителя, а видео — главным форматом контента.</p>
+
+            <div class="action-hint">Обратите внимание студентов на таймлайн эволюции технологий.</div>
+
+            <h3>📌 Эволюция мобильных технологий</h3>
+
+            <p>Чтобы понять современные возможности мобильного маркетинга, нужно посмотреть, как развивались технологии. На картинке 2000 года видно, как отдельные технологические направления постепенно эволюционировали и вплетались в возможности современных смартфонов: навигационные устройства, телевизор, фотоаппарат, пейджер, телефон, радиотелефон, календарь, игровые приставки, музыкальные устройства.</p>
+
+            <p>В начале 2000-х конвергенция этих технологий определила современные возможности смартфонов. В 2013 году количество смартфонов в мире превысило 1 млрд единиц. К 2026 году — более 7 млрд устройств. Смартфон объединяет все функции: большой экран с высоким разрешением, камеру, тачскрин, GPS-навигацию, музыкальный плеер, игровую приставку.</p>
+
+            <div class="action-hint">Перейдите к восьми возможностям мобильного маркетинга.</div>
+
+            <h3>📌 Возможности мобильного маркетинга</h3>
+
+            <p><strong>SMS-реклама</strong> — традиционный канал, работает без интернета. <strong>Мобильный веб-контент</strong> — реклама на мобильных сайтах и в веб-приложениях. <strong>Программы лояльности</strong> — бонусы, скидки, бонусные сообщения от операторов. <strong>Мобильная дисплейная реклама</strong> — в мобильном вебе и приложениях. <strong>Скачиваемый контент</strong> — рингтоны, музыка, изображения. <strong>Мобильные купоны</strong> — легко принести с собой и предъявить. <strong>Мобильный теггинг</strong> — распознавание QR-кодов и штрих-кодов. <strong>Гео-зависимая реклама</strong> — на основе GPS-местоположения.</p>
+
+            <p>Смартфоны и планшеты сопровождают человека постоянно. Большинство становится подключёнными к интернету на базе мобильных устройств практически постоянно. Это увеличивает и время контакта, и саму аудиторию.</p>
+
+            <div class="action-hint">Обратите внимание студентов на схему работы QR-кода.</div>
+
+            <h3>📌 Мобильный теггинг: от печатной рекламы к покупке</h3>
+
+            <p>Технология распознавания QR-кодов и штрих-кодов позволяет совместить печатную бумажную рекламу с возможностями её электронной обработки. Разберём пошагово.</p>
+
+            <p><strong>Шаг 1:</strong> на печатной рекламе (журнал, газета, билборд) размещён QR-код. <strong>Шаг 2:</strong> пользователь наводит камеру смартфона на код, происходит декодирование. <strong>Шаг 3:</strong> если код — ссылка на веб-сайт, пользователь переходит на него, получает информацию о товаре. <strong>Шаг 4:</strong> может заказать и купить товар прямо со смартфона.</p>
+
+            <p>Таким образом, печатный плакат становится точкой входа в цифровую воронку продаж. Это один из самых эффективных способов объединения офлайн и онлайн.</p>
+
+            <div class="action-hint">Перейдите к поставщикам мобильной рекламы.</div>
+
+            <h3>📌 Поставщики мобильной рекламы</h3>
+
+            <p>Четыре категории поставщиков.</p>
+
+            <p><strong>Мобильные операторы</strong> — Вымпелком (Билайн), МТС, Мегафон, Ростелеком. Выступают регуляторами доступа к сайтам, оптимизированным для мобильных устройств. Реклама может сопровождать традиционные услуги: звонки, SMS.</p>
+
+            <p><strong>Продавцы мобильной рекламы</strong> — MegaLabs, Mobi. Системы размещения и управления рекламными сообщениями на мобильных сайтах, работающие в сотрудничестве с операторами сотовой связи.</p>
+
+            <p><strong>Поставщики мобильной сети и медиа</strong> — Яндекс, Mail.ru. Агрегаторы, объединяющие мобильные версии сайтов и рекламные места в мобильных приложениях.</p>
+
+            <p><strong>Поставщики гео-зависимой рекламы</strong> — Яндекс, Google, Alter. Доставка рекламных сообщений на основе автоматически вычисленного или предполагаемого местонахождения пользователя в реальном мире.</p>
+
+            <div class="action-hint">Перейдите к видеорекламе.</div>
+
+            <h3>📌 Видеореклама и монетизация</h3>
+
+            <p>Поставщики цифрового видео — компании, которые предоставляют видеоконтент бесплатно (с рекламой) или на базе подписки. Примеры: Twitch, Амедиатека, RuTube. Большинство владельцев компьютеров и смартфонов смотрят видеофильмы на подобных сайтах.</p>
+
+            <p>Три модели монетизации. <strong>Рекламная модель:</strong> большинство фильмов бесплатно, привлекается широкая аудитория, размещается реклама — прероллы (перед), мидроллы (в процессе), построллы (после). <strong>Подписка:</strong> премиум-фильмы без рекламы по платной подписке. <strong>Пользовательский контент:</strong> загрузка видео пользователями расширяет аудиторию и повышает привлекательность площадки для рекламодателей.</p>
+
+            <div class="action-hint">Перейдите к купонным сервисам.</div>
+
+            <h3>📌 Сервисы купонных скидок</h3>
+
+            <p>Купонные сервисы — это агрегаторы платёжеспособного спроса в обмен на скидки, предоставляемые рекламодателями. Две основные модели.</p>
+
+            <p><strong>Групповые купоны.</strong> Скидка предоставляется при наборе минимального количества людей. Потенциальный покупатель привлекает аудиторию через email, соцсети. Для продавца — рост оборачиваемости товара, для покупателя — скидка.</p>
+
+            <p><strong>Ограниченное время продаж.</strong> Товар или услуга вывешивается на 24 часа с таймером. Психологически это стимулирует сделать выбор быстро. Прообраз модели — компания Woot, которая впоследствии была приобретена Google. Компании: Groupon, KupiBonus, KupiKupon.</p>
+
+            <h3>📌 Масштаб рынка 2025</h3>
+
+            <p>Мировой рынок мобильной рекламы достиг <span class="stat-inline">$262,8 млрд</span> при росте 7% год к году. Доля мобильной рекламы в digital составляет <span class="stat-inline">72,3%</span>. Мировой рынок видеорекламы — <span class="stat-inline">$185 млрд</span> с ростом 8,5%. Рынок мобильной коммерции достиг <span class="stat-inline">$2,24 трлн</span>. Прогноз роста мобильной рекламы к 2027 году — $340 млрд при CAGR 12,9%.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали мобильную и видеорекламу. Ключевые выводы:</p>
+
+            <ul>
+                <li>Смартфон стал главным экраном потребителя — 7+ млрд устройств в мире.</li>
+                <li>Восемь возможностей мобильного маркетинга: SMS, веб, лояльность, дисплей, контент, купоны, теггинг, гео.</li>
+                <li>Мобильный теггинг объединяет печатную рекламу с онлайн-покупкой через QR-коды.</li>
+                <li>Четыре категории поставщиков: операторы, продавцы, сети/медиа, гео-сервисы.</li>
+                <li>Видеореклама монетизируется через рекламу, подписку, пользовательский контент.</li>
+                <li>Купонные сервисы: групповые скидки и ограниченное время продаж.</li>
+                <li>Рынок мобильной рекламы — $262,8 млрд, прогноз $340 млрд к 2027 году.</li>
+            </ul>
+
+            <p>На следующей, заключительной лекции мы разберём методы, стратегию и тактику e-mail маркетинга. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Short Message Service</div>
+                            <div class="gloss-def">Служба коротких сообщений — традиционный канал мобильного маркетинга</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">QR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Quick Response Code</div>
+                            <div class="gloss-def">Двумерный штрих-код для быстрого распознавания и перехода по ссылке</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GPS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Global Positioning System</div>
+                            <div class="gloss-def">Глобальная система позиционирования для определения местоположения</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Преролл</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Pre-roll</div>
+                            <div class="gloss-def">Рекламный ролик, показываемый перед основным видео</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Мидролл</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Mid-roll</div>
+                            <div class="gloss-def">Рекламный ролик, показываемый в процессе просмотра видео</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Постролл</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Post-roll</div>
+                            <div class="gloss-def">Рекламный ролик, показываемый после основного видео</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Connected TV</div>
+                            <div class="gloss-def">Подключённое телевидение — Smart TV с доступом к интернет-сервисам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AdMob</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Google AdMob</div>
+                            <div class="gloss-def">Платформа Google для монетизации мобильных приложений</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Woot</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Woot.com</div>
+                            <div class="gloss-def">Первый сервис с моделью «ограниченное время продаж», приобретён Google</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Groupon</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Groupon</div>
+                            <div class="gloss-def">Сервис групповых скидок — агрегатор платёжеспособного спроса</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📱 Мобильная реклама</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Fortune Business Insights: Mobile Advertising Market — $262,8 млрд (2025). — <a href="https://www.fortunebusinessinsights.com" target="_blank">FortuneBusinessInsights.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">eMarketer: Mobile Advertising Share of Digital — 72,3%. — <a href="https://www.emarketer.com" target="_blank">eMarketer.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">TAdviser: мировой рынок мобильной коммерции — $2,24 трлн. — <a href="https://tadviser.ru" target="_blank">TAdviser.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📺 Видеореклама и CTV</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Statista: Digital Video Advertising Market — $185 млрд (2025). — <a href="https://www.statista.com" target="_blank">Statista.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Magnite: State of CTV 2025 — доля CTV в видеорекламе 28%. — <a href="https://www.magnite.com" target="_blank">Magnite.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">ComNews: российский рынок CTV привлек рекламодателей и кибермошенников. — <a href="https://www.comnews.ru" target="_blank">ComNews.ru</a> <span class="src-date">18.02.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎫 Купонные сервисы</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">TAdviser: обзор российского рынка купонных сервисов. — <a href="https://tadviser.ru" target="_blank">TAdviser.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">РБК: почему купонные сервисы переживают ренессанс в 2025 году. — <a href="https://www.rbc.ru" target="_blank">RBC.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📷 QR-коды и теггинг</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">AdIndex: как QR-коды меняют офлайн-рекламу в 2025 году. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

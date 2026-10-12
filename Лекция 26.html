@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 26. Методы, стратегия и тактика e-mail маркетинга</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #431407; color: #ffedd5; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #7c2d12; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #f97316; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #7c2d12 0%, #c2410c 60%, #f97316 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(194, 65, 12, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* CAMPAIGN FLOW */
+        .flow-card { background: #fff7ed; border: 2px solid #fed7aa; border-radius: 14px; padding: 20px 24px; }
+        .flow-card .flow-title { font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 14px; }
+        .flow-steps { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .flow-node { flex: 1; min-width: 100px; background: white; border: 2px solid #f97316; border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .flow-node .fn-icon { font-size: 20px; margin-bottom: 4px; }
+        .flow-node .fn-name { font-size: 10.5px; font-weight: bold; color: #7c2d12; line-height: 1.3; }
+        .flow-node .fn-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+        .flow-arrow { font-size: 16px; color: #f97316; font-weight: bold; }
+
+        /* SPAM ECOSYSTEM SVG */
+        .chart-card { background: #ffffff; border: 2px solid #fed7aa; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* LEGAL SCHEMA */
+        .legal-card { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px; padding: 20px 24px; }
+        .legal-card .legal-title { font-size: 14px; font-weight: bold; color: #166534; margin-bottom: 14px; }
+        .legal-chain { display: flex; flex-direction: column; gap: 10px; }
+        .legal-step { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: white; border-radius: 10px; border-left: 4px solid #16a34a; }
+        .legal-step .ls-num { width: 30px; height: 30px; background: #16a34a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; flex-shrink: 0; }
+        .legal-step .ls-body { flex: 1; }
+        .legal-step .ls-name { font-size: 12.5px; font-weight: bold; color: #065f46; margin-bottom: 3px; }
+        .legal-step .ls-desc { font-size: 11px; color: #475569; line-height: 1.4; }
+
+        /* STRATEGY SCHEMA */
+        .strategy-card { background: #faf5ff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 20px 24px; }
+        .strategy-card .strat-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 14px; }
+        .strat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .strat-block { background: white; border: 1.5px solid #c4b5fd; border-radius: 10px; padding: 12px; }
+        .strat-block .sb-icon { font-size: 18px; margin-bottom: 4px; }
+        .strat-block .sb-name { font-size: 11.5px; font-weight: bold; color: #6b21a8; margin-bottom: 3px; }
+        .strat-block .sb-desc { font-size: 10px; color: #475569; line-height: 1.4; }
+
+        /* THREE LAYERS */
+        .layers-card { background: #fef3c7; border: 2px solid #fde68a; border-radius: 14px; padding: 20px 24px; }
+        .layers-card .layers-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 14px; }
+        .layer-row { display: flex; gap: 12px; margin-bottom: 10px; padding: 12px 14px; border-radius: 10px; align-items: center; }
+        .layer-row.l1 { background: linear-gradient(90deg, #fee2e2, #fecaca); }
+        .layer-row.l2 { background: linear-gradient(90deg, #fef3c7, #fde68a); }
+        .layer-row.l3 { background: linear-gradient(90deg, #dcfce7, #bbf7d0); }
+        .layer-row .lr-num { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 14px; flex-shrink: 0; }
+        .layer-row.l1 .lr-num { background: #dc2626; }
+        .layer-row.l2 .lr-num { background: #d97706; }
+        .layer-row.l3 .lr-num { background: #16a34a; }
+        .layer-row .lr-body { flex: 1; }
+        .layer-row .lr-name { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+        .layer-row.l1 .lr-name { color: #991b1b; }
+        .layer-row.l2 .lr-name { color: #78350f; }
+        .layer-row.l3 .lr-name { color: #065f46; }
+        .layer-row .lr-desc { font-size: 10.5px; color: #475569; line-height: 1.4; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #7c2d12; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #fff7ed; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .mid { color: #f59e0b; font-weight: bold; }
+        .metrics-table .cat { color: #c2410c; font-weight: bold; }
+
+        /* METRICS BAR */
+        .hbar-card { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px; padding: 20px 24px; }
+        .hbar-card .hbar-title { font-size: 14px; font-weight: bold; color: #166534; margin-bottom: 14px; }
+        .hbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+        .hbar-label { font-size: 11.5px; color: #1e293b; width: 190px; font-weight: 500; text-align: right; }
+        .hbar-track { flex: 1; background: #dcfce7; height: 24px; border-radius: 6px; overflow: hidden; }
+        .hbar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: bold; color: white; }
+        .hbar-fill.green { background: linear-gradient(90deg, #15803d, #22c55e); }
+        .hbar-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .hbar-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+        .hbar-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #f97316; }
+        .rt-btn:hover { background: #ea580c; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #fdba74; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #7c2d12; padding-bottom: 10px; }
+        .timer-badge { background: #fbbf24; color: #431407; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; font-weight: bold; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #ffedd5; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #fdba74; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #7c2d12; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #7c2d12; color: #fdba74; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #fdba74; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #f97316; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #f97316; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #fdba74; font-size: 13px; min-width: 110px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #fdba74; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #f97316; color: #431407; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #fdba74; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 26. Методы, стратегия и тактика e-mail маркетинга
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">📧</div>
+                <div class="hero-data">
+                    <div class="hero-number">12,9 млрд</div>
+                    <div class="hero-label">Писем отправлено в России (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">9,4%</div>
+                    <div class="hero-label">Средний Open Rate</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">×36</div>
+                    <div class="hero-label">ROI email-маркетинга</div>
+                </div>
+            </div>
+
+            <!-- CAMPAIGN FLOW -->
+            <div class="flow-card">
+                <div class="flow-title">🔄 Пять этапов e-mail кампании</div>
+                <div class="flow-steps">
+                    <div class="flow-node">
+                        <div class="fn-icon">📋</div>
+                        <div class="fn-name">1. Формирование списка</div>
+                        <div class="fn-desc">Сбор email на сайте или покупка базы</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node">
+                        <div class="fn-icon">📝</div>
+                        <div class="fn-name">2. Разработка кампании</div>
+                        <div class="fn-desc">Идея, текст, рекламное предложение</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node">
+                        <div class="fn-icon">✉️</div>
+                        <div class="fn-name">3. Рассылка</div>
+                        <div class="fn-desc">Доставка писем адресатам</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node">
+                        <div class="fn-icon">📊</div>
+                        <div class="fn-name">4. Отслеживание</div>
+                        <div class="fn-desc">Open Rate, CTR, конверсии</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node">
+                        <div class="fn-icon">🔁</div>
+                        <div class="fn-name">5. Оптимизация</div>
+                        <div class="fn-desc">Анализ и корректировка</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #7c2d12; margin-top: 12px;">Цикл замыкается: анализ → корректировка → новая кампания. E-mail — не разовая акция, а постоянный процесс.</div>
+            </div>
+
+            <!-- SPAM ECOSYSTEM SVG -->
+            <div class="chart-card">
+                <div class="chart-title">🚫 Экосистема спама: почему это живучая система <span>Пять участников</span></div>
+                <svg viewBox="0 0 600 260" style="width: 100%; height: auto;">
+                    <!-- Пользователи -->
+                    <circle cx="90" cy="80" r="38" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="90" y="76" font-size="22" text-anchor="middle">👤</text>
+                    <text x="90" y="92" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Пользователи</text>
+                    <text x="90" y="132" font-size="8.5" fill="#64748b" text-anchor="middle">Получают спам</text>
+                    <text x="90" y="145" font-size="8.5" fill="#64748b" text-anchor="middle">Жалуются провайдеру</text>
+
+                    <!-- Спамеры -->
+                    <circle cx="510" cy="80" r="38" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>
+                    <text x="510" y="76" font-size="22" text-anchor="middle">😈</text>
+                    <text x="510" y="92" font-size="9" fill="#991b1b" text-anchor="middle" font-weight="bold">Спамеры</text>
+                    <text x="510" y="132" font-size="8.5" fill="#64748b" text-anchor="middle">Рассылaют миллионы писем</text>
+                    <text x="510" y="145" font-size="8.5" fill="#64748b" text-anchor="middle">Зарабатывают на отклике</text>
+
+                    <!-- Сервис-провайдеры -->
+                    <rect x="240" y="20" width="120" height="55" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="300" y="42" font-size="11" fill="#78350f" text-anchor="middle" font-weight="bold">⚙️ Сервис-провайдеры</text>
+                    <text x="300" y="58" font-size="8.5" fill="#475569" text-anchor="middle">Борьба со спамом</text>
+                    <text x="300" y="70" font-size="8.5" fill="#475569" text-anchor="middle">Фильтрация писем</text>
+
+                    <!-- Правительство -->
+                    <rect x="240" y="95" width="120" height="55" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="300" y="117" font-size="11" fill="#1e3a8a" text-anchor="middle" font-weight="bold">🏛️ Правительство</text>
+                    <text x="300" y="133" font-size="8.5" fill="#475569" text-anchor="middle">Нормативные акты</text>
+                    <text x="300" y="145" font-size="8.5" fill="#475569" text-anchor="middle">Штрафы за спам</text>
+
+                    <!-- IT-корпорации -->
+                    <rect x="240" y="170" width="120" height="55" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                    <text x="300" y="192" font-size="11" fill="#065f46" text-anchor="middle" font-weight="bold">🛡️ Антиспам-решения</text>
+                    <text x="300" y="208" font-size="8.5" fill="#475569" text-anchor="middle">Создают IT-корпорации</text>
+                    <text x="300" y="220" font-size="8.5" fill="#475569" text-anchor="middle">Продают за деньги</text>
+
+                    <defs>
+                        <marker id="arrowRed4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+                        </marker>
+                        <marker id="arrowBlue4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Стрелки -->
+                    <line x1="130" y1="70" x2="235" y2="48" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowBlue4)"/>
+                    <line x1="470" y1="70" x2="365" y2="48" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowRed4)"/>
+                    <line x1="130" y1="90" x2="235" y2="118" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowBlue4)"/>
+                    <line x1="470" y1="95" x2="365" y2="115" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowRed4)"/>
+
+                    <!-- Легенда -->
+                    <text x="300" y="250" font-size="10" fill="#7c2d12" text-anchor="middle" font-weight="bold">Из огромной аудитории находится небольшой процент → спамеры зарабатывают → система работает</text>
+                </svg>
+            </div>
+
+            <!-- LEGAL SCHEMA -->
+            <div class="legal-card">
+                <div class="legal-title">✅ Легальный e-mail маркетинг: правильная цепочка</div>
+                <div class="legal-chain">
+                    <div class="legal-step">
+                        <div class="ls-num">1</div>
+                        <div class="ls-body">
+                            <div class="ls-name">Подписка с согласием</div>
+                            <div class="ls-desc">Пользователь осознанно подписывается, отмечает галочку согласия, знает, какую информацию будет получать</div>
+                        </div>
+                    </div>
+                    <div class="legal-step">
+                        <div class="ls-num">2</div>
+                        <div class="ls-body">
+                            <div class="ls-name">Приветственное письмо</div>
+                            <div class="ls-desc">Подтверждение подписки, краткое описание того, что будет в рассылке, — формирует ожидания</div>
+                        </div>
+                    </div>
+                    <div class="legal-step">
+                        <div class="ls-num">3</div>
+                        <div class="ls-body">
+                            <div class="ls-name">Полезный контент</div>
+                            <div class="ls-desc">Бесплатные отчёты, аналитика, вебинары — даём пользу до рекламного предложения</div>
+                        </div>
+                    </div>
+                    <div class="legal-step">
+                        <div class="ls-num">4</div>
+                        <div class="ls-body">
+                            <div class="ls-name">Рекламное предложение</div>
+                            <div class="ls-desc">Только после того, как сформировано доверие. Пользователь проявит большую лояльность</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STRATEGY SCHEMA -->
+            <div class="strategy-card">
+                <div class="strat-title">🎯 Стратегия e-mail маркетинга по Сергею Дубовику: 8 элементов</div>
+                <div class="strat-grid">
+                    <div class="strat-block">
+                        <div class="sb-icon">🎯</div>
+                        <div class="sb-name">Главная цель кампании</div>
+                        <div class="sb-desc">Увеличить продажи, прибыль, сократить текучесть кадров, привлечь клиентов</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">👥</div>
+                        <div class="sb-name">Целевая группа</div>
+                        <div class="sb-desc">Лидеры мнений, клиенты, бывшие клиенты, партнёры, поставщики, сотрудники</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">💡</div>
+                        <div class="sb-name">Основная идея</div>
+                        <div class="sb-desc">Краткий слоган: «Мы поможем сэкономить время», «У нас самые низкие цены»</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">📋</div>
+                        <div class="sb-name">Задача для групп</div>
+                        <div class="sb-desc">Изменить отношение, сделать первый заказ, прийти за повторной покупкой</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">🎬</div>
+                        <div class="sb-name">Действие целевых групп</div>
+                        <div class="sb-desc">Запрос образцов, подписка, использование купона, заполнение анкеты</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">🎁</div>
+                        <div class="sb-name">Стимулирование покупки</div>
+                        <div class="sb-desc">Вебинар, бесплатный образец, отчёт, книга, целевое предложение с призывом</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">📨</div>
+                        <div class="sb-name">Формат коммуникаций</div>
+                        <div class="sb-desc">Регулярная тематическая рассылка, ежедневные новости, обратная связь</div>
+                    </div>
+                    <div class="strat-block">
+                        <div class="sb-icon">🔍</div>
+                        <div class="sb-name">Привлечение подписчиков</div>
+                        <div class="sb-desc">Форма на сайте, статья с призывом, подписная страница, подарок за подписку</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THREE LAYERS -->
+            <div class="layers-card">
+                <div class="layers-title">🏗️ Три слоя вовлечения: от анонима к клиенту</div>
+                <div class="layer-row l1">
+                    <div class="lr-num">1</div>
+                    <div class="lr-body">
+                        <div class="lr-name">Верхний слой: работа с анонимами</div>
+                        <div class="lr-desc">Преобразование анонимных посетителей в зарегистрированных. Лендинг, форма подписки, оставление координат за бонус. Главная цель — получить контакт</div>
+                    </div>
+                </div>
+                <div class="layer-row l2">
+                    <div class="lr-num">2</div>
+                    <div class="lr-body">
+                        <div class="lr-name">Средний слой: персональный маркетинг</div>
+                        <div class="lr-desc">Сегментация, разработка кампаний с использованием email, блогов. Донести правильное предложение правильному клиенту. Персонализация по интересам</div>
+                    </div>
+                </div>
+                <div class="layer-row l3">
+                    <div class="lr-num">3</div>
+                    <div class="lr-body">
+                        <div class="lr-name">Нижний слой: работа с клиентом</div>
+                        <div class="lr-desc">Автоматизация: CRM, HelpDesk, оформление заказа, программы лояльности. Удержание, повторные продажи, LTV</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #78350f; margin-top: 10px;">Цепочка: аноним → зарегистрированный → персональное предложение → заказ → клиент → адвокат бренда</div>
+            </div>
+
+            <!-- METRICS BAR -->
+            <div class="hbar-card">
+                <div class="hbar-title">📊 Метрики e-mail маркетинга в России (2025)</div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Open Rate (средний)</div>
+                    <div class="hbar-track"><div class="hbar-fill green" style="width: 94%;">9,4%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Click Rate</div>
+                    <div class="hbar-track"><div class="hbar-fill amber" style="width: 45%;">0,7%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Конверсия в покупку</div>
+                    <div class="hbar-track"><div class="hbar-fill violet" style="width: 28%;">2,8%</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Отписки</div>
+                    <div class="hbar-track"><div class="hbar-fill rose" style="width: 5%;">0,5%</div></div>
+                </div>
+                <div style="font-size: 11px; color: #166534; margin-top: 8px;">Открываемость растёт: в 2023 году Open Rate был 8,1%, в 2025 — 9,4%. Люди возвращаются к email как к надёжному каналу.</div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #7c2d12; margin-bottom: 8px;">📋 Топ-5 отраслей по объёму e-mail рассылок (Россия, 2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Отрасль</th>
+                            <th>Объём писем</th>
+                            <th>Open Rate</th>
+                            <th>Особенность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Образование</strong></td>
+                            <td class="cat">2,6 млрд</td>
+                            <td class="high">12–15%</td>
+                            <td>Вебинары, курсы, интенсивы</td>
+                        </tr>
+                        <tr>
+                            <td><strong>E-commerce</strong></td>
+                            <td class="cat">1,7 млрд</td>
+                            <td class="high">10–12%</td>
+                            <td>Брошенные корзины, акции</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ретейл</strong></td>
+                            <td class="cat">1,6 млрд</td>
+                            <td>8–10%</td>
+                            <td>Программы лояльности, скидки</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IT и SaaS</strong></td>
+                            <td class="cat">1,4 млрд</td>
+                            <td class="mid">7–9%</td>
+                            <td>Onboarding, обновления</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Маркетинг / услуги</strong></td>
+                            <td class="cat">1,2 млрд</td>
+                            <td>6–8%</td>
+                            <td>Кейсы, лид-магниты</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Основы e-mail</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Стратегия Дубовика</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Три слоя вовлечения</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 26 из 30
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #431407; padding: 20px 20px 10px 20px; border-bottom: 1px solid #7c2d12; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали рекламу на мобильных платформах и видеорекламу. Сегодня мы разберём e-mail маркетинг — канал, который переживает ренессанс. Несмотря на все прогнозы о его смерти, e-mail возвращается, и в 2025 году объём отправленных писем в России достиг рекорда.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми метриками.</div>
+
+            <h3>📌 Общая схема e-mail маркетинга</h3>
+
+            <p>E-mail маркетинг — это процесс, который включает пять ключевых этапов.</p>
+
+            <p><strong>Формирование и управление почтовыми списками.</strong> Списки можно составить на базе сбора информации на собственном сайте или приобрести у поставщиков информации о потенциальных покупателях. Под каждую компанию подбирается своя аудитория.</p>
+
+            <p><strong>Разработка рекламной кампании.</strong> Продумывается текст, основная идея, что вы собираетесь рекламировать в данном послании, создаётся рекламное предложение.</p>
+
+            <p><strong>Рассылка.</strong> Часть предложений доходит до адресата, часть кликает по ссылке, часть доходит до рекламируемого продукта.</p>
+
+            <p><strong>Отслеживание результатов.</strong> Базовый элемент маркетинговой кампании — измерение метрик: Open Rate, Click Rate, конверсии.</p>
+
+            <p><strong>Анализ и оптимизация.</strong> Циклический процесс — не разовая акция, а постоянная работа.</p>
+
+            <div class="action-hint">Перейдите к экосистеме спама.</div>
+
+            <h3>📌 Проблема спама и почему это живучая система</h3>
+
+            <p>Все знакомы с проблемой спама — несанкционированной e-mail рассылки. Во многих государствах законодательно запрещена незапрошенная рассылка. Проблема существует: отвлекает время сотрудников, занимает сетевые ресурсы, рабочее время. Компания, которая рассылает свои предложения спамерскими методами, может пострадать от штрафов и попасть в список спамеров.</p>
+
+            <p>Почему же спам такая живучая система? На слайде показана экосистема участников. <strong>Пользователи</strong> получают спам, жалуются сервис-провайдерам. <strong>Сервис-провайдеры</strong> ведут борьбу со спамом. <strong>Правительство</strong> получает запрос на борьбу и издаёт нормативные акты. <strong>IT-корпорации</strong> создают антиспам-решения. <strong>Спамеры</strong> зарабатывают, потому что среди огромной аудитории находится небольшой процент, который откликается на предложение.</p>
+
+            <p>Чёрный электронный бизнес — целая индустрия с высококвалифицированными разработчиками, ботнетами, облачными технологиями рассылки. Спам рассылается через заражённые компьютеры, пробивая антиспамовую защиту. Пользователи ведут себя непоследовательно: они не принимают принципиального решения «не пользуюсь спамом», а когда предложение оказывается интересным — оно принимается. За счёт этого система продолжает работать.</p>
+
+            <div class="action-hint">Перейдите к легальному e-mail маркетингу.</div>
+
+            <h3>📌 Легальный e-mail маркетинг: правильная цепочка</h3>
+
+            <p>Чтобы не попасть в категорию спамеров, нужно соблюдать правильную цепочку.</p>
+
+            <p><strong>Подписка с согласием.</strong> Пользователь осознанно подписывается, знает, какую информацию будет получать. <strong>Приветственное письмо.</strong> Подтверждение подписки, краткое описание того, что будет в рассылке. <strong>Полезный контент.</strong> Бесплатные отчёты, аналитика, вебинары — даём пользу до рекламного предложения. <strong>Рекламное предложение.</strong> Только после того, как сформировано доверие.</p>
+
+            <p>Пример. Фирма, которая продаёт маркетинговые исследования, рассылает потенциальному клиенту письма с бесплатными полезными материалами, информацией о ситуации на рынке. А впоследствии, когда появляется рекламное предложение по продвижению конкретного продукта, потенциальный пользователь проявляет большую лояльность и обращает внимание на этот продукт.</p>
+
+            <div class="action-hint">Перейдите к стратегии Дубовика.</div>
+
+            <h3>📌 Стратегия e-mail маркетинга по Сергею Дубовику</h3>
+
+            <p>Стратегия включает восемь элементов.</p>
+
+            <p><strong>Главная цель кампании.</strong> Что вы хотите добиться: увеличить продажи, прибыль, сократить текучесть кадров, привлечь новых клиентов. Цель должна быть количественной и измеримой.</p>
+
+            <p><strong>Выбор целевой группы.</strong> Лидеры мнений, клиенты (по объёму заказа, отрасли, географии), бывшие клиенты, партнёры, поставщики, собственные сотрудники. Интересно, что e-mail маркетинг может быть направлен и внутрь организации — для удержания сотрудников, информирования их.</p>
+
+            <p><strong>Основная идея.</strong> Краткий слоган: «Мы поможем вам сэкономить время», «У нас самые низкие цены».</p>
+
+            <p><strong>Задача для целевых групп.</strong> Изменить отношение к продукту, сделать первый заказ, прийти за повторной покупкой.</p>
+
+            <p><strong>Действие целевых групп.</strong> Что вы ожидаете: запрос на образцы, подписка на рассылку, использование купона, заполнение анкеты.</p>
+
+            <p><strong>Стимулирование покупки.</strong> Вебинар, бесплатный образец, отчёт, книга, целевое коммерческое предложение с призывом к действию.</p>
+
+            <p><strong>Формат коммуникаций.</strong> Регулярная тематическая рассылка, ежедневные новости, обратная связь.</p>
+
+            <p><strong>Привлечение подписчиков.</strong> Форма на сайте, статья «понравилась статья — подпишись», подписная страница с продающим заголовком, сегментацией, понятными выгодами, подарком за подписку.</p>
+
+            <p><strong>Анализ результатов.</strong> Измерение отклонений от запланированных результатов и корректирующие действия. Цикл замыкается: анализ → корректировка → запуск заново.</p>
+
+            <div class="action-hint">Перейдите к трём слоям вовлечения.</div>
+
+            <h3>📌 Три слоя вовлечения: от анонима к клиенту</h3>
+
+            <p>Эффективный e-mail маркетинг работает в три слоя.</p>
+
+            <p><strong>Верхний слой — работа с анонимами.</strong> Преобразование анонимных посетителей в зарегистрированных. Лендинг, форма подписки, оставление координат за бонус. Главная цель — получить контакт.</p>
+
+            <p><strong>Средний слой — персональный маркетинг.</strong> Сегментация потенциальных клиентов, разработка кампаний с использованием email, блогов. Главная задача — донести правильное предложение правильному клиенту.</p>
+
+            <p><strong>Нижний слой — работа с клиентом.</strong> Автоматизация: CRM, HelpDesk, оформление заказа, программы лояльности. Удержание, повторные продажи, LTV.</p>
+
+            <p>Цепочка: аноним → зарегистрированный → персональное предложение → заказ → клиент → адвокат бренда. На каждом слое — своя задача и свои инструменты.</p>
+
+            <h3>📌 Масштаб и метрики 2025</h3>
+
+            <p>E-mail маркетинг переживает ренессанс. За 2025 год бизнес отправил <span class="stat-inline">12,9 млрд</span> писем против 9,3 млрд в 2023 году — рост почти на 40%. Средний Open Rate вырос до <span class="stat-inline">9,4%</span> (в 2023 было 8,1%). Click Rate — 0,7%, конверсия в покупку — 2,8%, отписки — 0,5%. ROI e-mail маркетинга — один из самых высоких в digital: до $36 на каждый вложенный доллар.</p>
+
+            <p>Топ-5 отраслей по объёму рассылок: образование (2,6 млрд), e-commerce (1,7 млрд), ретейл (1,6 млрд), IT и SaaS (1,4 млрд), маркетинг и услуги (1,2 млрд).</p>
+
+            <p>Одна из причин роста e-mail — нестабильность работы мессенджеров. Бизнес возвращается к email как к надёжному каналу коммуникации, который работает независимо от блокировок и санкций платформ.</p>
+
+            <p>Сервисы электронных директивных рассылок: один из старейших поставщиков — Subscribe.ru (СПБ), открыто более 25 000 рассылок, входит в топ-20 крупнейших в мире поставщиков подобных услуг.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали методы, стратегию и тактику e-mail маркетинга. Ключевые выводы:</p>
+
+            <ul>
+                <li>Пять этапов e-mail кампании: список → разработка → рассылка → отслеживание → оптимизация.</li>
+                <li>Экосистема спама: пользователи, провайдеры, правительство, IT-корпорации, спамеры.</li>
+                <li>Легальная цепочка: подписка → приветствие → полезный контент → рекламное предложение.</li>
+                <li>Стратегия Дубовика: 8 элементов от цели до анализа результатов.</li>
+                <li>Три слоя: анонимы → персональный маркетинг → клиенты.</li>
+                <li>12,9 млрд писем в 2025, Open Rate 9,4%, ROI до ×36.</li>
+                <li>E-mail переживает ренессанс благодаря надёжности и независимости от платформ.</li>
+            </ul>
+
+            <p>На следующей лекции мы начнём блок про социальные медиа. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Email</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Electronic Mail</div>
+                            <div class="gloss-def">Электронная почта — канал коммуникации через email-рассылки</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Open Rate</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Open Rate (OR)</div>
+                            <div class="gloss-def">Показатель открываемости писем — отношение открытий к доставленным</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Click-Through Rate</div>
+                            <div class="gloss-def">Показатель кликабельности — отношение кликов к доставленным письмам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Bounce</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Bounce Rate</div>
+                            <div class="gloss-def">Процент недоставленных писем (жёсткий и мягкий bounce)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Unsubscribe</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Unsubscribe Rate</div>
+                            <div class="gloss-def">Процент отписок от рассылки</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Double Opt-In</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Double Opt-In</div>
+                            <div class="gloss-def">Двойное подтверждение подписки через письмо — защита от спама</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ROI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Return on Investment</div>
+                            <div class="gloss-def">Возврат инвестиций — e-mail показывает один из самых высоких ROI</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">152-ФЗ</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">ФЗ-152 «О персональных данных»</div>
+                            <div class="gloss-def">Российский закон, регулирующий обработку персональных данных и рассылки</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GDPR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">General Data Protection Regulation</div>
+                            <div class="gloss-def">Общий регламент защиты данных ЕС — регулирует email-маркетинг в Европе</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">LTV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Lifetime Value</div>
+                            <div class="gloss-def">Пожизненная ценность клиента — ключевая метрика удержания</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок e-mail в России</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">AdIndex: Объём отправленных по email писем вырос почти на 40% за 3 года — 12,9 млрд писем. — <a href="https://adindex.ru/news/tendencies/2026/03/19/343383.phtml" target="_blank">AdIndex.ru</a> <span class="src-date">19.03.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">ComNews: Электронная почта стала главным каналом связи компаний с аудиторией. — <a href="https://www.comnews.ru" target="_blank">ComNews.ru</a> <span class="src-date">06.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Mindbox: Email-маркетинг — тренды и метрики 2025. — <a href="https://mindbox.ru" target="_blank">Mindbox.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📧 Инструменты и сервисы</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Unisender: Email Marketing Platforms Benchmark Report 2025. — <a href="https://www.unisender.com" target="_blank">Unisender.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">MailerLite: Email Marketing Benchmarks 2025 — open rate, click rate, unsubscribe. — <a href="https://www.mailerlite.com/blog/compare-your-email-performance-metrics-industry-benchmarks" target="_blank">MailerLite.com</a> <span class="src-date">03.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">SendPulse: E-mail маркетинг — как увеличить Open Rate. — <a href="https://sendpulse.com" target="_blank">SendPulse.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Стратегия и тактика</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Дубовик С. E-mail маркетинг: стратегия, тактика и инструменты. — Блог «Директ-Блог», 2024.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Ryan D. Understanding Digital Marketing. — Kogan Page, 2024.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Chaffey D., Ellis-Chadwick F. Digital Marketing: Strategy, Implementation and Practice. — Pearson, 2022.</div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🚫 Спам и законодательство</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">ФЗ-152 «О персональных данных»: требования к обработке email-баз. — <a href="http://pravo.gov.ru" target="_blank">Pravo.gov.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">GDPR: General Data Protection Regulation — правила email-маркетинга в ЕС. — <a href="https://gdpr.eu" target="_blank">GDPR.eu</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">CAN-SPAM Act: американское законодательство против спама. — <a href="https://www.ftc.gov" target="_blank">FTC.gov</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

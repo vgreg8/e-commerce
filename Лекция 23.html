@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 23. Как работает AD-сервер</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0c1a3a; color: #dbeafe; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #1e3a8a; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #3b82f6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #60a5fa 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 36px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11.5px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* BANNER TYPES */
+        .banner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .banner-card { border-radius: 12px; padding: 14px 12px; text-align: center; transition: transform 0.15s; }
+        .banner-card:hover { transform: translateY(-2px); }
+        .banner-card.static { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .banner-card.popup { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 2px solid #dc2626; }
+        .banner-card.transform { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .banner-card.interactive { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 2px solid #10b981; }
+        .banner-card.floating { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 2px solid #8b5cf6; }
+        .banner-card.medkon { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .banner-card .banner-icon { font-size: 22px; margin-bottom: 6px; }
+        .banner-card .banner-name { font-size: 12px; font-weight: bold; color: #1e293b; margin-bottom: 4px; }
+        .banner-card .banner-desc { font-size: 10px; color: #475569; line-height: 1.35; }
+
+        /* SVG AD SERVER SCHEMA */
+        .chart-card { background: #ffffff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* SITES GRID */
+        .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .role-card { border-radius: 12px; padding: 16px; }
+        .role-card.publisher { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .role-card.advertiser { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .role-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .role-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .role-card li { margin-bottom: 4px; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #1e3a8a; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #eff6ff; }
+        .metrics-table .price { color: #059669; font-weight: bold; }
+        .metrics-table .cat { color: #1e3a8a; font-weight: bold; }
+
+        /* FORMAT COMPARE */
+        .format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .format-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px 12px; text-align: center; }
+        .format-card .format-icon { font-size: 22px; margin-bottom: 6px; }
+        .format-card .format-name { font-size: 12px; font-weight: bold; color: #1e3a8a; margin-bottom: 4px; }
+        .format-card .format-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+
+        /* TREND SVG */
+        .svg-card { background: #ffffff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 18px 22px; }
+        .svg-card .svg-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .svg-card .svg-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #3b82f6; }
+        .rt-btn:hover { background: #2563eb; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #93c5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e3a8a; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #dbeafe; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #93c5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e3a8a; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #1e3a8a; color: #93c5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #3b82f6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #93c5fd; font-size: 13px; min-width: 90px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #3b82f6; color: #0c1a3a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #93c5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 23. Как работает AD-сервер
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🖥️</div>
+                <div class="hero-data">
+                    <div class="hero-number">100 мс</div>
+                    <div class="hero-label">Полный цикл доставки баннера</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">12</div>
+                    <div class="hero-label">Шагов в схеме доставки</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">56%</div>
+                    <div class="hero-label">Издателей используют header bidding</div>
+                </div>
+            </div>
+
+            <!-- BANNER TYPES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px;">📢 Шесть типов баннеров: от классики до трансформеров</div>
+                <div class="banner-grid">
+                    <div class="banner-card static">
+                        <div class="banner-icon">🖼️</div>
+                        <div class="banner-name">Обычные</div>
+                        <div class="banner-desc">Различные формы и размеры, классические баннеры</div>
+                    </div>
+                    <div class="banner-card.floating">
+                        <div class="banner-icon">🌊</div>
+                        <div class="banner-name">Floating</div>
+                        <div class="banner-desc">Плавающие баннеры, перемещаются по экрану</div>
+                    </div>
+                    <div class="banner-card.interactive">
+                        <div class="banner-icon">🖱️</div>
+                        <div class="banner-name">Интерактивные</div>
+                        <div class="banner-desc">С ними можно взаимодействовать, играть, вращать</div>
+                    </div>
+                    <div class="banner-card.popup">
+                        <div class="banner-icon">💥</div>
+                        <div class="banner-name">Pop-up</div>
+                        <div class="banner-desc">Возникают поверх текста — наиболее назойливая реклама</div>
+                    </div>
+                    <div class="banner-card.popup">
+                        <div class="banner-icon">⬇️</div>
+                        <div class="banner-name">Pop-under</div>
+                        <div class="banner-desc">Возникают под страницей, видны при её закрытии</div>
+                    </div>
+                    <div class="banner-card.transform">
+                        <div class="banner-icon">🔄</div>
+                        <div class="banner-name">Трансформеры</div>
+                        <div class="banner-desc">Меняют форму: большое изображение → узкая полоска</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #475569; margin-top: 8px;">Принцип: чем более привлекателен баннер, тем выше CTR (Click-Through Rate). Но по мере привыкания эффективность снижается.</div>
+            </div>
+
+            <!-- SVG AD SERVER FLOW -->
+            <div class="chart-card">
+                <div class="chart-title">🔄 Схема работы AD-сервера: 12 шагов доставки рекламы <span>Client-Server архитектура</span></div>
+                <svg viewBox="0 0 600 330" style="width: 100%; height: auto;">
+                    <!-- Пользователь -->
+                    <circle cx="50" cy="50" r="20" fill="#1e3a8a" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="50" y="55" font-size="18" text-anchor="middle">👤</text>
+                    <text x="50" y="85" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">Пользователь</text>
+
+                    <!-- Издатель -->
+                    <rect x="130" y="20" width="130" height="70" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="195" y="42" font-size="11" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Издатель</text>
+                    <text x="195" y="58" font-size="9" fill="#475569" text-anchor="middle">Веб-сервер + контент</text>
+                    <text x="195" y="72" font-size="9" fill="#475569" text-anchor="middle">Ad-сервер издателя</text>
+
+                    <defs>
+                        <marker id="arrowBlue2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                        </marker>
+                        <marker id="arrowPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ec4899"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Стрелки -->
+                    <line x1="75" y1="50" x2="125" y2="50" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue2)"/>
+                    <text x="100" y="42" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">1. Запрос</text>
+                    <line x1="130" y1="60" x2="80" y2="60" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue2)"/>
+                    <text x="105" y="75" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">2. Код + Ad Tag</text>
+
+                    <!-- Рекламодатель -->
+                    <rect x="350" y="20" width="140" height="70" rx="10" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="420" y="42" font-size="11" fill="#831843" text-anchor="middle" font-weight="bold">Рекламодатель</text>
+                    <text x="420" y="58" font-size="9" fill="#475569" text-anchor="middle">Ad-сервер</text>
+                    <text x="420" y="72" font-size="9" fill="#475569" text-anchor="middle">рекламодателя</text>
+
+                    <line x1="260" y1="55" x2="345" y2="55" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue2)"/>
+                    <text x="300" y="48" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">3. Запрос баннера</text>
+
+                    <!-- CDN -->
+                    <rect x="510" y="20" width="80" height="70" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="550" y="45" font-size="10" fill="#78350f" text-anchor="middle" font-weight="bold">CDN</text>
+                    <text x="550" y="60" font-size="9" fill="#475569" text-anchor="middle">Облачное</text>
+                    <text x="550" y="73" font-size="9" fill="#475569" text-anchor="middle">хранилище</text>
+
+                    <line x1="490" y1="55" x2="505" y2="55" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowBlue2)"/>
+                    <text x="498" y="48" font-size="8" fill="#78350f" text-anchor="middle" font-weight="bold">4</text>
+
+                    <!-- Финальная доставка -->
+                    <line x1="420" y1="90" x2="420" y2="115" stroke="#ec4899" stroke-width="2" marker-end="url(#arrowPink)"/>
+
+                    <!-- Баннер -->
+                    <rect x="330" y="120" width="180" height="45" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="420" y="140" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="bold">🖼️ Рекламный баннер</text>
+                    <text x="420" y="155" font-size="8" fill="#475569" text-anchor="middle">Загружен и готов к показу</text>
+
+                    <!-- Шаги аналитики -->
+                    <rect x="30" y="120" width="270" height="95" rx="10" fill="#f0f9ff" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4 3"/>
+                    <text x="165" y="140" font-size="10" fill="#0c4a6e" text-anchor="middle" font-weight="bold">📊 Трекинг показов</text>
+                    <text x="45" y="160" font-size="9" fill="#475569">• Издатель засчитывает показ в базе</text>
+                    <text x="45" y="175" font-size="9" fill="#475569">• Рекламодатель прикрепляет редирект</text>
+                    <text x="45" y="190" font-size="9" fill="#475569">• Проверка успешной загрузки</text>
+                    <text x="45" y="205" font-size="9" fill="#475569">• Финальный учёт показов</text>
+
+                    <!-- Header Bidding блок -->
+                    <rect x="30" y="230" width="540" height="80" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="300" y="252" font-size="11" fill="#78350f" text-anchor="middle" font-weight="bold">⚡ Header Bidding (2025–2026): современный стандарт</text>
+                    <text x="300" y="272" font-size="9" fill="#475569" text-anchor="middle">Издатель выставляет рекламное место на несколько аукционов ОДНОВРЕМЕННО, не последовательно</text>
+                    <text x="300" y="290" font-size="9" fill="#475569" text-anchor="middle">56% издателей используют header bidding → рост дохода на 30–40% против классической цепочки</text>
+                    <text x="300" y="305" font-size="9" fill="#475569" text-anchor="middle">Интеграция через Prebid.js, Amazon TAM, Google Open Bidding</text>
+                </svg>
+            </div>
+
+            <!-- ROLES GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px;">👥 Два Ad-сервера: издателя и рекламодателя</div>
+                <div class="roles-grid">
+                    <div class="role-card publisher">
+                        <h5 style="color: #1e3a8a;">📤 Ad Server издателя</h5>
+                        <ul>
+                            <li>Хранит и доставляет баннеры на страницы</li>
+                            <li>Управляет инвентарём рекламных мест</li>
+                            <li>Ведёт трекинг показов и кликов</li>
+                            <li>Приоритизирует собственные кампании</li>
+                            <li>Может продавать инвентарь через SSP</li>
+                        </ul>
+                    </div>
+                    <div class="role-card advertiser">
+                        <h5 style="color: #831843;">📥 Ad Server рекламодателя</h5>
+                        <ul>
+                            <li>Хранит креативы рекламодателя</li>
+                            <li>Раздаёт баннеры через CDN по всему миру</li>
+                            <li>Верифицирует успешную доставку</li>
+                            <li>Засчитывает показы в своей базе</li>
+                            <li>Управляет частотой показов (frequency cap)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMAT COMPARE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px;">💰 Три схемы размещения баннерной рекламы в Яндексе</div>
+                <div class="format-grid">
+                    <div class="format-card">
+                        <div class="format-icon">⚡</div>
+                        <div class="format-name">RTB на площадках РСЯ</div>
+                        <div class="format-desc">Аукцион: баннер показывается рекламодателю с наибольшей ставкой за 1000 показов (CPM)</div>
+                    </div>
+                    <div class="format-card">
+                        <div class="format-icon">📺</div>
+                        <div class="format-name">Видеосеть Яндекса</div>
+                        <div class="format-desc">Единое размещение медийных баннеров с видеороликом на группе сервисов Яндекса</div>
+                    </div>
+                    <div class="format-card">
+                        <div class="format-icon">🔍</div>
+                        <div class="format-name">Медийно-контекстный баннер</div>
+                        <div class="format-desc">Показывается на странице результатов поиска Яндекса, зависит от тематики запроса</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a8a; margin-bottom: 8px;">📊 Рынок Ad Server и programmatic-рекламы (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Доля programmatic-рекламы в digital</td>
+                            <td class="price">&gt; 90%</td>
+                            <td class="cat">растёт</td>
+                            <td>IAB Europe</td>
+                        </tr>
+                        <tr>
+                            <td>Издатели, использующие header bidding</td>
+                            <td>56%</td>
+                            <td class="cat">+18 п.п.</td>
+                            <td>Prebid.org</td>
+                        </tr>
+                        <tr>
+                            <td>Рост дохода издателей от header bidding</td>
+                            <td class="price">+30–40%</td>
+                            <td class="cat">стабильно</td>
+                            <td>Google Ad Manager</td>
+                        </tr>
+                        <tr>
+                            <td>Рынок Ad Server Software (мир)</td>
+                            <td>$2,1 млрд</td>
+                            <td class="cat">CAGR 12,4%</td>
+                            <td>Grand View Research</td>
+                        </tr>
+                        <tr>
+                            <td>Средний CTR баннеров 2025</td>
+                            <td>0,07%</td>
+                            <td class="cat">стабильно</td>
+                            <td>Smartly.io</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SVG TREND -->
+            <div class="svg-card">
+                <div class="svg-title">📈 Рост header bidding vs классический Ad Server <span>2018 → 2026</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Header bidding (растёт) -->
+                    <polyline points="90,130 220,115 350,90 480,60 580,35"
+                              fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>
+                    <circle cx="90" cy="130" r="5" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="115" r="5" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="90" r="5" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="60" r="5" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="35" r="7" fill="#1e3a8a" stroke="white" stroke-width="2.5"/>
+
+                    <!-- Waterfall (снижается) -->
+                    <polyline points="90,60 220,75 350,90 480,105 580,120"
+                              fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 3"/>
+                    <circle cx="580" cy="120" r="6" fill="#64748b" stroke="white" stroke-width="2"/>
+
+                    <!-- Подписи -->
+                    <text x="90" y="125" font-size="9" fill="#1e3a8a" font-weight="bold">15%</text>
+                    <text x="350" y="82" font-size="9" fill="#1e3a8a" font-weight="bold">38%</text>
+                    <text x="580" y="28" font-size="10" fill="#1e3a8a" text-anchor="end" font-weight="900">56%</text>
+
+                    <text x="90" y="54" font-size="9" fill="#64748b" font-weight="bold">85%</text>
+                    <text x="580" y="135" font-size="9" fill="#64748b" text-anchor="end" font-weight="bold">44%</text>
+
+                    <!-- Подписи осей -->
+                    <text x="90" y="158" font-size="10" fill="#475569" text-anchor="middle">2018</text>
+                    <text x="220" y="158" font-size="10" fill="#475569" text-anchor="middle">2020</text>
+                    <text x="350" y="158" font-size="10" fill="#475569" text-anchor="middle">2022</text>
+                    <text x="480" y="158" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="580" y="158" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="bold">2026</text>
+
+                    <!-- Легенда -->
+                    <text x="100" y="30" font-size="10" fill="#3b82f6" font-weight="bold">🟦 Header Bidding</text>
+                    <text x="100" y="45" font-size="10" fill="#64748b" font-weight="bold">⬜ Waterfall (классика)</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Header bidding (Prebid.js) заменил классический waterfall-аукцион. Издатели получают на 30–40% больше дохода.</div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Ad-сервер</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Баннеры и форматы</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Header bidding</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 23 из 26
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0c1a3a; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e3a8a; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали поведенческую рекламу и ретаргетинг. Сегодня мы поговорим о том, как работает AD-сервер — технологический фундамент доставки баннерной рекламы. Без понимания этой схемы невозможно понять, как работает современный programmatic и RTB.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми метриками.</div>
+
+            <h3>📌 Типы баннерной рекламы</h3>
+
+            <p>Прежде чем говорить о серверах, разберём, какие бывают баннеры. <strong>Обычные баннеры</strong> — различные формы и размеры, классика. <strong>Floating (плавающие)</strong> — перемещаются по экрану. <strong>Интерактивные</strong> — с ними можно взаимодействовать: играть, вращать, кликать. <strong>Pop-up</strong> — возникают поверх читаемого текста, наиболее назойливая реклама. <strong>Pop-under</strong> — возникают под страницей и становятся видны по мере её закрытия. <strong>Баннеры-трансформеры</strong> — меняют форму в процессе загрузки: большое изображение трансформируется в узкую полоску.</p>
+
+            <p>Ключевой принцип: чем привлекательнее баннер, тем выше CTR (Click-Through Rate). Но по мере появления новых технологий пользователи к ним привыкают, и эффективность снижается. Это постоянная гонка между креативом и баннерной слепотой.</p>
+
+            <div class="action-hint">Перейдите к принципу работы баннерной сети.</div>
+
+            <h3>📌 Принцип работы баннерной рекламной сети</h3>
+
+            <p>Три элемента: рекламодатель, рекламная сеть, веб-сайт. <strong>Рекламодатель</strong> задаёт параметры: где показывать баннер (только в России или по всему миру), в какое время, на какую категорию пользователей таргетировать. <strong>Рекламная сеть</strong> ведёт учёт просмотров, кликов и конверсий по баннеру. <strong>Веб-сайт</strong> размещает баннеры, которые могут включать текст, изображения, видео, интерактивные элементы.</p>
+
+            <p>Схемы размещения и оплаты в Яндексе: <strong>RTB на площадках РСЯ</strong> — баннеры показываются рекламодателю, предложившему наибольшую ставку (CPM — цена за 1000 показов). <strong>Видеосеть Яндекса</strong> — единое размещение медийных баннеров с видеороликом. <strong>Медийно-контекстный баннер</strong> — показывается на странице результатов поиска Яндекса, зависит от тематики запроса.</p>
+
+            <div class="action-hint">Обратите внимание студентов на детальную схему работы Ad Server.</div>
+
+            <h3>📌 Схема работы Ad Server: 12 шагов</h3>
+
+            <p>В основе лежит клиент-серверная архитектура. Термин «издатель» (publisher) — веб-сайт, который публикует свои страницы и размещает рекламу. Разберём пошагово.</p>
+
+            <p><strong>Шаг 1:</strong> пользователь переходит по ссылке на сайт издателя. <strong>Шаг 2:</strong> веб-сервер издателя формирует код, указывающий браузеру, где взять контент и как его форматировать. <strong>Шаг 3:</strong> часть кода включает ссылку на рекламный тег (ad tag), который перенаправляет браузер на рекламный сервер издателя. <strong>Шаг 4:</strong> сервер издателя предназначен для доставки и отслеживания рекламы. <strong>Шаг 5:</strong> если издатель хочет разместить собственные объявления — шаги 7–12 не нужны. <strong>Шаг 6:</strong> если нужно разместить объявление рекламодателя, сервер издателя перенаправляет браузер на сервер рекламодателя, предварительно засчитав показ в своей базе. <strong>Шаг 7:</strong> браузер обращается к серверу рекламодателя. <strong>Шаг 8:</strong> перенаправление на CDN (Content Delivery Network) — сеть доставки контента. <strong>Шаг 9:</strong> CDN — облачное хранилище, глобальная сеть серверов, хранящих исходные рекламные файлы. <strong>Шаг 10:</strong> сервер рекламодателя прикрепляет второе перенаправление на себя. <strong>Шаг 11:</strong> проверка, что рекламное объявление было благополучно скачано. <strong>Шаг 12:</strong> окончательно зачитывает показ в своей базе данных.</p>
+
+            <p>Всё это происходит за доли секунды. Ad Server — это сетевой сервис, который хранит, поддерживает и загружает рекламные баннеры на веб-сайтах и отслеживает статистику.</p>
+
+            <p>Компании на российском рынке: AdRiver, AdFox, DoubleClick (Google). Эти сервисы — основа экосистемы интерактивной рекламы.</p>
+
+            <div class="action-hint">Перейдите к трендам 2025–2026.</div>
+
+            <h3>📌 Header Bidding — современный стандарт</h3>
+
+            <p>Ключевой тренд 2025–2026 — переход к header bidding. Классический waterfall-аукцион работал последовательно: издатель сначала запрашивал ставку у одного партнёра, потом у другого, и так далее. Если первый партнёр давал мало — вызывался следующий. Это приводило к потере времени и денег.</p>
+
+            <p>Header bidding — технология, при которой издатель выставляет рекламное место на несколько аукционов <strong>одновременно</strong>. Все партнёры делают ставки параллельно, и издатель выбирает победителя. <span class="stat-inline">56%</span> издателей используют header bidding, и это даёт рост дохода на <strong>30–40%</strong> против классической цепочки. Интеграция через Prebid.js, Amazon TAM, Google Open Bidding.</p>
+
+            <p>Другие тренды: <strong>переход к first-party data</strong> для таргетинга, <strong>интеграция AI</strong> в Ad Server для автоматической оптимизации ставок, <strong>рост CTV (Connected TV)</strong> — реклама на Smart TV становится отдельным сегментом Ad Server.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали, как работает AD-сервер. Ключевые выводы:</p>
+
+            <ul>
+                <li>Шесть типов баннеров: обычные, floating, интерактивные, pop-up, pop-under, трансформеры.</li>
+                <li>Баннерная сеть включает рекламодателя, рекламную сеть и веб-сайт.</li>
+                <li>Три схемы размещения в Яндексе: RTB на РСЯ, видеосеть, медийно-контекстный баннер.</li>
+                <li>Схема работы Ad Server — 12 шагов от запроса до финального учёта показов.</li>
+                <li>Два Ad Server: издателя и рекламодателя — каждый выполняет свою функцию.</li>
+                <li>Header bidding заменил waterfall-аукцион: 56% издателей, +30–40% дохода.</li>
+                <li>Компании на рынке: AdRiver, AdFox, DoubleClick, Prebid.js.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём, как работает RTB. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Ad Server</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Рекламный сервер</div>
+                            <div class="gloss-def">Сетевой сервис для хранения, доставки баннеров и трекинга показов/кликов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Ad Tag</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Рекламный тег</div>
+                            <div class="gloss-def">Фрагмент кода, встраиваемый в страницу для запроса рекламы у Ad Server</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CDN</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Content Delivery Network</div>
+                            <div class="gloss-def">Сеть доставки контента — глобальная сеть серверов для быстрой раздачи файлов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Click-Through Rate</div>
+                            <div class="gloss-def">Показатель кликабельности — отношение кликов к показам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Mille</div>
+                            <div class="gloss-def">Стоимость за 1000 показов рекламного объявления</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Publisher</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Издатель</div>
+                            <div class="gloss-def">Веб-сайт или приложение, размещающее рекламу на своих страницах</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Header Bidding</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Header Bidding</div>
+                            <div class="gloss-def">Технология параллельного аукциона: издатель выставляет место сразу на несколько аукционов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Prebid.js</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Prebid.js</div>
+                            <div class="gloss-def">Open-source библиотека для реализации header bidding</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Waterfall</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Waterfall-аукцион</div>
+                            <div class="gloss-def">Классическая последовательная схема продажи рекламы — устаревающий стандарт</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AdRiver / AdFox</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">AdRiver / AdFox</div>
+                            <div class="gloss-def">Российские Ad Server-платформы для управления баннерной рекламой</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🖥️ Ad Server и баннеры</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Google Ad Manager: How Ad Servers Work — официальная документация. — <a href="https://admanager.google.com" target="_blank">AdManager.Google.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">AdOps Insider: Ad Server доставка и трекинг — техническая схема. — <a href="https://adopsinsider.com" target="_blank">AdOpsInsider.com</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">AdIndex: AdRiver и AdFox — обзор российских Ad Server-платформ. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚡ Header Bidding</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Prebid.org: Header Bidding Trends Report 2025 — 56% издателей используют. — <a href="https://prebid.org" target="_blank">Prebid.org</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Google Ad Manager: Open Bidding — как работает параллельный аукцион. — <a href="https://support.google.com/admanager" target="_blank">Support.Google.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Amazon Publisher Services: Transparent Ad Marketplace (TAM). — <a href="https://aps.amazon.com" target="_blank">APS.Amazon.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок и тренды</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Grand View Research: Ad Server Software Market Size — $2,1 млрд, CAGR 12,4%. — <a href="https://www.grandviewresearch.com" target="_blank">GrandViewResearch.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">IAB Europe: Programmatic Market Report 2025 — >90% digital-рекламы продаётся программно. — <a href="https://iabeurope.eu" target="_blank">IABEurope.eu</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Smartly.io: State of Digital Advertising 2025 — средний CTR баннеров. — <a href="https://www.smartly.io" target="_blank">Smartly.io</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

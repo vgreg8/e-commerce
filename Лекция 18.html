@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 18. Легальные и нелегальные методы оптимизации</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a1a2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #7f1d1d; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #ef4444; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 60%, #ef4444 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(185, 28, 28, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* WHITE HAT / BLACK HAT */
+        .hat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .hat-card { border-radius: 12px; padding: 18px; }
+        .hat-card.white { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #10b981; }
+        .hat-card.black { background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 2px solid #dc2626; }
+        .hat-card h5 { font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .hat-card ul { margin: 0 0 0 16px; font-size: 11.5px; line-height: 1.55; color: #1e293b; }
+        .hat-card li { margin-bottom: 4px; }
+
+        /* QUADRANT SVG */
+        .quadrant-card { background: #ffffff; border: 2px solid #fecaca; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(185, 28, 28, 0.08); }
+        .quadrant-card .q-title { font-size: 14px; font-weight: bold; color: #7f1d1d; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .quadrant-card .q-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* SPAM TYPES */
+        .spam-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .spam-card { border-radius: 12px; padding: 14px 12px; text-align: center; }
+        .spam-card.dev { background: #fef2f2; border: 2px solid #fca5a5; }
+        .spam-card.content { background: #fef3c7; border: 2px solid #fcd34d; }
+        .spam-card.link { background: #faf5ff; border: 2px solid #c4b5fd; }
+        .spam-card .spam-icon { font-size: 24px; margin-bottom: 6px; }
+        .spam-card .spam-name { font-size: 12px; font-weight: bold; margin-bottom: 6px; }
+        .spam-card.dev .spam-name { color: #991b1b; }
+        .spam-card.content .spam-name { color: #92400e; }
+        .spam-card.link .spam-name { color: #6d28d9; }
+        .spam-card .spam-examples { font-size: 10px; color: #475569; line-height: 1.4; }
+
+        /* RISK/RETURN TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #7f1d1d; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #fef2f2; }
+        .metrics-table .low { color: #059669; font-weight: bold; }
+        .metrics-table .medium { color: #f59e0b; font-weight: bold; }
+        .metrics-table .high { color: #e11d48; font-weight: bold; }
+        .metrics-table .cat { color: #e11d48; font-weight: bold; }
+        .metrics-table .crit { color: #7f1d1d; font-weight: 900; background: #fee2e2; }
+
+        /* GRAY AREA SPECTRUM */
+        .spectrum-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .spectrum-card .spectrum-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 16px; }
+        .spectrum { display: flex; height: 60px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .spectrum-seg { display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: bold; flex-direction: column; padding: 0 8px; text-align: center; line-height: 1.25; }
+        .spectrum-seg.white { background: linear-gradient(90deg, #10b981, #34d399); flex: 4; }
+        .spectrum-seg.gray { background: linear-gradient(90deg, #f59e0b, #fbbf24); flex: 3; }
+        .spectrum-seg.black { background: linear-gradient(90deg, #dc2626, #7f1d1d); flex: 3; }
+        .spectrum-seg small { font-size: 9px; opacity: 0.9; font-weight: 400; margin-top: 2px; }
+        .spectrum-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10.5px; color: #64748b; font-weight: 600; }
+
+        /* RISK SVG */
+        .chart-card { background: #ffffff; border: 2px solid #fecaca; border-radius: 14px; padding: 18px 22px; }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #7f1d1d; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* PENALTY TIMELINE */
+        .penalty-card { background: #fef2f2; border: 2px solid #fecaca; border-radius: 14px; padding: 20px 24px; }
+        .penalty-card .penalty-title { font-size: 14px; font-weight: bold; color: #991b1b; margin-bottom: 14px; }
+        .penalty-track { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .penalty-node { flex: 1; min-width: 110px; background: white; border: 2px solid #ef4444; border-radius: 10px; padding: 12px 10px; text-align: center; }
+        .penalty-node .pn-icon { font-size: 22px; margin-bottom: 6px; }
+        .penalty-node .pn-name { font-size: 11.5px; font-weight: bold; color: #7f1d1d; margin-bottom: 4px; }
+        .penalty-node .pn-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+        .penalty-arrow { font-size: 18px; color: #ef4444; font-weight: bold; }
+
+        /* TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .tool-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px 12px; text-align: center; }
+        .tool-card .tool-icon { font-size: 22px; margin-bottom: 6px; }
+        .tool-card .tool-name { font-size: 12px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
+        .tool-card .tool-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #ef4444; }
+        .rt-btn:hover { background: #dc2626; }
+        .stop-btn { background: #0f172a; }
+        .stop-btn:hover { background: #1e293b; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #fca5a5; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #450a0a; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #fca5a5; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #450a0a; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #334155; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #7f1d1d; color: #fca5a5; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #fca5a5; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #ef4444; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #ef4444; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #fca5a5; font-size: 13px; min-width: 80px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #fca5a5; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #ef4444; color: #1a1a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #fca5a5; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 18. Легальные и нелегальные методы оптимизации
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">⚖️</div>
+                <div class="hero-data">
+                    <div class="hero-number">50%</div>
+                    <div class="hero-label">Сайтов в топ-20 Google — AI-спам</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">×80</div>
+                    <div class="hero-label">Рост скам-контента в поиске Google (2024→2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">99%</div>
+                    <div class="hero-label">Точность SpamBrain в выявлении спама</div>
+                </div>
+            </div>
+
+            <!-- WHITE HAT / BLACK HAT -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #7f1d1d; margin-bottom: 10px;">🎩 Два подхода к SEO: white hat vs black hat</div>
+                <div class="hat-grid">
+                    <div class="hat-card white">
+                        <h5 style="color: #065f46;">✅ White Hat SEO</h5>
+                        <ul>
+                            <li>Контент для пользователей, а не для роботов</li>
+                            <li>Естественное наращивание ссылок</li>
+                            <li>Техническая оптимизация в рамках правил</li>
+                            <li>Работа над репутацией и экспертностью</li>
+                            <li><strong>Устойчивый долгосрочный рост</strong></li>
+                        </ul>
+                    </div>
+                    <div class="hat-card black">
+                        <h5 style="color: #991b1b;">❌ Black Hat SEO</h5>
+                        <ul>
+                            <li>Клоакинг, дорвеи, скрытый текст</li>
+                            <li>Покупные ссылки, PBN-сети</li>
+                            <li>Набивка ключевыми словами</li>
+                            <li>Имитация поведения пользователей</li>
+                            <li><strong>Быстрый результат — риск бана</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUADRANT SVG -->
+            <div class="quadrant-card">
+                <div class="q-title">📊 Матрица риск/доходность SEO-методов <span>2025–2026</span></div>
+                <svg viewBox="0 0 600 240" style="width: 100%; height: auto;">
+                    <!-- Оси -->
+                    <line x1="60" y1="20" x2="60" y2="200" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="60" y1="200" x2="580" y2="200" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="60" y1="110" x2="580" y2="110" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+                    <line x1="320" y1="20" x2="320" y2="200" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+
+                    <!-- Подписи осей -->
+                    <text x="35" y="30" font-size="10" fill="#64748b" font-weight="bold">Доход ↑</text>
+                    <text x="35" y="195" font-size="10" fill="#64748b" font-weight="bold">Риск →</text>
+                    <text x="580" y="215" font-size="10" fill="#64748b" font-weight="bold" text-anchor="end">Высокий риск</text>
+
+                    <!-- Квадранты -->
+                    <text x="180" y="70" font-size="11" fill="#059669" text-anchor="middle" font-weight="bold">Идеальная зона</text>
+                    <text x="180" y="85" font-size="9" fill="#64748b" text-anchor="middle">White Hat SEO</text>
+
+                    <text x="450" y="70" font-size="11" fill="#b91c1c" text-anchor="middle" font-weight="bold">Краткосрочный выигрыш</text>
+                    <text x="450" y="85" font-size="9" fill="#64748b" text-anchor="middle">Black Hat SEO</text>
+
+                    <text x="180" y="160" font-size="11" fill="#64748b" text-anchor="middle" font-weight="bold">Слабая отдача</text>
+                    <text x="180" y="175" font-size="9" fill="#64748b" text-anchor="middle">Медленные тактики</text>
+
+                    <text x="450" y="160" font-size="11" fill="#b91c1c" text-anchor="middle" font-weight="bold">⚠ Опасная зона</text>
+                    <text x="450" y="175" font-size="9" fill="#64748b" text-anchor="middle">Быстрый бан</text>
+
+                    <!-- Точки-методы -->
+                    <circle cx="130" cy="55" r="8" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <text x="145" y="58" font-size="9" fill="#065f46" font-weight="bold">Контент</text>
+
+                    <circle cx="200" cy="75" r="8" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <text x="215" y="78" font-size="9" fill="#065f46" font-weight="bold">Перелинковка</text>
+
+                    <circle cx="250" cy="45" r="8" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <text x="265" y="48" font-size="9" fill="#065f46" font-weight="bold">UX / CWV</text>
+
+                    <circle cx="380" cy="60" r="8" fill="#f59e0b" stroke="white" stroke-width="2"/>
+                    <text x="395" y="63" font-size="9" fill="#92400e" font-weight="bold">Гостевые посты</text>
+
+                    <circle cx="440" cy="90" r="8" fill="#f59e0b" stroke="white" stroke-width="2"/>
+                    <text x="455" y="93" font-size="9" fill="#92400e" font-weight="bold">Покупка ссылок</text>
+
+                    <circle cx="530" cy="60" r="8" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <text x="495" y="55" font-size="9" fill="#7f1d1d" font-weight="bold">Клоакинг</text>
+
+                    <circle cx="500" cy="150" r="8" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <text x="465" y="153" font-size="9" fill="#7f1d1d" font-weight="bold">Дорвеи</text>
+
+                    <circle cx="550" cy="130" r="8" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <text x="515" y="145" font-size="9" fill="#7f1d1d" font-weight="bold">AI-спам</text>
+
+                    <!-- Легенда -->
+                    <circle cx="70" cy="225" r="6" fill="#10b981"/>
+                    <text x="82" y="228" font-size="9" fill="#065f46" font-weight="bold">White Hat</text>
+                    <circle cx="170" cy="225" r="6" fill="#f59e0b"/>
+                    <text x="182" y="228" font-size="9" fill="#92400e" font-weight="bold">Серая зона</text>
+                    <circle cx="280" cy="225" r="6" fill="#dc2626"/>
+                    <text x="292" y="228" font-size="9" fill="#7f1d1d" font-weight="bold">Black Hat</text>
+                </svg>
+            </div>
+
+            <!-- GRAY AREA SPECTRUM -->
+            <div class="spectrum-card">
+                <div class="spectrum-title">🌈 Спектр SEO-методов: от белого к чёрному</div>
+                <div class="spectrum">
+                    <div class="spectrum-seg white">✅ White Hat<small>Безопасно, устойчиво</small></div>
+                    <div class="spectrum-seg gray">⚠ Серая зона<small>Риск санкций</small></div>
+                    <div class="spectrum-seg black">❌ Black Hat<small>Риск бана</small></div>
+                </div>
+                <div class="spectrum-labels">
+                    <span>Контент, UX, перелинковка, E-E-A-T</span>
+                    <span>Покупные ссылки, гостевые посты с оптимизацией</span>
+                    <span>Клоакинг, дорвеи, AI-спам, PBN</span>
+                </div>
+            </div>
+
+            <!-- SPAM TYPES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #7f1d1d; margin-bottom: 10px;">🚫 Три категории нелегальных методов</div>
+                <div class="spam-grid">
+                    <div class="spam-card dev">
+                        <div class="spam-icon">⚙️</div>
+                        <div class="spam-name">Разработческий спам</div>
+                        <div class="spam-examples">Клоакинг, скрытый текст, дорвеи, скрайпер-сайты, зеркала, JS-редиректы</div>
+                    </div>
+                    <div class="spam-card content">
+                        <div class="spam-icon">📝</div>
+                        <div class="spam-name">Контентный спам</div>
+                        <div class="spam-examples">Набивка ключевыми словами, AI-контент без пользы, непрофильные тексты, прокрутка статей</div>
+                    </div>
+                    <div class="spam-card link">
+                        <div class="spam-icon">🔗</div>
+                        <div class="spam-name">Ссылочный спам</div>
+                        <div class="spam-examples">PBN-сети, покупные ссылки, ссылки на биржах, спам-комментарии, форумный спам</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RISK/RETURN TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #7f1d1d; margin-bottom: 8px;">📋 Сравнение методов: скорость, устойчивость, риск</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Метод</th>
+                            <th>Скорость</th>
+                            <th>Устойчивость</th>
+                            <th>Риск</th>
+                            <th>Категория</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Контент-маркетинг</strong></td>
+                            <td class="low">Медленно</td>
+                            <td class="low">Высокая</td>
+                            <td class="low">Низкий</td>
+                            <td>White Hat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Технический SEO</strong></td>
+                            <td class="medium">Средне</td>
+                            <td class="low">Высокая</td>
+                            <td class="low">Низкий</td>
+                            <td>White Hat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Внутренняя перелинковка</strong></td>
+                            <td class="medium">Средне</td>
+                            <td class="low">Высокая</td>
+                            <td class="low">Низкий</td>
+                            <td>White Hat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Гостевые посты</strong></td>
+                            <td class="medium">Средне</td>
+                            <td class="medium">Средняя</td>
+                            <td class="medium">Средний</td>
+                            <td>Серая зона</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Покупные ссылки</strong></td>
+                            <td class="high">Быстро</td>
+                            <td class="high">Низкая</td>
+                            <td class="high">Высокий</td>
+                            <td>Серая зона</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PBN-сети</strong></td>
+                            <td class="high">Быстро</td>
+                            <td class="high">Низкая</td>
+                            <td class="crit">Критический</td>
+                            <td>Black Hat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Клоакинг</strong></td>
+                            <td class="high">Быстро</td>
+                            <td class="high">Низкая</td>
+                            <td class="crit">Критический</td>
+                            <td>Black Hat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI-спам без пользы</strong></td>
+                            <td class="high">Быстро</td>
+                            <td class="high">Низкая</td>
+                            <td class="crit">Критический</td>
+                            <td>Black Hat</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RISK SVG CHART -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Рост AI-спама в поиске Google <span>2024 → 2026</span></div>
+                <svg viewBox="0 0 600 160" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="130" x2="580" y2="130" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="90" x2="580" y2="90" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="50" x2="580" y2="50" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <polygon points="90,118 220,100 350,70 480,40 580,20 580,130 90,130"
+                             fill="url(#grad-spam)" opacity="0.3"/>
+                    <defs>
+                        <linearGradient id="grad-spam" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#dc2626"/>
+                            <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <polyline points="90,118 220,100 350,70 480,40 580,20"
+                              fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round"/>
+
+                    <circle cx="90" cy="118" r="5" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="100" r="5" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="70" r="5" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="40" r="5" fill="#dc2626" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="20" r="7" fill="#7f1d1d" stroke="white" stroke-width="2.5"/>
+
+                    <text x="90" y="112" font-size="9" fill="#7f1d1d" text-anchor="middle" font-weight="bold">1x</text>
+                    <text x="220" y="94" font-size="9" fill="#7f1d1d" text-anchor="middle" font-weight="bold">4x</text>
+                    <text x="350" y="64" font-size="9" fill="#7f1d1d" text-anchor="middle" font-weight="bold">18x</text>
+                    <text x="480" y="34" font-size="9" fill="#7f1d1d" text-anchor="middle" font-weight="bold">45x</text>
+                    <text x="580" y="14" font-size="10" fill="#7f1d1d" text-anchor="middle" font-weight="900">80x</text>
+
+                    <text x="90" y="145" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="220" y="145" font-size="10" fill="#475569" text-anchor="middle">2025 H1</text>
+                    <text x="350" y="145" font-size="10" fill="#475569" text-anchor="middle">2025 H2</text>
+                    <text x="480" y="145" font-size="10" fill="#475569" text-anchor="middle">2026 H1</text>
+                    <text x="580" y="145" font-size="10" fill="#7f1d1d" text-anchor="middle" font-weight="bold">2026 H2</text>
+
+                    <text x="555" y="40" font-size="10" fill="#7f1d1d" text-anchor="end" font-weight="bold">Рост ×80</text>
+                    <text x="555" y="53" font-size="9" fill="#64748b" text-anchor="end">скам-контента</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">По данным Originality.AI, 50% сайтов в топ-20 Google содержат AI-спам. Доля AI-контента, попадающего в выдачу, выросла в 80 раз за два года.</div>
+            </div>
+
+            <!-- PENALTY TIMELINE -->
+            <div class="penalty-card">
+                <div class="penalty-title">⛔ Хроника санкций Google и Яндекса (2024–2026)</div>
+                <div class="penalty-track">
+                    <div class="penalty-node">
+                        <div class="pn-icon">🔍</div>
+                        <div class="pn-name">Март 2024</div>
+                        <div class="pn-desc">Core Update<br>+ Spam Update:<br>–40% трафика у спам-сайтов</div>
+                    </div>
+                    <div class="penalty-arrow">→</div>
+                    <div class="penalty-node">
+                        <div class="pn-icon">🤖</div>
+                        <div class="pn-name">Июнь 2025</div>
+                        <div class="pn-desc">SpamBrain 2.0<br>Массовая деиндексация<br>PBN-сетей</div>
+                    </div>
+                    <div class="penalty-arrow">→</div>
+                    <div class="penalty-node">
+                        <div class="pn-icon">📉</div>
+                        <div class="pn-name">Февраль 2026</div>
+                        <div class="pn-desc">Google скам-апдейт:<br>×80 рост блокировок<br>за AI-спам</div>
+                    </div>
+                    <div class="penalty-arrow">→</div>
+                    <div class="penalty-node">
+                        <div class="pn-icon">⚡</div>
+                        <div class="pn-name">Май 2026</div>
+                        <div class="pn-desc">Яндекс усилил борьбу<br>с SEO-спамом<br>и накрутками</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOOLS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #7f1d1d; margin-bottom: 10px;">🛡️ Инструменты проверки и защиты от санкций</div>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">🔍</div>
+                        <div class="tool-name">Ahrefs / Majestic</div>
+                        <div class="tool-desc">Анализ ссылочного профиля, выявление токсичных ссылок</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-name">Яндекс.Вебмастер</div>
+                        <div class="tool-desc">Проверка на санкции, «Опасные» ссылки, нарушения</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🚫</div>
+                        <div class="tool-name">Disavow Tool</div>
+                        <div class="tool-desc">Отклонение токсичных ссылок в Google Search Console</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🔎</div>
+                        <div class="tool-name">Screaming Frog</div>
+                        <div class="tool-desc">Технический аудит, выявление клоакинга и скрытого текста</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📝</div>
+                        <div class="tool-name">Originality.AI</div>
+                        <div class="tool-desc">Проверка контента на AI-генерацию и уникальность</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">⚖️</div>
+                        <div class="tool-name">Хрумер / ZennoPoster</div>
+                        <div class="tool-desc">Классические инструменты black hat — сегодня легко выявляются</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: White Hat vs Black Hat</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Категории спама</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Санкции и восстановление</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 18 из 20
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a1a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #450a0a; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали оптимизацию контента и структуры сайта. Сегодня мы поговорим о легальных и нелегальных методах оптимизации — эта тема особенно важна, потому что разница между «эффективно» и «опасно» часто определяется деталями.</p>
+
+            <div class="action-hint">Обратите внимание студентов на сравнение white hat и black hat.</div>
+
+            <h3>📌 White Hat и Black Hat: два подхода к SEO</h3>
+
+            <p><strong>White Hat SEO</strong> — это работа в рамках правил поисковых систем. Уайтхэт-оптимизатор создаёт контент для пользователей, а не для роботов. Он занимается естественным наращиванием ссылок, технической оптимизацией, работает над репутацией и экспертностью сайта. Результат приходит медленнее, но он устойчив и долгосрочен.</p>
+
+            <p><strong>Black Hat SEO</strong> — это использование запрещённых методов. Блэкхэт-оптимизатор применяет клоакинг (показывает роботам один контент, пользователям — другой), создаёт дорвеи (doorway pages — страницы-обманки), использует скрытый текст, покупает ссылки на биржах, создаёт PBN-сети (Private Blog Network). Результат приходит быстро, но при обнаружении сайт получает санкции — вплоть до полного исключения из индекса.</p>
+
+            <h3>📌 Схема затрат и результатов</h3>
+
+            <p>Давайте разберём экономику этих подходов. Легальные методы требуют постепенных вложений — «синие затраты» — и дают стабильный рост. Нелегальные методы дают быстрый результат при меньших стартовых вложениях — «красные затраты», но риск бана сайта делает их опасными в долгосрочной перспективе.</p>
+
+            <p>В оффлайновом мире стратегии, основанные на нарушении законов, тоже позволяют быстрее достичь результатов, но увеличивают риск ответственности. В SEO аналогично: нелегальные методы работают, но до первого крупного апдейта.</p>
+
+            <div class="action-hint">Обратите внимание студентов на спектр методов.</div>
+
+            <h3>📌 Серая область</h3>
+
+            <p>Между легальными и нелегальными методами существует серая область. К ней относятся: покупка ссылок (без явного указания на продажу), гостевые посты с оптимизацией анкора, обмен ссылками с партнёрами, размещение в каталогах с оплатой. Эти методы сегодня не вызывают немедленного наказания, но при обнаружении могут привести к санкциям.</p>
+
+            <p>Важно избегать блокировки сайта поисковой машиной. Санкции бывают двух типов: алгоритмические (автоматические, снижают позиции) и ручные (назначает модератор, полностью исключают сайт из выдачи). Восстановление после ручных санкций может занять месяцы.</p>
+
+            <h3>📌 Манипуляции и алгоритмы поисковых систем</h3>
+
+            <p>Разработчики сайтов должны учитывать особенности алгоритмов поисковых систем. Поисковики оценивают удобство сайта для пользователей. Пользователи оценивают качество информации, достоверность, объективность и удобство поиска. Роботы стремятся оценивать больше элементов, но человек выполняет некоторые задачи лучше — например, оценку экспертности и полезности контента.</p>
+
+            <div class="action-hint">Перейдите к разбору структуры нелегальных методов.</div>
+
+            <h3>📌 Три категории нелегальных методов</h3>
+
+            <p>Все нелегальные методы делятся на три категории.</p>
+
+            <p><strong>Разработческий спам.</strong> Клоакинг — показ разного контента роботам и пользователям. Дорвеи — страницы-обманки, которые перенаправляют пользователя на другой сайт. Скрайпер-сайты — автоматически генерируемые сайты с чужим контентом. Зеркала — копии сайтов под разными доменами. JS-редиректы для обмана роботов.</p>
+
+            <p><strong>Контентный спам.</strong> Прокрутка статей с помощью автоматизированных средств. Набивка ключевых слов — keyword stuffing. Использование непрофильных текстов, не имеющих отношения к теме сайта. AI-контент без пользы для читателя, сгенерированный массово.</p>
+
+            <p><strong>Ссылочный спам.</strong> PBN-сети — частные сети блогов, созданные исключительно для продажи ссылок. Покупные ссылки на биржах (Sape, GoGetLinks). Спам-комментарии на форумах и в блогах. Массовая регистрация в каталогах.</p>
+
+            <p>Примеры спама на форумах и в блогах: записи с положительными отзывами о сайте, не имеющие отношения к обсуждаемой теме. Интересно, что понятие «спам» субъективно: то, что один считает спамом, другой — эффективным продвижением.</p>
+
+            <h3>📌 Масштаб проблемы в 2025–2026</h3>
+
+            <p>Масштаб проблемы AI-спама в 2026 году стал критическим. По данным Originality.AI, <span class="stat-inline">50%</span> сайтов в топ-20 Google содержат AI-спам. Доля AI-контента, попадающего в выдачу, выросла в <span class="stat-inline">80 раз</span> за два года.</p>
+
+            <p>Google ответил усилением алгоритмов. SpamBrain — нейросетевой алгоритм борьбы со спамом — показывает точность около 99% в выявлении спама. В феврале 2026 года Google провёл скам-апдейт, в результате которого количество блокировок выросло в 80 раз. Яндекс также усилил борьбу с SEO-спамом и накрутками в мае 2026 года.</p>
+
+            <p>Хроника санкций: март 2024 — Core Update + Spam Update, до 40% трафика потеряли спам-сайты. Июнь 2025 — SpamBrain 2.0 и массовая деиндексация PBN-сетей. Февраль 2026 — Google скам-апдейт. Май 2026 — Яндекс усилил санкции против накруток.</p>
+
+            <h3>📌 Инструменты проверки и защиты</h3>
+
+            <p>Как защитить сайт от санкций? Есть несколько ключевых инструментов.</p>
+
+            <p><strong>Ahrefs / Majestic</strong> — анализ ссылочного профиля, выявление токсичных ссылок. <strong>Яндекс.Вебмастер</strong> — проверка на санкции, раздел «Опасные ссылки», нарушения. <strong>Disavow Tool</strong> в Google Search Console — отклонение токсичных ссылок. <strong>Screaming Frog</strong> — технический аудит, выявление клоакинга и скрытого текста. <strong>Originality.AI</strong> — проверка контента на AI-генерацию.</p>
+
+            <p>Классические инструменты black hat — Хрумер, ZennoPoster — сегодня легко выявляются поисковиками и не рекомендуются к использованию.</p>
+
+            <h3>📌 Параметры анализа трафика и ссылок</h3>
+
+            <p>Регулярный анализ помогает выявить проблемы до санкций. Параметры анализа трафика: объём, увеличение, стабильность. Резкие колебания — сигнал санкций или технических проблем. Параметры анализа ссылок: количество, распределение, возраст, источник, авторитетность. Положительные ссылки от известных компаний и традиционных медиа — признак здорового профиля.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали легальные и нелегальные методы оптимизации. Ключевые выводы:</p>
+
+            <ul>
+                <li>White Hat SEO — устойчивый долгосрочный рост в рамках правил. Black Hat — быстрый результат с риском бана.</li>
+                <li>Серая область: покупные ссылки, гостевые посты с оптимизацией. Не вызывают немедленного наказания, но рискованны.</li>
+                <li>Три категории нелегальных методов: разработческий, контентный, ссылочный спам.</li>
+                <li>50% сайтов в топ-20 Google содержат AI-спам. Рост скам-контента — ×80 за два года.</li>
+                <li>SpamBrain показывает 99% точности в выявлении спама. Санкции ужесточаются каждый год.</li>
+                <li>Инструменты защиты: Ahrefs, Яндекс.Вебмастер, Disavow Tool, Screaming Frog, Originality.AI.</li>
+            </ul>
+
+            <p>На следующей лекции мы обсудим дилемму: SEO своими силами или аутсорсинг. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">White Hat</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Белая шляпа</div>
+                            <div class="gloss-def">Легальные методы SEO в рамках правил поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Black Hat</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Чёрная шляпа</div>
+                            <div class="gloss-def">Запрещённые методы SEO, рискующие санкциями поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PBN</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Private Blog Network</div>
+                            <div class="gloss-def">Частная сеть сайтов, созданных для продажи ссылок</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Клоакинг</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cloaking</div>
+                            <div class="gloss-def">Показ разного контента роботам и пользователям</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Дорвей</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Doorway Page</div>
+                            <div class="gloss-def">Страница-обманка, перенаправляющая пользователя на другой сайт</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Скрайпер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Scraper Site</div>
+                            <div class="gloss-def">Автоматически генерируемый сайт с чужим контентом</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SpamBrain</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">SpamBrain</div>
+                            <div class="gloss-def">Нейросетевой алгоритм Google для выявления спама</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Disavow</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Disavow Tool</div>
+                            <div class="gloss-def">Инструмент Google для отклонения токсичных ссылок</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Core Update</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Крупное обновление алгоритма</div>
+                            <div class="gloss-def">Глобальное обновление алгоритма Google, влияющее на ранжирование</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Keyword Stuffing</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Набивка ключевыми словами</div>
+                            <div class="gloss-def">Избыточное использование ключей в тексте для манипуляции поисковиками</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 AI-спам и алгоритмы</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Originality.AI: 50% of Top-20 Google Results Contain AI-Generated Content. — <a href="https://originality.ai/blog/ai-content-in-google-search-results" target="_blank">Originality.ai</a> <span class="src-date">02.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Google Search Central: Google Search's Spam Policies — SpamBrain 99% accuracy. — <a href="https://developers.google.com/search/docs/essentials/spam-policies" target="_blank">Google Developers</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">The Keyword: Google tightens spam detection with Gemini-powered algorithm. — <a href="https://blog.google/products/search/google-search-update-spam/" target="_blank">Blog.Google</a> <span class="src-date">12.02.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚠️ Хроника санкций</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Search Engine Land: Google March 2024 spam update — 40% traffic drop for spam sites. — <a href="https://searchengineland.com" target="_blank">SearchEngineLand.com</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">SEJ: Google February 2026 spam update — 80x surge in scam content blocks. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">20.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Яндекс.Вебмастер: Усиление борьбы с SEO-спамом и накрутками в 2026 году. — <a href="https://yandex.ru/support/webmaster" target="_blank">Yandex.ru</a> <span class="src-date">05.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎩 White Hat / Black Hat</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Search Engine Journal: A Technical Guide To Black Hat SEO — что стало опаснее в 2025. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">02.07.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Amsive: The State of Black Hat SEO in 2025 — new techniques, new risks. — <a href="https://www.amsive.com" target="_blank">Amsive.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Ahrefs: White Hat SEO vs Black Hat SEO — What's the Difference? — <a href="https://ahrefs.com/blog/white-hat-seo-vs-black-hat-seo/" target="_blank">Ahrefs.com</a> <span class="src-date">06.03.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🛡️ Защита и инструменты</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Moz: Toxic Backlinks — How to Identify and Disavow. — <a href="https://moz.com/learn/seo/toxic-backlinks" target="_blank">Moz.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Screaming Frog: SEO Spider — Technical SEO for detecting cloaking. — <a href="https://www.screamingfrog.co.uk" target="_blank">ScreamingFrog.co.uk</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Sitechecker: 25 Common SEO Mistakes — Black Hat Tactics To Avoid. — <a href="https://sitechecker.pro" target="_blank">Sitechecker.pro</a> <span class="src-date">17.06.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

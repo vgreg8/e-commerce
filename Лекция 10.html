@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 10. Элементы экосистемы цифрового маркетинга и их взаимодействие</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a1e2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #831843; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #ec4899; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #831843 0%, #be185d 50%, #ec4899 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(190, 24, 93, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* ECOSYSTEM MAP */
+        .eco-map { background: #fdf2f8; border: 2px solid #fbcfe8; border-radius: 14px; padding: 18px 22px; }
+        .eco-map .eco-title { font-size: 14px; font-weight: bold; color: #831843; margin-bottom: 12px; }
+        .eco-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: stretch; }
+        .eco-block { flex: 1; border-radius: 8px; padding: 10px 12px; font-size: 11px; font-weight: 600; color: white; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 44px; }
+        .eco-block small { display: block; font-weight: 400; font-size: 9.5px; opacity: 0.85; margin-top: 2px; }
+        .eco-arrow-row { display: flex; justify-content: center; gap: 8px; margin: 4px 0; font-size: 16px; color: #94a3b8; }
+
+        /* HORIZONTAL BAR: MEDIA SELLERS */
+        .hbar-card { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px; padding: 20px 24px; }
+        .hbar-card .hbar-title { font-size: 14px; font-weight: bold; color: #166534; margin-bottom: 14px; }
+        .hbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+        .hbar-label { font-size: 12px; color: #1e293b; width: 150px; font-weight: 500; text-align: right; }
+        .hbar-track { flex: 1; background: #dcfce7; height: 22px; border-radius: 6px; overflow: hidden; }
+        .hbar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10.5px; font-weight: bold; color: white; }
+        .hbar-fill.blue { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+        .hbar-fill.green { background: linear-gradient(90deg, #15803d, #22c55e); }
+        .hbar-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .hbar-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+        .hbar-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+
+        /* SEO TABLE */
+        .top-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .top-table th { background: #831843; color: white; padding: 8px 10px; text-align: left; font-weight: 600; }
+        .top-table td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; }
+        .top-table tr:nth-child(even) td { background: #fdf2f8; }
+        .top-table .rank { font-weight: 900; color: #be185d; }
+        .top-table .money { font-weight: bold; color: #059669; }
+
+        /* AUCTION SCHEMA */
+        .rtb-card { background: #fefce8; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .rtb-card .rtb-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 12px; }
+        .rtb-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .rtb-node { flex: 1; min-width: 90px; background: white; border: 2px solid #f59e0b; border-radius: 8px; padding: 10px 8px; text-align: center; }
+        .rtb-node .rtb-icon { font-size: 20px; margin-bottom: 4px; }
+        .rtb-node .rtb-name { font-size: 11px; font-weight: bold; color: #78350f; }
+        .rtb-node .rtb-desc { font-size: 9.5px; color: #92400e; margin-top: 2px; line-height: 1.3; }
+        .rtb-arrow { font-size: 18px; color: #f59e0b; font-weight: bold; }
+
+        /* ROLE COMPARE */
+        .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .role-card { border-radius: 12px; padding: 16px; }
+        .role-card.seller { background: #eff6ff; border: 2px solid #93c5fd; }
+        .role-card.buyer { background: #fef2f2; border: 2px solid #fca5a5; }
+        .role-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .role-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.5; color: #334155; }
+        .role-card li { margin-bottom: 4px; }
+
+        /* PROGRESS RINGS */
+        .progress-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .progress-card { background: #fdf2f8; border: 2px solid #fbcfe8; border-radius: 12px; padding: 16px; text-align: center; }
+        .progress-ring { width: 90px; height: 90px; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .progress-ring .ring-inner { width: 66px; height: 66px; background: #fdf2f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .progress-ring .ring-val { font-size: 18px; font-weight: 900; color: #831843; line-height: 1; }
+        .progress-ring .ring-cap { font-size: 8px; color: #831843; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+        .progress-label { font-size: 11px; font-weight: bold; color: #831843; line-height: 1.3; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #ec4899; }
+        .rt-btn:hover { background: #db2777; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #f9a8d4; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #f9a8d4; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #831843; color: #f9a8d4; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #f9a8d4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #ec4899; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #ec4899; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #f9a8d4; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #f9a8d4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #ec4899; color: #1a1e2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #f9a8d4; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 10. Элементы экосистемы цифрового маркетинга и их взаимодействие
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-def">
+                <div class="hd-icon">🔗</div>
+                <div class="hd-body">
+                    <div class="hd-title">Экосистема цифрового маркетинга — это живая сеть, где каждый участник влияет на конечный результат</div>
+                    <div class="hd-text">Рекламные агентства, медиаселлеры, медиабайеры, SEO-компании, классифайды, банковские рекламные платформы и посредники — все они работают в единой системе. Сегодня мы разберём, как эта система устроена и как её элементы взаимодействуют.</div>
+                    <div class="hd-quote">«Рынок сильно зависит от селлеров. Важно, чтобы рекламодатели и агентства выстраивали отношения с селлерами» — Алексей Бахтеров, президент Media Instinct Group</div>
+                </div>
+            </div>
+
+            <!-- ECOSYSTEM MAP -->
+            <div class="eco-map">
+                <div class="eco-title">🗺️ Карта экосистемы цифрового маркетинга: участники и их взаимодействие</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #831843, #be185d);">Рекламодатели <small>Сбер (54 млрд ₽), ВТБ, Яндекс</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">Агентства <small>Nectarin, Realweb, MGCom, DOT</small></div>
+                </div>
+
+                <div class="eco-arrow-row">↓</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #0e7490, #06b6d4);">Медиаселлеры <small>Яндекс (500 млрд ₽), RWB Media, НРА, Ozon, VK</small></div>
+                </div>
+
+                <div class="eco-arrow-row">↓</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #15803d, #22c55e);">Платформы закупки <small>DSP, SSP, Ad Exchange, VK Ads</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #b45309, #f59e0b);">Аналитика и верификация <small>Soloway, AdRiver, AdFox</small></div>
+                </div>
+
+                <div class="eco-arrow-row">↓</div>
+
+                <div class="eco-row">
+                    <div class="eco-block" style="background: linear-gradient(135deg, #475569, #64748b);">Паблишеры и классифайды <small>Avito, Циан, маркетплейсы</small></div>
+                    <div class="eco-block" style="background: linear-gradient(135deg, #1e293b, #334155);">Аудитория <small>105 млн пользователей Рунета</small></div>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL BAR: MEDIA SELLERS -->
+            <div class="hbar-card">
+                <div class="hbar-title">📊 Крупнейшие медиаселлеры России: консолидация рынка (2025)</div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Яндекс</div>
+                    <div class="hbar-track"><div class="hbar-fill.blue" style="width: 100%;">500 млрд ₽</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">RWB Media</div>
+                    <div class="hbar-track"><div class="hbar-fill.amber" style="width: 90%;">450 млрд ₽</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">НРА</div>
+                    <div class="hbar-track"><div class="hbar-fill.violet" style="width: 60%;">300 млрд ₽</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">Ozon</div>
+                    <div class="hbar-track"><div class="hbar-fill.rose" style="width: 50%;">250 млрд ₽</div></div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">VK</div>
+                    <div class="hbar-track"><div class="hbar-fill.green" style="width: 20%;">100 млрд ₽</div></div>
+                </div>
+                <div style="font-size: 11px; color: #166534; margin-top: 8px;">На пятерку лидеров приходится 1,6 трлн руб., или 80% от общего объёма рынка (2 трлн руб.). Источник: Media Instinct Group, 2025.</div>
+            </div>
+
+            <!-- SEO TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #831843; margin-bottom: 10px;">🏆 Рейтинг известности SEO-компаний России (2025)</div>
+                <table class="top-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Компания</th>
+                            <th>Изменение</th>
+                            <th>Особенность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="rank">1</td><td><strong>Ingate Group</strong></td><td>→ удержала лидерство</td><td>Высокие экспертные оценки</td></tr>
+                        <tr><td class="rank">2</td><td>impulse.guru</td><td>→ сохранила позицию</td><td>Стабильное присутствие в топе</td></tr>
+                        <tr><td class="rank">3</td><td>Ашманов и партнеры</td><td class="money">↑ +1</td><td>Поднялась на одну строчку</td></tr>
+                        <tr><td class="rank">4</td><td>Demis Group</td><td class="money">↑↑ +2</td><td>Наиболее заметный рывок года</td></tr>
+                        <tr><td class="rank">5</td><td>Пиксель Плюс</td><td>→ сохранила позицию</td><td>Стабильно в топ-5</td></tr>
+                    </tbody>
+                </table>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Источник: SEOnews, декабрь 2025. Рынок SEO вырос на 12% в 2025 году.</div>
+            </div>
+
+            <!-- AUCTION SCHEMA -->
+            <div class="rtb-card">
+                <div class="rtb-title">⚡ Как рекламодатель находит аудиторию через RTB-аукцион</div>
+                <div class="rtb-flow">
+                    <div class="rtb-node">
+                        <div class="rtb-icon">👤</div>
+                        <div class="rtb-name">Аудитория</div>
+                        <div class="rtb-desc">Заходит на сайт паблишера</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">📤</div>
+                        <div class="rtb-name">SSP</div>
+                        <div class="rtb-desc">Yandex SSP, RTBSape, Adlook</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">⚡</div>
+                        <div class="rtb-name">Ad Exchange</div>
+                        <div class="rtb-desc">Аукцион за ~100 мс</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">📥</div>
+                        <div class="rtb-name">DSP</div>
+                        <div class="rtb-desc">Ставки от рекламодателей</div>
+                    </div>
+                    <div class="rtb-arrow">→</div>
+                    <div class="rtb-node">
+                        <div class="rtb-icon">🖼️</div>
+                        <div class="rtb-name">Показ</div>
+                        <div class="rtb-desc">Победитель показывает рекламу</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROLE COMPARE -->
+            <div class="role-grid">
+                <div class="role-card seller">
+                    <h5 style="color: #1d4ed8;">📤 Медиаселлер</h5>
+                    <ul>
+                        <li>Продаёт рекламные площади медиа</li>
+                        <li>Имеет эксклюзивное право на продажу</li>
+                        <li>Примеры: Яндекс, СберСеллер, RWB Media, VK</li>
+                        <li>Работает с паблишерами и агентствами</li>
+                    </ul>
+                </div>
+                <div class="role-card buyer">
+                    <h5 style="color: #b91c1c;">📥 Медиабайер</h5>
+                    <ul>
+                        <li>Закупает рекламу для рекламодателей</li>
+                        <li>Оптимизирует медиапланы</li>
+                        <li>Работает с DSP и прямыми площадками</li>
+                        <li>Следит за ROI и эффективностью</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PROGRESS RINGS -->
+            <div class="progress-grid">
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#ec4899 0deg 172deg, #fce7f3 172deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">80%</div>
+                            <div class="ring-cap">рынка</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Концентрация рынка у топ-5 медиаселлеров</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#22c55e 0deg 216deg, #dcfce7 216deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">60%</div>
+                            <div class="ring-cap">классифайды</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Авито — лидер среди классифайдов (59,8%)</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#f59e0b 0deg 126deg, #fef3c7 126deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">35%</div>
+                            <div class="ring-cap">рост</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Сбер Ads: +25% рекламной выручки</div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Экосистема digital-маркетинга</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Медиаселлеры и классифайды</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: SEO и таргетинг</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 10 из 10
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a1e2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #334155; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня — заключительная лекция нашего курса. На прошлых занятиях мы разобрали экосистему интерактивной рекламы. Сегодня мы детально разберём элементы экосистемы цифрового маркетинга и их взаимодействие: рекламные агентства, медиаселлеров, медиабайеров, SEO-компании, классифайды и посредников.</p>
+
+            <div class="action-hint">Обратите внимание студентов на карту экосистемы на слайде.</div>
+
+            <h3>📌 Рекламные агентства</h3>
+
+            <p>Рекламные агентства предоставляют комплексные услуги: планирование, подготовка кампаний, маркетинговые концепции, медиапланы. Они получают средства от рекламодателей и часть оставляют себе в качестве вознаграждения.</p>
+
+            <p>По данным Digital Index 2025, лидерами по узнаваемости стали Realweb, MGCom и Nectarin. В интегральном рейтинге первое место занял Nectarin, за ним следуют агентства DOT и RTA. Лидерами по качеству услуг стали CreativePeople, «Скотч» и BAR Agency.</p>
+
+            <p>Среди SMM-агентств седьмой год подряд лидирует Setters. В сегменте креативных разработок первым по узнаваемости стало агентство Realweb — его знают почти 30% заказчиков. Наибольшее число лучших специалистов также сконцентрировано в Realweb.</p>
+
+            <h3>📌 Медиаселлеры</h3>
+
+            <p>Медиаселлеры — это компании, которые специализируются на продаже рекламных площадей и имеют эксклюзивное право на продажу услуг медиа. Они являются ключевым звеном между паблишерами и рекламодателями.</p>
+
+            <p>Рынок медиаселлеров крайне консолидирован. По данным Media Instinct Group, всего на пятёрку лидеров — «Яндекс», RWB Media, НРА, Ozon и VK — приходится <span class="stat-inline">1,6 трлн рублей</span>, или 80% от общего объёма рынка, который достиг 2 трлн рублей.</p>
+
+            <p>Лидером является «Яндекс» с цифровым сегментом в 500 млрд рублей. За ним следует RWB Media, объединяющая наружную рекламу и digital и генерирующая 450 млрд рублей. НРА, работающая на стыке телевидения и цифровых каналов, показывает результат в 300 млрд рублей. Далее следуют Ozon с 250 млрд рублей и VK с 100 млрд рублей.</p>
+
+            <p>Интересная модель у RWB Media: компания создаёт «вселенную для предпринимателей», предлагая возможность получать рекламу на ТВ и в наружных носителях бесплатно при оплате продвижения на Wildberries. Эта модель отвечает тренду, когда на смену крупным брендам приходят тысячи новых.</p>
+
+            <div class="action-hint">Перейдите к разбору SEO-рынка.</div>
+
+            <h3>📌 SEO-агентства</h3>
+
+            <p>SEO-агентства помогают сайтам продвигаться в поисковых системах: формируют ключевые слова, улучшают технические характеристики, отслеживают результаты.</p>
+
+            <p>По итогам 2025 года российский рынок поискового продвижения вырос на <span class="stat-inline">12%</span>. Это выше, чем рост рекламно-маркетинговых агентств (+1%), но ниже, чем рост веб-разработки (+26%) и SMM (+16%).</p>
+
+            <p>Рейтинг известности SEO-компаний 2025 года возглавила Ingate Group, укрепившая лидерство за счёт высоких экспертных оценок. Вторую позицию заняла impulse.guru, третью — «Ашманов и партнеры». Наиболее заметный рывок совершила Demis Group, поднявшаяся сразу на две позиции. Пиксель Плюс сохранила пятое место.</p>
+
+            <p>Важно отметить, что рынок SEO продолжает меняться под влиянием генеративного ИИ. Пользователи всё чаще получают информацию непосредственно из ИИ-сервисов, поэтому для специалистов важным становится не только присутствие сайта в поисковой выдаче, но и видимость бренда в ответах нейросетей, цитируемость контента и качество источников. Число новых игроков, впервые попавших в итоговую таблицу, сократилось до 61 против 87 в 2024 году — барьеры для входа на рынок выросли.</p>
+
+            <h3>📌 Таргетированная реклама и VK Ads</h3>
+
+            <p>Рекламодатели используют системы таргетированной рекламы для фокусировки сообщений на определённых анкетных признаках пользователей. Крупнейшие платформы: VK Ads, Яндекс.Директ, Telegram Ads.</p>
+
+            <p>VK Ads постоянно развивает свои инструменты. В ноябре 2025 года платформа обновила Прогнозатор — инструмент, который позволяет оценить потенциальный охват и стоимость кампании до её запуска. Также была внедрена технология Full Stream Attribution, позволяющая передавать события с сайта или мобильного приложения напрямую в рекламную систему для более точной атрибуции и оптимизации кампаний.</p>
+
+            <p>Таргетированная реклама в VK позволяет нацелиться на пользователей по социально-демографическим признакам (пол, возраст), гео, интересам и ключевым фразам. Расширенный таргетинг даёт возможность настраивать кампании на основе поведения и данных из CRM-систем.</p>
+
+            <div class="action-hint">Перейдите к разбору классифайдов.</div>
+
+            <h3>📌 Классифайды</h3>
+
+            <p>Классифайды — это платформы, которые классифицируют объявления по тематическим спискам, аналогично газетным рубрикам. Крупнейшие игроки: Avito, Циан, Яндекс.Маркет, Профи.ру, Дром.ру.</p>
+
+            <p>По данным исследования, большинство респондентов (59,8%) чаще всего пользуются платформой «Авито», что подтверждает её статус лидера. «Циан» занимает второе место (26,1%), «Профи.ру» используется чуть реже (14,1%).</p>
+
+            <p>Классифайды демонстрируют впечатляющую динамику. В 2025 году рекламная выручка «Авито» выросла на <span class="stat-inline">22%</span>, «Циан» — на 21%, «Яндекс.Недвижимости» — на 20%. Рост обеспечивают высокий пользовательский трафик, встроенные рекламные инструменты и возможность точечного таргетинга. Развитие рекламных кабинетов позволило таким платформам привлекать бюджеты быстрее, чем другим сегментам рекламы.</p>
+
+            <p>Важный тренд: бизнес переносит рекламные бюджеты в классифайды. Компании всё чаще отказываются от менее предсказуемых каналов и переходят к инструментам с управляемыми метриками эффективности.</p>
+
+            <h3>📌 Посредники и рекламные сети</h3>
+
+            <p>Компании-посредники собирают сайты в единую сеть и осуществляют их взаимное продвижение. Ключевые игроки этого сегмента: RTBSape (более 20 000 сайтов прямого инвентаря, один из крупнейших поставщиков трафика в РФ), Admitad (экосистема для онлайн-маркетинга, победитель Martech Star Awards 2025 в номинации «Best CPA-network»), Soloway (системы верификации и управления интернет-рекламой, вошла в группу компаний Internest вместе с AdRiver).</p>
+
+            <p>Также на рынке работают крупные рекламные сети: СберСеллер (вошёл в топ-10 рейтинга Technology Index 2025 в номинации «Premium Networks»), Perfluence (платформа для блогеров, заняла четвёртое место в направлении «Знание» и третье в категории «Сотрудничество»).</p>
+
+            <p>Особое место занимают компании, продающие исследования, которые увеличивают отдачу инвестиций в онлайн-маркетинг. Клиентами таких компаний часто являются рекламные агентства, а не рекламодатели.</p>
+
+            <h3>📌 Финтех-платформы и банковские рекламные сервисы</h3>
+
+            <p>Новый и быстрорастущий сегмент — рекламные платформы банков. «Сбер Ads» показал рост рекламной выручки на <span class="stat-inline">25%</span> в 2025 году. «Т-Банк» и «Альфа-Банк» находятся в стадии активного развития собственных рекламных продуктов.</p>
+
+            <p>Это отражает общий тренд: компании всё чаще переходят от работы с отдельными каналами продвижения к интегрированным экосистемам, которые позволяют управлять полным жизненным циклом коммуникации — от формирования интереса до продаж и развития программ лояльности.</p>
+
+            <h3>📌 Итоги курса</h3>
+
+            <p>Сегодня мы завершили курс «Интернет-маркетинг». Давайте подведём итоги.</p>
+
+            <p>За десять лекций мы прошли путь от введения в интернет-маркетинг до детального разбора экосистемы цифрового маркетинга. Мы разобрали:</p>
+
+            <ul>
+                <li>Основы интернет-маркетинга и его метрики.</li>
+                <li>Эволюцию представлений об интернет-маркетинге — от первых баннеров до эпохи ИИ.</li>
+                <li>Эволюцию электронной коммерции и веб-технологий.</li>
+                <li>Рынок услуг интернет-маркетинга (464,1 млрд руб. в 2025 году).</li>
+                <li>Соотношение интернет-маркетинга и интерактивного маркетинга.</li>
+                <li>Преимущества интернет-рекламы перед традиционными каналами.</li>
+                <li>Экосистему интерактивной рекламы и её участников.</li>
+                <li>Элементы экосистемы цифрового маркетинга и их взаимодействие.</li>
+            </ul>
+
+            <p>Ключевой вывод курса: интернет-маркетинг — это не набор разрозненных инструментов, а управляемая экосистема, которая эволюционирует вместе с технологиями. Сегодня мы находимся на пороге эпохи, когда ИИ-агенты станут основными потребителями веб-контента, а GEO заменит SEO как основной инструмент видимости. Рекламные агентства будут вынуждены работать с органическим поиском, контентом, техническим состоянием сайтов, аналитикой и новыми ИИ-каналами одновременно.</p>
+
+            <p>Спасибо за внимание! Успехов в изучении интернет-маркетинга!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Ad Exchange</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Рекламная биржа</div>
+                            <div class="gloss-def">Платформа, где встречаются покупатели и продавцы рекламного инвентаря</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CPA</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Cost Per Action</div>
+                            <div class="gloss-def">Модель оплаты за целевое действие — покупку, регистрацию, заявку</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">DSP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Demand-Side Platform</div>
+                            <div class="gloss-def">Платформа со стороны спроса — автоматизирует закупку рекламы для рекламодателей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Generative Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация для генеративных поисковых систем и нейросетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">RTB</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Real-Time Bidding</div>
+                            <div class="gloss-def">Аукцион рекламных показов в реальном времени</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Social Media Marketing</div>
+                            <div class="gloss-def">Маркетинг в социальных сетях</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SSP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Supply-Side Platform</div>
+                            <div class="gloss-def">Платформа со стороны предложения — управляет рекламными ресурсами издателей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Классифайд</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Classified Advertising</div>
+                            <div class="gloss-def">Тематические объявления, аналог газетных рубрик (Avito, Циан)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Медиаселлер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Media Seller</div>
+                            <div class="gloss-def">Компания, продающая рекламные площади медиа на эксклюзивной основе</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Медиабайер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Media Buyer</div>
+                            <div class="gloss-def">Компания, закупающая рекламу для рекламодателей и оптимизирующая медиапланы</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Паблишер</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Publisher</div>
+                            <div class="gloss-def">Владелец сайта или приложения, предоставляющий рекламные площади</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏆 Агентства и рейтинги</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">AdIndex: Digital Index 2025 — лучшие агентства по продвижению в цифровой среде. — <a href="https://adindex.ru/news/digital/2025/11/11/339035.phtml" target="_blank">AdIndex.ru</a> <span class="src-date">26.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">SEOnews: Рейтинг известности SEO-компаний 2025 — Ingate Group лидер. — <a href="https://www.likeni.ru/events/seonews-podvel-itogi-reytinga-izvestnosti-seo-kompaniy-2025-goda/" target="_blank">Likeni.ru</a> <span class="src-date">05.12.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📤 Медиаселлеры</div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Advesti: Как распределяются доходы российского медийного рынка — топ-5 селлеров концентрируют 80%. — <a href="https://advesti.ru/news/sled/kak_raspredelyayutsya_dohody_rossiyskogo_mediynogo_rynka_10-10-2025" target="_blank">Advesti.ru</a> <span class="src-date">10.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">AdIndex: Совокупный объем российского медийного рынка достиг 2 трлн рублей. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">10.10.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 SEO и таргетинг</div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">TopVisor: Рынок SEO в России вырос на 12% в 2025 году. — <a href="https://journal.topvisor.com/ru/news/17-08-2026-rynok-seo-v-rossii-vyros-na-12-v-2025-godu/" target="_blank">TopVisor.com</a> <span class="src-date">17.08.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">VK Ads: Обновления платформы за ноябрь 2025 — Прогнозатор и Full Stream Attribution. — <a href="https://ads.vk.com" target="_blank">Ads.VK.com</a> <span class="src-date">05.12.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📋 Классифайды</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">RB.ru: Бизнес меняет рекламную стратегию — четверть бюджетов получили классифайды. — <a href="https://rb.ru/news/biznes-menyaet-reklamnuyu-strategiyu-chetvert-vseh-byudzhetov-v-2025-godu-poluchili-klassifajdy-i-finteh-platformy/" target="_blank">RB.ru</a> <span class="src-date">06.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">РУДН: Исследование использования классифайдов — Авито лидирует с 59,8%. — <a href="https://esystem.rudn.ru" target="_blank">RUDN.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤝 Посредники и сети</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Sostav.ru: СберСеллер и Perfluence вошли в число лидеров рейтинга AdIndex 2025. — <a href="https://www.sostav.ru/blogs/272646/63694" target="_blank">Sostav.ru</a> <span class="src-date">07.07.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">AdIndex: Технологический Индекс 2025 — МТС Ads, Soloway в лидерах. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Sostav.ru: Soloway вошла в группу компаний Internest (AdRiver). — <a href="https://oborot.ru" target="_blank">Oborot.ru</a> <span class="src-date">16.02.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏦 Финтех-платформы</div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">RB.ru: Сбер Ads показал рост на 25%, Т-Банк и Альфа-Банк развивают рекламные продукты. — <a href="https://rb.ru/news/biznes-menyaet-reklamnuyu-strategiyu-chetvert-vseh-byudzhetov-v-2025-godu-poluchili-klassifajdy-i-finteh-platformy/" target="_blank">RB.ru</a> <span class="src-date">06.04.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

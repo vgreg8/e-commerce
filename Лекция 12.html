@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 12. Хостинг Web-сайта</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0c1a2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #1e3a5f; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #3b82f6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO STAT */
+        .hero-stat {
+            display: flex; align-items: center; gap: 30px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #3b82f6 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 54px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 42px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 13px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 70px; background: rgba(255,255,255,0.3); }
+
+        /* HOSTING TYPES GRID */
+        .hosting-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hosting-card { border-radius: 12px; padding: 16px; transition: transform 0.15s; }
+        .hosting-card:hover { transform: translateY(-2px); }
+        .hosting-card.shared { background: #eff6ff; border: 2px solid #93c5fd; }
+        .hosting-card.vps { background: #f0fdf4; border: 2px solid #86efac; }
+        .hosting-card.dedicated { background: #fef3c7; border: 2px solid #fcd34d; }
+        .hosting-card.cloud { background: #faf5ff; border: 2px solid #c4b5fd; }
+        .hosting-card .hc-icon { font-size: 24px; margin-bottom: 6px; }
+        .hosting-card .hc-name { font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 4px; }
+        .hosting-card .hc-price { font-size: 12px; font-weight: 900; color: #059669; margin-bottom: 6px; }
+        .hosting-card .hc-desc { font-size: 11px; color: #475569; line-height: 1.4; }
+        .hosting-card .hc-desc small { display: block; margin-top: 4px; color: #94a3b8; }
+
+        /* DONUT: CLOUD MARKET */
+        .donut-card { display: flex; gap: 25px; align-items: center; background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 14px; padding: 20px 24px; }
+        .donut-chart { width: 160px; height: 160px; border-radius: 50%; position: relative; flex-shrink: 0;
+            background: conic-gradient(#2563eb 0deg 117deg, #f59e0b 117deg 167deg, #10b981 167deg 193deg, #8b5cf6 193deg 360deg); }
+        .donut-chart::after { content: ''; position: absolute; inset: 32px; background: #f0f9ff; border-radius: 50%; }
+        .donut-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .donut-center .donut-pct { font-size: 24px; font-weight: 900; color: #1e3a5f; }
+        .donut-center .donut-cap { font-size: 9px; color: #1e3a5f; text-transform: uppercase; letter-spacing: 0.5px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .donut-legend .legend-color { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+        .donut-legend .legend-text strong { color: #1e3a5f; font-size: 12px; }
+        .donut-legend .legend-text small { color: #64748b; display: block; font-size: 10.5px; }
+
+        /* TABLE: PRICES */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .metrics-table th { background: #1e3a5f; color: white; padding: 9px 11px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 11px; border-bottom: 1px solid #e2e8f0; color: #2d3748; }
+        .metrics-table tr:nth-child(even) td { background: #f0f9ff; }
+        .metrics-table .price { font-weight: bold; color: #059669; }
+
+        /* SVG TREND */
+        .chart-card { background: #ffffff; border: 2px solid #bae6fd; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* COMPARE ROLES */
+        .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .role-card { border-radius: 12px; padding: 16px; }
+        .role-card.unmanaged { background: #fef2f2; border: 2px solid #fca5a5; }
+        .role-card.managed { background: #f0fdf4; border: 2px solid #86efac; }
+        .role-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .role-card ul { margin: 0 0 0 16px; font-size: 11.5px; line-height: 1.55; color: #334155; }
+        .role-card li { margin-bottom: 4px; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #3b82f6; }
+        .rt-btn:hover { background: #2563eb; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #93c5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #93c5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #1e3a5f; color: #93c5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #3b82f6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #93c5fd; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #3b82f6; color: #0c1a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #93c5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 12. Хостинг Web-сайта
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO STAT -->
+            <div class="hero-stat">
+                <div class="hero-icon">🌐</div>
+                <div class="hero-data">
+                    <div class="hero-number">416,5 млрд ₽</div>
+                    <div class="hero-label">Рынок облачных сервисов в России (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">+30%</div>
+                    <div class="hero-label">Рост спроса на виртуальные серверы</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">1,2 трлн ₽</div>
+                    <div class="hero-label">Прогноз рынка к 2030 году</div>
+                </div>
+            </div>
+
+            <!-- HOSTING TYPES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px;">🏗️ Четыре типа хостинга: от общего к выделенному</div>
+                <div class="hosting-grid">
+                    <div class="hosting-card shared">
+                        <div class="hc-icon">📦</div>
+                        <div class="hc-name">Виртуальный (shared)</div>
+                        <div class="hc-price">от 150 ₽/мес</div>
+                        <div class="hc-desc">Ресурсы делятся между пользователями. Подходит для лендингов и небольших сайтов.<small>Минус: соседи влияют на производительность</small></div>
+                    </div>
+                    <div class="hosting-card vps">
+                        <div class="hc-icon">🖥️</div>
+                        <div class="hc-name">VPS / VDS</div>
+                        <div class="hc-price">от 450 ₽/мес</div>
+                        <div class="hc-desc">Виртуальный выделенный сервер с гарантированными ресурсами. Root-доступ.<small>+30% спроса в 2025 году</small></div>
+                    </div>
+                    <div class="hosting-card dedicated">
+                        <div class="hc-icon">🏢</div>
+                        <div class="hc-name">Выделенный сервер</div>
+                        <div class="hc-price">от 5 000 ₽/мес</div>
+                        <div class="hc-desc">Физический сервер в дата-центре. Максимальная производительность и контроль.<small>Для высоконагруженных проектов</small></div>
+                    </div>
+                    <div class="hosting-card cloud">
+                        <div class="hc-icon">☁️</div>
+                        <div class="hc-name">Облачный хостинг</div>
+                        <div class="hc-price">от 6 $/мес</div>
+                        <div class="hc-desc">Ресурсы по требованию. Автомасштабирование при пиковых нагрузках.<small>Рост +18,3% в год — быстрее VPS</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DONUT: CLOUD MARKET -->
+            <div class="donut-card">
+                <div class="donut-chart">
+                    <div class="donut-center">
+                        <div class="donut-pct">416,5</div>
+                        <div class="donut-cap">млрд ₽</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div style="font-size: 13px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">Российский облачный рынок (2025): IaaS + PaaS + SaaS</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #2563eb;"></div>
+                        <div class="legend-text">
+                            <strong>Cloud.ru — 32,5%</strong>
+                            <small>Лидер по IaaS + PaaS</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <div class="legend-text">
+                            <strong>РТК-ЦОД — 13,7%</strong>
+                            <small>Ростелеком</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <div class="legend-text">
+                            <strong>Yandex Cloud — 11%</strong>
+                            <small>Экосистема Яндекс</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #8b5cf6;"></div>
+                        <div class="legend-text">
+                            <strong>Другие — 42,8%</strong>
+                            <small>Selectel, MWS, VK Cloud, ActiveCloud</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRICES TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 8px;">💰 Стоимость хостинга в России (2025): рост цен на 15–20%</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>Цена в России</th>
+                            <th>Для кого</th>
+                            <th>Особенность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Виртуальный (shared)</td>
+                            <td class="price">150–500 ₽/мес</td>
+                            <td>Лендинги, блоги</td>
+                            <td>Ресурсы делятся</td>
+                        </tr>
+                        <tr>
+                            <td>VPS (unmanaged)</td>
+                            <td class="price">450–2 400 ₽/мес</td>
+                            <td>Разработчики</td>
+                            <td>Root-доступ, свой стек</td>
+                        </tr>
+                        <tr>
+                            <td>VPS (managed)</td>
+                            <td class="price">1 500–5 000 ₽/мес</td>
+                            <td>Бизнес без сисадмина</td>
+                            <td>Провайдер управляет</td>
+                        </tr>
+                        <tr>
+                            <td>Выделенный сервер</td>
+                            <td class="price">от 5 000 ₽/мес</td>
+                            <td>Highload проекты</td>
+                            <td>Максимальный контроль</td>
+                        </tr>
+                        <tr>
+                            <td>Облачный хостинг</td>
+                            <td class="price">от 6 $/мес</td>
+                            <td>Переменная нагрузка</td>
+                            <td>Pay-as-you-go</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">По данным T-Bank Secrets, к середине 2025 года средняя стоимость базового тарифа выросла на 15–20% из-за роста цен на оборудование и электроэнергию.</div>
+            </div>
+
+            <!-- SVG TREND -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Рост российского облачного рынка <span>2024 → 2030</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <polygon points="90,125 220,110 350,85 480,50 580,20 580,140 90,140"
+                             fill="url(#grad-cloud)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="grad-cloud" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#2563eb"/>
+                            <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <polyline points="90,125 220,110 350,85 480,50 580,20"
+                              fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round"/>
+
+                    <circle cx="90" cy="125" r="5" fill="#2563eb" stroke="white" stroke-width="2"/>
+                    <circle cx="220" cy="110" r="5" fill="#2563eb" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="85" r="5" fill="#2563eb" stroke="white" stroke-width="2"/>
+                    <circle cx="480" cy="50" r="5" fill="#2563eb" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="20" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <text x="90" y="118" font-size="9" fill="#1e3a5f" text-anchor="middle" font-weight="bold">322</text>
+                    <text x="220" y="103" font-size="9" fill="#1e3a5f" text-anchor="middle" font-weight="bold">416</text>
+                    <text x="350" y="78" font-size="9" fill="#1e3a5f" text-anchor="middle" font-weight="bold">550</text>
+                    <text x="480" y="43" font-size="9" fill="#1e3a5f" text-anchor="middle" font-weight="bold">800</text>
+                    <text x="580" y="13" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">1200</text>
+
+                    <text x="90" y="155" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="220" y="155" font-size="10" fill="#475569" text-anchor="middle">2025</text>
+                    <text x="350" y="155" font-size="10" fill="#475569" text-anchor="middle">2026</text>
+                    <text x="480" y="155" font-size="10" fill="#475569" text-anchor="middle">2028</text>
+                    <text x="580" y="155" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2030</text>
+
+                    <text x="555" y="28" font-size="10" fill="#e11d48" text-anchor="end" font-weight="bold">CAGR 24,4%</text>
+                    <text x="555" y="41" font-size="9" fill="#64748b" text-anchor="end">млрд ₽</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">По данным iKS-Consulting, рынок облачных инфраструктурных сервисов России достигнет 1,2 трлн руб. к 2030 году при среднегодовых темпах роста 24,4%.</div>
+            </div>
+
+            <!-- COMPARE ROLES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px;">⚖️ Unmanaged vs Managed хостинг</div>
+                <div class="role-grid">
+                    <div class="role-card unmanaged">
+                        <h5 style="color: #b91c1c;">🔧 Unmanaged VPS</h5>
+                        <ul>
+                            <li>Клиент управляет сервером самостоятельно</li>
+                            <li>Дешевле на 50–70%</li>
+                            <li>Нужны навыки Linux-администрирования</li>
+                            <li>Для команд с техническими специалистами</li>
+                        </ul>
+                    </div>
+                    <div class="role-card managed">
+                        <h5 style="color: #15803d;">🛠️ Managed VPS</h5>
+                        <ul>
+                            <li>Провайдер управляет инфраструктурой</li>
+                            <li>Дороже, но не нужен сисадмин</li>
+                            <li>Настройка, обновления, безопасность — на провайдере</li>
+                            <li>Для бизнеса без технической команды</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/private/86e11a60155f9cdf4f74cf52f3ac7ca5/?p=6OuKweR-ZO5MkStxeMZLUw/')" class="video-btn rt-btn">📜 Лекция 12: Что такое хостинг</button>
+
+        
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 12 из 15
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0c1a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e293b; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали стратегию сайта и этапы его создания. Сегодня мы поговорим о хостинге — это инфраструктурная тема, о которой долго не вспоминают, пока не начинается рост нагрузки, сбои или рост цен. Именно поэтому маркетологу важно понимать, как выбрать хостинг под задачи бизнеса.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми цифрами рынка.</div>
+
+            <h3>📌 Что такое хостинг</h3>
+
+            <p>Хостинг — это услуга размещения сайта на сервере, доступном в интернете круглосуточно. Если вы хотите, чтобы ваш сайт видели 24/7, вам нужен хостинг. При выборе важно учитывать скорость, стабильность, активность поддержки, цену и такие критерии, как SSL-сертификаты, базы данных, почтовые сервисы.</p>
+
+            <p>Ключевой параметр — uptime, время безотказной работы. Для нормального функционирования сайта он должен быть не ниже 99,9%. Это означает, что сайт может быть недоступен не более 8,7 часов в год.</p>
+
+            <h3>📌 Разделяемый хостинг (shared hosting)</h3>
+
+            <p>Первый и самый простой тип — виртуальный или разделяемый хостинг. Каждый аккаунт делит серверные ресурсы с другими участниками. Платный разделяемый хостинг избавляет от рекламы, но возможны задержки в работе из-за действий соседей по хостингу. Бесплатный разделяемый хостинг — это минимум комфорта и реклама на сайте провайдера.</p>
+
+            <p>Типичная цена в России — 150–500 рублей в месяц. Подходит для лендингов, блогов и небольших сайтов с низким трафиком.</p>
+
+            <h3>📌 Виртуальный сервер (VPS/VDS)</h3>
+
+            <p>Виртуальный сервер предоставляет ограничения на устанавливаемое ПО и гарантии по выделению ресурсов. VDS (Virtual Dedicated Server) позволяет получить доступ к виртуальному серверу как к виртуальному хостингу. Аналогия с коммунально-жилищными службами: виртуальный сервер — это отдельная квартира, где можно разместить свою мебель.</p>
+
+            <p>В 2025 году спрос на виртуальные серверы в России вырос на 30% по сравнению с прошлым годом. Это связано с импортозамещением, миграцией пользователей из зарубежных облаков и переходом на отечественные сервисы. Наибольший рост показали сегменты e-commerce, разработки SaaS-сервисов, образовательных платформ и digital-агентств.</p>
+
+            <p>Цены на VPS в России начинаются от 450 рублей в месяц за базовые конфигурации и могут достигать 5 000 рублей для managed-решений.</p>
+
+            <h3>📌 Физический сервер</h3>
+
+            <p>Физический сервер может быть собственным или арендованным у провайдера дата-центра. Провайдер обеспечивает инженерные системы: климат-контроль, пожаротушение, подключение электричества, резервированный канал в интернет. Аналогия: выделенный сервер — это личный коттедж с внешними коммуникациями.</p>
+
+            <p>Цена выделенного сервера в России начинается от 5 000 рублей в месяц. Это решение для высоконагруженных проектов, которым нужны максимальные производительность и контроль.</p>
+
+            <h3>📌 Облачный хостинг</h3>
+
+            <p>Облачный хостинг позволяет динамически подключать ресурсы по требованию. Оплата идёт по факту потребления. Пример: при увеличении нагрузки на сайт облачный хостинг обеспечивает достаточные ресурсы для пиковых нагрузок.</p>
+
+            <p>Исторический пример: веб-сайты для Олимпиады в Сочи были созданы с использованием технологий Microsoft Windows Azure. Пиковые нагрузки могут возникать из-за рекламы, праздников или распродаж — облако позволяет справиться с ними без падения сайта.</p>
+
+            <p>Российский рынок облачных сервисов в 2025 году достиг <span class="stat-inline">416,5 млрд рублей</span>, а к 2030 году прогнозируется рост до <span class="stat-inline">1,2 трлн рублей</span> при среднегодовых темпах роста 24,4%. Облачный хостинг растёт на 18,3% в год — быстрее, чем VPS и shared-хостинг.</p>
+
+            <p>Лидеры российского облачного рынка: Cloud.ru (32,5%), РТК-ЦОД (13,7%), Yandex Cloud (11%). В сегменте IaaS пятёрка лидеров контролирует 67% рынка.</p>
+
+            <div class="action-hint">Перейдите к сравнению unmanaged и managed хостинга.</div>
+
+            <h3>📌 Unmanaged vs Managed хостинг</h3>
+
+            <p>Важное различие — уровень управления. Unmanaged VPS дешевле на 50–70%, но требует навыков Linux-администрирования. Managed VPS дороже, но провайдер берёт на себя настройку, обновления и безопасность.</p>
+
+            <p>По данным исследования CloudLinux и WebPros, 29% провайдеров дифференцируют свои VPS через fully managed service, 22% — через превосходную поддержку. Только 14% конкурируют исключительно по цене. Это показывает, что рынок движется в сторону сервисной модели, а не ценовых войн.</p>
+
+            <h3>📌 Тренды хостинга в 2025–2026</h3>
+
+            <p>Несколько ключевых трендов определяют развитие рынка.</p>
+
+            <p><strong>Повышение цен.</strong> К середине 2025 года средняя стоимость базового тарифа хостинга выросла на 15–20%. Это связано с ростом цен на оборудование, стоимости аренды стоек в ЦОДах, увеличением расходов на электроснабжение и охлаждение.</p>
+
+            <p><strong>Рост спроса на виртуальные серверы.</strong> Спрос на VPS в России вырос на 30% за год. Малый и средний бизнес отказывается от аренды физической инфраструктуры в пользу виртуальных серверов или облачных решений.</p>
+
+            <p><strong>От универсальных решений к специализации.</strong> На рынке растёт количество нишевых решений — хостинг для 1С, конфигурации под интернет-магазины на Bitrix, сервера под Telegram-ботов, среды для Node.js/React и кастомные контейнерные образы.</p>
+
+            <p><strong>Контейнеризация и DevOps.</strong> Более 60% агентств в 2024–2025 годах перешли на инфраструктуру, где VDS — это только базис, а вся логика живёт в контейнерах. Docker, Kubernetes, CI/CD — теперь требования, а не тренды.</p>
+
+            <p><strong>Роль ИИ.</strong> По данным 2026 Web Hosting Trends Report, ИИ рассматривается как тренд, который окажет наибольшее влияние в 2026 году. Провайдеры используют ИИ для решения проблем в поддержке клиентов и автоматизации безопасности.</p>
+
+            <h3>📌 Распределённые варианты хостинга</h3>
+
+            <p>Колокейшн: клиент управляет инфраструктурой и приложениями, оборудование размещается в дата-центре провайдера. Управляемый веб-хостинг: провайдер берёт на себя управление инфраструктурой и приложениями.</p>
+
+            <p>В 2025 году ГК Key Point начала строительство нового дата-центра в Санкт-Петербурге — крупнейшей площадки для колокейшн в Северо-Западном регионе. Проект мощностью 20 МВт рассчитан на 1626 ИТ-стоек. Первая очередь будет сертифицирована по уровню Tier III, вторая и третья — по уровню Tier IV, максимальному уровню отказоустойчивости.</p>
+
+            <p>Лидером в сегменте колокейшн остаётся «Ростелеком» (РТК-ЦОД), который контролирует до трети коммерческих ЦОД в России.</p>
+
+            <h3>📌 Практические рекомендации</h3>
+
+            <p>Как выбрать хостинг? Вот четыре вопроса, которые помогут определиться:</p>
+
+            <ul>
+                <li>Колеблется ли трафик более чем в 3 раза между пиком и спадом? Да → облачный хостинг. Нет → VPS справится с фиксированной ценой.</li>
+                <li>Есть ли в команде Linux-администратор? Да → unmanaged VPS сэкономит 50–70%. Нет → managed VPS или облако.</li>
+                <li>Сколько стоит час простоя? Больше 200 $ → облако с мультисерверной избыточностью. Меньше → VPS с автоматическими бэкапами.</li>
+                <li>Бюджет фиксированный или гибкий? Фиксированный → VPS. Гибкий → облако с оплатой по потреблению.</li>
+            </ul>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали хостинг веб-сайтов. Ключевые выводы:</p>
+
+            <ul>
+                <li>Хостинг — это аренда сервера для размещения сайта. Uptime должен быть не ниже 99,9%.</li>
+                <li>Четыре типа хостинга: shared (150–500 ₽/мес), VPS (450–5 000 ₽/мес), выделенный (от 5 000 ₽/мес), облачный (от 6 $/мес).</li>
+                <li>Российский облачный рынок в 2025 году достиг 416,5 млрд рублей, прогноз к 2030 — 1,2 трлн рублей.</li>
+                <li>Спрос на VPS вырос на 30% за год. Managed-хостинг становится стандартом для бизнеса без сисадмина.</li>
+                <li>Ключевые тренды: рост цен на 15–20%, специализация решений, контейнеризация, внедрение ИИ.</li>
+                <li>Колокейшн и managed hosting — распределённые варианты для крупных проектов.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём CMS — системы управления контентом. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CI/CD</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Continuous Integration / Continuous Delivery</div>
+                            <div class="gloss-def">Непрерывная интеграция и доставка — практики автоматизации сборки и развёртывания</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">IaaS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Infrastructure as a Service</div>
+                            <div class="gloss-def">Инфраструктура как услуга — аренда виртуальных серверов и ресурсов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PaaS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Platform as a Service</div>
+                            <div class="gloss-def">Платформа как услуга — среда для разработки и развёртывания приложений</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SaaS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Software as a Service</div>
+                            <div class="gloss-def">Программное обеспечение как услуга по подписке</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SLA</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Service Level Agreement</div>
+                            <div class="gloss-def">Соглашение об уровне обслуживания — гарантии доступности и качества</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">VDS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Virtual Dedicated Server</div>
+                            <div class="gloss-def">Виртуальный выделенный сервер с гарантированными ресурсами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">VPS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Virtual Private Server</div>
+                            <div class="gloss-def">Виртуальный частный сервер — изолированная виртуальная машина</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ЦОД</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Центр обработки данных</div>
+                            <div class="gloss-def">Дата-центр — помещение для размещения серверного оборудования</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Колокейшн</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Colocation</div>
+                            <div class="gloss-def">Размещение собственного оборудования клиента в дата-центре провайдера</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Рынок хостинга и облаков</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">iKS-Consulting: Объём российского облачного рынка к 2030 г. превысит 1 трлн руб. — <a href="https://www.comnews.ru/content/242275/2025-11-12/2025-w46/1008/obem-rossiyskogo-oblachnogo-rynka-k-2030-g-pereydet-za-1-trln-rub" target="_blank">ComNews.ru</a> <span class="src-date">12.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">TAdviser: Общая характеристика облачного рынка России. — <a href="https://www.tadviser.ru" target="_blank">TAdviser.ru</a> <span class="src-date">17.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">T-Bank Secrets: Российский хостинг в 2025 году — тренды и цены. — <a href="https://secrets.tbank.ru/blogi-kompanij/rossijskij-hosting-v-2025-godu/" target="_blank">T-Bank.ru</a> <span class="src-date">22.08.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🌍 Мировые тренды</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">WebPros: 2026 Web Hosting Trends Report — 65% провайдеров выросли в 2025. — <a href="https://www.webpros.com" target="_blank">WebPros.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">CloudLinux: Scaling Hosting in 2026 — VPS и выделенные серверы как главная возможность роста. — <a href="https://blog.cloudlinux.com" target="_blank">CloudLinux.com</a> <span class="src-date">23.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Stackademic: VPS vs Cloud Hosting in 2026 — сравнение и рекомендации. — <a href="https://blog.stackademic.com" target="_blank">Stackademic.com</a> <span class="src-date">01.06.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🏆 Провайдеры и рейтинги</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">HostObzor: Рейтинг хостингов 2025 — FirstVDS, JustHost, NetAngels. — <a href="https://hostobzor.ru" target="_blank">HostObzor.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Sostav.ru: Хостинг для сайта — 7 альтернатив дорогим провайдерам. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">20.03.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">ComNews: ГК Key Point начала строительство крупнейшего колокейшн-ЦОД в Санкт-Петербурге. — <a href="https://www.comnews.ru" target="_blank">ComNews.ru</a> <span class="src-date">13.11.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 Managed hosting</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">6Wresearch: Russia Managed Hosting Market (2025–2031). — <a href="https://www.6wresearch.com" target="_blank">6WResearch.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

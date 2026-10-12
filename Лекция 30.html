@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 30. Особенности размещения рекламы в UGC-ресурсах и краудсорсинг</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0f172a; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #1e3a5f; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #3b82f6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #3b82f6 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* UGC ECOSYSTEM SVG */
+        .chart-card { background: #ffffff; border: 2px solid #bfdbfe; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* THREATS/OPPORTUNITIES */
+        .threat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .threat-card { border-radius: 12px; padding: 16px; }
+        .threat-card.risk { background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 2px solid #dc2626; }
+        .threat-card.chance { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #10b981; }
+        .threat-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .threat-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .threat-card li { margin-bottom: 4px; }
+
+        /* SENTIMENT SCHEMA */
+        .sentiment-card { background: #fef3c7; border: 2px solid #fde68a; border-radius: 14px; padding: 20px 24px; }
+        .sentiment-card .sent-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 14px; }
+        .sentiment-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .sentiment-node { flex: 1; min-width: 110px; background: white; border: 2px solid #f59e0b; border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .sentiment-node .sn-icon { font-size: 20px; margin-bottom: 4px; }
+        .sentiment-node .sn-name { font-size: 11px; font-weight: bold; color: #78350f; line-height: 1.25; }
+        .sentiment-node .sn-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+        .sentiment-arrow { font-size: 16px; color: #f59e0b; font-weight: bold; }
+
+        /* CROWDSOURCING GRID */
+        .crowd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .crowd-card { border-radius: 12px; padding: 16px; }
+        .crowd-card.c1 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .crowd-card.c2 { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .crowd-card.c3 { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .crowd-card.c4 { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .crowd-card .cc-icon { font-size: 24px; margin-bottom: 6px; }
+        .crowd-card .cc-name { font-size: 12.5px; font-weight: 900; margin-bottom: 5px; }
+        .crowd-card.c1 .cc-name { color: #1e3a8a; }
+        .crowd-card.c2 .cc-name { color: #78350f; }
+        .crowd-card.c3 .cc-name { color: #065f46; }
+        .crowd-card.c4 .cc-name { color: #831843; }
+        .crowd-card .cc-desc { font-size: 10.5px; color: #1e293b; line-height: 1.45; }
+        .crowd-card .cc-example { font-size: 10px; color: #7c3aed; margin-top: 6px; font-weight: 600; }
+
+        /* COLLECTIVE INNOVATION SVG */
+        .innovation-card { background: #faf5ff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 20px 24px; }
+        .innovation-card .inn-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 14px; }
+        .inn-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .inn-node { flex: 1; min-width: 100px; background: white; border: 2px solid #a855f7; border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .inn-node .in-icon { font-size: 20px; margin-bottom: 4px; }
+        .inn-node .in-name { font-size: 10.5px; font-weight: bold; color: #6b21a8; line-height: 1.3; }
+        .inn-node .in-desc { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+        .inn-arrow { font-size: 16px; color: #a855f7; font-weight: bold; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #1e3a5f; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #eff6ff; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .mid { color: #f59e0b; font-weight: bold; }
+        .metrics-table .cat { color: #3b82f6; font-weight: bold; }
+
+        /* COURSE SUMMARY */
+        .summary-card { background: linear-gradient(135deg, #f0f9ff, #dbeafe); border: 2px solid #3b82f6; border-radius: 14px; padding: 20px 24px; }
+        .summary-card .sum-title { font-size: 15px; font-weight: bold; color: #1e3a5f; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .summary-blocks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .summary-block { background: white; border-radius: 10px; padding: 14px; border: 1.5px solid #bfdbfe; }
+        .summary-block .sb-num { font-size: 22px; font-weight: 900; color: #2563eb; line-height: 1; }
+        .summary-block .sb-cap { font-size: 10.5px; color: #475569; margin-top: 4px; line-height: 1.4; }
+        .summary-block .sb-lec { font-size: 9.5px; color: #94a3b8; margin-top: 3px; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #3b82f6; }
+        .rt-btn:hover { background: #2563eb; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #93c5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #93c5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #1e3a5f; color: #93c5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #3b82f6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #93c5fd; font-size: 13px; min-width: 110px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #93c5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #3b82f6; color: #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #93c5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 30. Особенности размещения рекламы в UGC-ресурсах и краудсорсинг
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🤝</div>
+                <div class="hero-data">
+                    <div class="hero-number">85%</div>
+                    <div class="hero-label">Fortune 500 используют краудсорсинг</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">+28%</div>
+                    <div class="hero-label">UGC конвертирует лучше рекламы</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">$62 млрд</div>
+                    <div class="hero-label">Мировой рынок краудсорсинга (2025)</div>
+                </div>
+            </div>
+
+            <!-- UGC ECOSYSTEM SVG -->
+            <div class="chart-card">
+                <div class="chart-title">🌐 UGC-экосистема: как бренд работает с пользовательским контентом <span>Цикл взаимодействия</span></div>
+                <svg viewBox="0 0 600 280" style="width: 100%; height: auto;">
+                    <!-- Бренд -->
+                    <rect x="230" y="20" width="140" height="70" rx="10" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="300" y="45" font-size="12" fill="white" text-anchor="middle" font-weight="bold">🏢 Бренд</text>
+                    <text x="300" y="62" font-size="9.5" fill="#93c5fd" text-anchor="middle">Хочет позитивный UGC</text>
+                    <text x="300" y="77" font-size="9.5" fill="#93c5fd" text-anchor="middle">Не контролирует контент</text>
+
+                    <defs>
+                        <marker id="arrowBlue3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                        </marker>
+                        <marker id="arrowGreen3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                        </marker>
+                        <marker id="arrowAmber3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Стрелка к UGC -->
+                    <line x1="300" y1="90" x2="300" y2="115" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrowBlue3)"/>
+                    <text x="360" y="108" font-size="9.5" fill="#3b82f6" font-weight="bold">Мониторинг, вовлечение</text>
+
+                    <!-- UGC -->
+                    <rect x="180" y="120" width="240" height="70" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+                    <text x="300" y="143" font-size="12" fill="#78350f" text-anchor="middle" font-weight="bold">📝 UGC-контент</text>
+                    <text x="300" y="160" font-size="9.5" fill="#475569" text-anchor="middle">Отзывы, посты, видео, комментарии</text>
+                    <text x="300" y="175" font-size="9.5" fill="#475569" text-anchor="middle">Создаётся пользователями</text>
+
+                    <!-- Три аудитории -->
+                    <rect x="30" y="215" width="140" height="55" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                    <text x="100" y="236" font-size="10" fill="#14532d" text-anchor="middle" font-weight="bold">❤️ Фанаты</text>
+                    <text x="100" y="252" font-size="9" fill="#475569" text-anchor="middle">Генерируют позитив</text>
+                    <text x="100" y="264" font-size="9" fill="#475569" text-anchor="middle">Защищают бренд</text>
+
+                    <rect x="230" y="215" width="140" height="55" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+                    <text x="300" y="236" font-size="10" fill="#334155" text-anchor="middle" font-weight="bold">👀 Обсерверы</text>
+                    <text x="300" y="252" font-size="9" fill="#475569" text-anchor="middle">Наблюдают (60–70%)</text>
+                    <text x="300" y="264" font-size="9" fill="#475569" text-anchor="middle">Решают по UGC</text>
+
+                    <rect x="430" y="215" width="140" height="55" rx="8" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                    <text x="500" y="236" font-size="10" fill="#831843" text-anchor="middle" font-weight="bold">😤 Критики</text>
+                    <text x="500" y="252" font-size="9" fill="#475569" text-anchor="middle">Негатив, жалобы</text>
+                    <text x="500" y="264" font-size="9" fill="#475569" text-anchor="middle">Работа с репутацией</text>
+
+                    <!-- Стрелки к аудиториям -->
+                    <line x1="230" y1="190" x2="130" y2="213" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen3)"/>
+                    <line x1="300" y1="190" x2="300" y2="213" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="370" y1="190" x2="470" y2="213" stroke="#ec4899" stroke-width="1.5" marker-end="url(#arrowAmber3)"/>
+
+                    <!-- Легенда -->
+                    <text x="300" y="15" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="bold">Цикл: бренд стимулирует UGC → аудитория реагирует → новые UGC-материалы</text>
+                </svg>
+            </div>
+
+            <!-- THREATS / OPPORTUNITIES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px;">⚖️ UGC для бренда: две стороны одной медали</div>
+                <div class="threat-grid">
+                    <div class="threat-card risk">
+                        <h5 style="color: #991b1b;">⚠️ Угрозы и риски</h5>
+                        <ul>
+                            <li>Нет гарантии положительных комментариев</li>
+                            <li>Негативные отзывы, фейки, троллинг</li>
+                            <li>Публикация непроверенных фактов</li>
+                            <li>Потеря контроля над репутацией</li>
+                            <li>Сотрудник завёл блог — нет времени отвечать</li>
+                        </ul>
+                    </div>
+                    <div class="threat-card chance">
+                        <h5 style="color: #065f46;">✅ Возможности и преимущества</h5>
+                        <ul>
+                            <li>Аутентичность и высокое доверие</li>
+                            <li>Виральность без больших бюджетов</li>
+                            <li>UGC конвертирует на 28% лучше</li>
+                            <li>Реальные отзывы повышают продажи</li>
+                            <li>Фанаты защищают бренд в дискуссиях</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SENTIMENT SCHEMA -->
+            <div class="sentiment-card">
+                <div class="sent-title">🧠 Sentiment-анализ и управление сообществом: 4 фазы</div>
+                <div class="sentiment-flow">
+                    <div class="sentiment-node">
+                        <div class="sn-icon">👂</div>
+                        <div class="sn-name">1. Слушаем</div>
+                        <div class="sn-desc">Мониторинг всех упоминаний бренда</div>
+                    </div>
+                    <div class="sentiment-arrow">→</div>
+                    <div class="sentiment-node">
+                        <div class="sn-icon">📊</div>
+                        <div class="sn-name">2. Оцениваем</div>
+                        <div class="sn-desc">Тональность: позитив, негатив, вопрос</div>
+                    </div>
+                    <div class="sentiment-arrow">→</div>
+                    <div class="sentiment-node">
+                        <div class="sn-icon">🤝</div>
+                        <div class="sn-name">3. Вовлекаем</div>
+                        <div class="sn-desc">Привлекаем авторитетов к управлению</div>
+                    </div>
+                    <div class="sentiment-arrow">→</div>
+                    <div class="sentiment-node">
+                        <div class="sn-icon">🔁</div>
+                        <div class="sn-name">4. Повторяем</div>
+                        <div class="sn-desc">Цикл: новые упоминания — новый анализ</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #78350f; margin-top: 12px;">Инструменты: Brand Analytics, YouScan, Hootsuite Insights. Задача: превратить нейтрала или критика в фаната бренда через персонализированное взаимодействие.</div>
+            </div>
+
+            <!-- CROWDSOURCING GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 10px;">🤝 Краудсорсинг: четыре модели извлечения пользы из толпы</div>
+                <div class="crowd-grid">
+                    <div class="crowd-card c1">
+                        <div class="cc-icon">✍️</div>
+                        <div class="cc-name">Контент-конкурсы</div>
+                        <div class="cc-desc">Толпа создаёт рекламные ролики, дизайны, идеи. Заказчик оплачивает только победителя.</div>
+                        <div class="cc-example">Crowdspring, Tongal</div>
+                    </div>
+                    <div class="crowd-card c2">
+                        <div class="cc-icon">🔧</div>
+                        <div class="cc-name">Микротаски</div>
+                        <div class="cc-desc">Большая задача разбивается на мелкие. Пример: перевод романа за 1 день с помощью 100 переводчиков.</div>
+                        <div class="cc-example">Amazon MTurk, Яндекс.Толока</div>
+                    </div>
+                    <div class="crowd-card c3">
+                        <div class="cc-icon">🖥️</div>
+                        <div class="cc-name">Распределённые вычисления</div>
+                        <div class="cc-desc">Добровольцы предоставляют ресурсы своих компьютеров для решения вычислительной задачи.</div>
+                        <div class="cc-example">BOINC, Folding@Home</div>
+                    </div>
+                    <div class="crowd-card c4">
+                        <div class="cc-icon">💡</div>
+                        <div class="cc-name">Коллективные инновации</div>
+                        <div class="cc-desc">Платформы для выявления важных идей от сотрудников и клиентов. Модификация продукта, стратегии.</div>
+                        <div class="cc-example">Kickstarter, Boomstarter</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLLECTIVE INNOVATION FLOW -->
+            <div class="innovation-card">
+                <div class="inn-title">💡 Платформы коллективных инноваций: как работает цепочка</div>
+                <div class="inn-flow">
+                    <div class="inn-node">
+                        <div class="in-icon">📝</div>
+                        <div class="in-name">1. Стимулирование идей</div>
+                        <div class="in-desc">Сбор предложений от толпы</div>
+                    </div>
+                    <div class="inn-arrow">→</div>
+                    <div class="inn-node">
+                        <div class="in-icon">🗳️</div>
+                        <div class="in-name">2. Объективный выбор</div>
+                        <div class="in-desc">Толпа сама селектирует лучшие идеи</div>
+                    </div>
+                    <div class="inn-arrow">→</div>
+                    <div class="inn-node">
+                        <div class="in-icon">🔄</div>
+                        <div class="in-name">3. Обработка</div>
+                        <div class="in-desc">Стимулирование участия в анализе</div>
+                    </div>
+                    <div class="inn-arrow">→</div>
+                    <div class="inn-node">
+                        <div class="in-icon">📊</div>
+                        <div class="in-name">4. Оценка вклада</div>
+                        <div class="in-desc">Моделирование толпы, оценка участников</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #6b21a8; margin-top: 12px;">Применение: оптимизация работы компании, корректировка маркетинговой стратегии, модификация продукта. Идеи «из кулуаров» доходят до руководства.</div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #1e3a5f; margin-bottom: 8px;">📊 Краудсорсинг и UGC: ключевые метрики 2025</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Мировой рынок краудсорсинга</td>
+                            <td class="high">$62 млрд</td>
+                            <td class="cat">CAGR 29%</td>
+                            <td>Grand View Research</td>
+                        </tr>
+                        <tr>
+                            <td>Компании Fortune 500, использующие краудсорсинг</td>
+                            <td class="high">85%</td>
+                            <td class="cat">растёт</td>
+                            <td>IdeaScale</td>
+                        </tr>
+                        <tr>
+                            <td>UGC vs брендированный контент</td>
+                            <td class="high">+28%</td>
+                            <td class="cat">стабильно</td>
+                            <td>Stackla</td>
+                        </tr>
+                        <tr>
+                            <td>Доверие UGC vs прямые бренд-каналы</td>
+                            <td class="high">×2,4</td>
+                            <td class="cat">растёт</td>
+                            <td>Nielsen</td>
+                        </tr>
+                        <tr>
+                            <td>Краудфандинг в России</td>
+                            <td>23,66 млрд ₽</td>
+                            <td class="high">+20%</td>
+                            <td>Kommersant</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- COURSE SUMMARY -->
+            <div class="summary-card">
+                <div class="sum-title">🎓 Итоги курса: 30 лекций — ключевые метрики, которые нужно запомнить</div>
+                <div class="summary-blocks">
+                    <div class="summary-block">
+                        <div class="sb-num">1,57 трлн ₽</div>
+                        <div class="sb-cap">Рынок интернет-рекламы в России (2025)</div>
+                        <div class="sb-lec">Лекции 1–5</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">11,5 трлн ₽</div>
+                        <div class="sb-cap">Рынок e-commerce (+28%)</div>
+                        <div class="sb-lec">Лекции 4, 6</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">464,1 млрд ₽</div>
+                        <div class="sb-cap">Рынок digital-услуг (+8,68%)</div>
+                        <div class="sb-lec">Лекция 6</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">+16%</div>
+                        <div class="sb-cap">SMM-сегмент digital-рынка</div>
+                        <div class="sb-lec">Лекция 29</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">58%</div>
+                        <div class="sb-cap">Запросов без клика (Zero-Click)</div>
+                        <div class="sb-lec">Лекции 14, 15</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">96,7%</div>
+                        <div class="sb-cap">Performance-бюджетов</div>
+                        <div class="sb-lec">Лекции 8, 20</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">5,24 млрд</div>
+                        <div class="sb-cap">Пользователей соцсетей</div>
+                        <div class="sb-lec">Лекция 27</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">$17 млрд</div>
+                        <div class="sb-cap">Рынок аффилиат-маркетинга</div>
+                        <div class="sb-lec">Лекция 21</div>
+                    </div>
+                    <div class="summary-block">
+                        <div class="sb-num">100 мс</div>
+                        <div class="sb-cap">Полный цикл RTB-аукциона</div>
+                        <div class="sb-lec">Лекция 24</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: UGC и реклама</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Краудсорсинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Итоги курса</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 30 из 30
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0f172a; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e293b; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня — заключительная лекция нашего курса. На прошлой лекции мы разобрали SMO и SMM. Сегодня мы поговорим об особенностях размещения рекламы в UGC-ресурсах и о краудсорсинге — технологиях, которые меняют отношения между брендом и аудиторией.</p>
+
+            <div class="action-hint">Обратите внимание студентов на UGC-экосистему.</div>
+
+            <h3>📌 Специфика UGC-ресурсов</h3>
+
+            <p>UGC (User-Generated Content) — это контент, создаваемый самими пользователями. Википедия, YouTube, Instagram, TikTok, форумы, отзовики. Ключевая особенность: контент не контролируется брендом. Для бренда UGC — одновременно возможность и угроза.</p>
+
+            <p>Угрозы: нет гарантии, что пользователи будут положительно комментировать бренд. Негативные отзывы, фейки, троллинг. Публикация непроверенных фактов. Сотрудник завёл блог, привлёк внимание, но потом нет времени отвечать — это может навредить репутации.</p>
+
+            <p>Возможности: аутентичность и высокое доверие. UGC конвертирует на <span class="stat-inline">28%</span> лучше брендированного контента. Пользователи доверяют UGC в 2,4 раза больше, чем прямым бренд-каналам. Реальные отзывы повышают продажи. Фанаты защищают бренд в дискуссиях.</p>
+
+            <div class="action-hint">Перейдите к sentiment-анализу.</div>
+
+            <h3>📌 Sentiment-анализ и управление сообществом</h3>
+
+            <p>Для работы с UGC используется sentiment-анализ — распознавание тональности высказываний. Четыре фазы.</p>
+
+            <p><strong>Фаза 1 — Слушаем.</strong> Мониторинг всех упоминаний бренда в социальных медиа. Инструменты: Brand Analytics, YouScan, Hootsuite Insights.</p>
+
+            <p><strong>Фаза 2 — Оцениваем.</strong> Тональность: позитив, негатив, вопрос. Простые системы работают по ключевым словам. Сложные — на базе машинного обучения, анализируют предложения целиком.</p>
+
+            <p><strong>Фаза 3 — Вовлекаем.</strong> Комплексный анализ: кто носитель экспертизы? Если влиятельный блогер жалуется на продукт — задача выявить его, предложить бесплатное тестирование, переманить на свою сторону. Из нейтрала или критика — в фаната бренда.</p>
+
+            <p><strong>Фаза 4 — Повторяем.</strong> Цикл бесконечен: появляются новые упоминания — начинается новый анализ.</p>
+
+            <p>Чем больше авторитетов вовлечено в управление сообществом, тем сильнее средняя положительная тональность высказываний о бренде.</p>
+
+            <div class="action-hint">Перейдите к краудсорсингу.</div>
+
+            <h3>📌 Краудсорсинг: извлечение пользы из толпы</h3>
+
+            <p><strong>Краудсорсинг (Crowdsourcing)</strong> — извлечение пользы на базе взаимодействия с толпой. Толпа может быть потенциальными покупателями, исполнителями, сотрудниками.</p>
+
+            <p>Четыре основные модели.</p>
+
+            <p><strong>Контент-конкурсы.</strong> Толпа создаёт рекламные ролики, дизайны, идеи. Заказчик оплачивает только победителя. В работе участвует всё сообщество, но платят лучшему. Примеры: Crowdspring, Tongal.</p>
+
+            <p><strong>Микротаски.</strong> Большая задача разбивается на мелкие и делегируется толпе. Пример: перевод многостраничного романа за один день с помощью 100 переводчиков, каждый из которых переводит свою страницу. Примеры: Amazon MTurk, Яндекс.Толока.</p>
+
+            <p><strong>Распределённые вычисления.</strong> Добровольцы предоставляют ресурсы своих компьютеров для решения вычислительной задачи. Примеры: BOINC, Folding@Home.</p>
+
+            <p><strong>Коллективные инновации.</strong> Платформы для выявления важных идей от сотрудников и клиентов. Модификация продукта, оптимизация стратегии. Примеры: Kickstarter, Boomstarter.</p>
+
+            <div class="action-hint">Перейдите к платформам коллективных инноваций.</div>
+
+            <h3>📌 Платформы коллективных инноваций</h3>
+
+            <p>Основные функции краудсорсинговых платформ.</p>
+
+            <p><strong>Стимулирование генерации идей.</strong> Сбор предложений от толпы.</p>
+
+            <p><strong>Объективный выбор идей.</strong> Толпа сама селектирует лучшие предложения, как в примере с конкурсом рекламных роликов.</p>
+
+            <p><strong>Стимулирование участия в обработке.</strong> Аналитическая обработка ответов.</p>
+
+            <p><strong>Моделирование толпы и оценка вклада.</strong> Понимание, кто и как повлиял на результат.</p>
+
+            <p>Такие системы используются как для оптимизации работы компании, так и для корректировки маркетинговой стратегии. Идеи, которые обсуждаются в кулуарах, могут быть извлечены и донесены до руководства.</p>
+
+            <h3>📌 Масштаб рынка 2025</h3>
+
+            <p>Мировой рынок краудсорсинга достиг <span class="stat-inline">$62 млрд</span> при CAGR 29%. <span class="stat-inline">85%</span> компаний из списка Fortune 500 используют краудсорсинг для инноваций. UGC конвертирует на <span class="stat-inline">28%</span> лучше брендированного контента. Доверие UGC в 2,4 раза выше прямых бренд-каналов. Краудфандинг в России — 23,66 млрд рублей (+20%).</p>
+
+            <div class="action-hint">Обратите внимание студентов на итоговую таблицу курса.</div>
+
+            <h3>📌 Итоги всего курса</h3>
+
+            <p>Мы прошли 30 лекций — от введения в интернет-маркетинг до краудсорсинга. Давайте зафиксируем ключевые метрики.</p>
+
+            <ul>
+                <li><strong>Рынок интернет-рекламы в России:</strong> 1,57 трлн ₽ (2025).</li>
+                <li><strong>Рынок e-commerce:</strong> 11,5 трлн ₽ (+28%).</li>
+                <li><strong>Рынок digital-услуг:</strong> 464,1 млрд ₽ (+8,68%).</li>
+                <li><strong>SMM-сегмент:</strong> +16% — один из устойчивых.</li>
+                <li><strong>Zero-Click:</strong> 58% запросов без клика.</li>
+                <li><strong>Performance-бюджеты:</strong> 96,7% от всего рынка.</li>
+                <li><strong>Пользователи соцсетей:</strong> 5,24 млрд в мире.</li>
+                <li><strong>Аффилиат-маркетинг:</strong> $17 млрд.</li>
+                <li><strong>RTB-аукцион:</strong> 100 миллисекунд.</li>
+            </ul>
+
+            <p>Главный вывод курса: интернет-маркетинг — это не набор разрозненных инструментов, а управляемая экосистема, которая эволюционирует вместе с технологиями. От статических страниц 1994 года до агентного веба 2025 года — каждый этап отвечал на конкретный экономический вызов.</p>
+
+            <p>Сегодня мы находимся на пороге эпохи, когда AI-агенты станут основными потребителями веб-контента, а GEO заменит SEO как основной инструмент видимости. Рекламные агентства будут вынуждены работать с органическим поиском, контентом, техническим состоянием сайтов, аналитикой и новыми ИИ-каналами одновременно.</p>
+
+            <p>Краудсорсинг и работа с UGC — это финальный аккорд: бренд перестаёт быть монологичным, он становится частью диалога с аудиторией. Побеждают те, кто умеет слушать, вовлекать и создавать условия для того, чтобы пользователи сами становились адвокатами бренда.</p>
+
+            <p>Спасибо за внимание! Успехов в изучении интернет-маркетинга и в вашей профессиональной карьере!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">UGC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">User-Generated Content</div>
+                            <div class="gloss-def">Контент, создаваемый самими пользователями ресурса</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Краудсорсинг</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Crowdsourcing</div>
+                            <div class="gloss-def">Извлечение пользы на базе взаимодействия с толпой</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Микротаски</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Microtasks</div>
+                            <div class="gloss-def">Разбиение большой задачи на мелкие для делегирования толпе</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Sentiment</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Sentiment Analysis</div>
+                            <div class="gloss-def">Анализ тональности высказываний: позитив, негатив, нейтрал</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Краудфандинг</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Crowdfunding</div>
+                            <div class="gloss-def">Коллективное финансирование проектов через платформы</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">MTurk</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Amazon Mechanical Turk</div>
+                            <div class="gloss-def">Платформа для выполнения микротасок распределённой рабочей силой</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Толока</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Яндекс.Толока</div>
+                            <div class="gloss-def">Российская краудсорсинговая платформа для решения задач</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Ad-вокат</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Brand Advocate</div>
+                            <div class="gloss-def">Пользователь, который активно защищает и продвигает бренд</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">BOINC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Berkeley Open Infrastructure for Network Computing</div>
+                            <div class="gloss-def">Платформа для распределённых вычислений на добровольных компьютерах</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Fortune 500</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Fortune 500</div>
+                            <div class="gloss-def">Список 500 крупнейших компаний США по выручке</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤝 Краудсорсинг</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Howe J. Crowdsourcing: Why the Power of the Crowd Is Driving the Future of Business. — Crown Business, 2008.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Grand View Research: Crowdsourcing Market Size Report — $62 млрд (2025), CAGR 29%. — <a href="https://www.grandviewresearch.com" target="_blank">GrandViewResearch.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">IdeaScale: 85% Fortune 500 используют краудсорсинг для инноваций. — <a href="https://ideascale.com" target="_blank">IdeaScale.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📝 UGC и доверие</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Stackla: The Consumer Content Report 2025 — UGC конвертирует на 28% лучше брендированного. — <a href="https://stackla.com" target="_blank">Stackla.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Nielsen: Global Trust in Advertising Survey 2025 — доверие UGC ×2,4 выше бренд-каналов. — <a href="https://www.nielsen.com" target="_blank">Nielsen.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🧠 Sentiment и управление</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">Brand Analytics: Система мониторинга и sentiment-анализа соцмедиа. — <a href="https://br-analytics.ru" target="_blank">Br-Analytics.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">YouScan: Платформа мониторинга и анализа социальных медиа. — <a href="https://youscan.io" target="_blank">YouScan.io</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Hootsuite: Social Listening and Sentiment Analysis Guide 2025. — <a href="https://www.hootsuite.com" target="_blank">Hootsuite.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🇷🇺 Российский рынок</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Kommersant: Рынок краудфандинга в России — 23,66 млрд ₽ (+20%). — <a href="https://www.kommersant.ru" target="_blank">Kommersant.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Яндекс.Толока: Российская краудсорсинговая платформа. — <a href="https://toloka.yandex.ru" target="_blank">Toloka.Yandex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

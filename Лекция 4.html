@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 4. Эволюция электронной коммерции</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0f172a; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #064e3b; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #10b981; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* ============ HERO STAT ============ */
+        .hero-stat {
+            display: flex; align-items: center; gap: 30px;
+            background: linear-gradient(135deg, #064e3b 0%, #10b981 60%, #34d399 100%);
+            border-radius: 18px; padding: 26px 32px; color: white;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 60px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 46px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 13px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 70px; background: rgba(255,255,255,0.3); }
+
+        /* ============ SVG CHART ============ */
+        .chart-card { background: #ffffff; border: 2px solid #d1fae5; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(16,185,129,0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* ============ DONUT ============ */
+        .donut-card { display: flex; gap: 25px; align-items: center; background: #fffbeb; border: 2px solid #fde68a; border-radius: 14px; padding: 20px 24px; }
+        .donut-chart { width: 170px; height: 170px; border-radius: 50%; position: relative; flex-shrink: 0;
+            background: conic-gradient(#10b981 0deg 244deg, #f59e0b 244deg 320deg, #3b82f6 320deg 360deg); }
+        .donut-chart::after { content: ''; position: absolute; inset: 32px; background: #fffbeb; border-radius: 50%; }
+        .donut-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .donut-center .donut-pct { font-size: 26px; font-weight: 900; color: #92400e; }
+        .donut-center .donut-cap { font-size: 10px; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .donut-legend .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+        .donut-legend .legend-text strong { color: #1f2937; }
+        .donut-legend .legend-text small { color: #64748b; display: block; font-size: 11px; }
+
+        /* ============ STAIRCASE ============ */
+        .stair-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 22px 20px 18px; }
+        .stair-card .stair-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 15px; }
+        .staircase { display: flex; align-items: flex-end; gap: 6px; height: 170px; }
+        .step { flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 6px 4px; color: white; border-radius: 8px 8px 0 0; text-align: center; }
+        .step .step-year { font-size: 12px; font-weight: 900; letter-spacing: -0.5px; }
+        .step .step-label { font-size: 9px; opacity: 0.95; margin-top: 3px; line-height: 1.15; }
+        .step-1 { height: 25%; background: linear-gradient(to top, #0369a1, #0ea5e9); }
+        .step-2 { height: 42%; background: linear-gradient(to top, #6d28d9, #8b5cf6); }
+        .step-3 { height: 58%; background: linear-gradient(to top, #b45309, #f59e0b); }
+        .step-4 { height: 78%; background: linear-gradient(to top, #be123c, #e11d48); }
+        .step-5 { height: 100%; background: linear-gradient(to top, #064e3b, #10b981); box-shadow: 0 -4px 12px rgba(16,185,129,0.4); }
+
+        /* ============ FUNNEL ============ */
+        .funnel-card { background: #eef2ff; border: 2px solid #c7d2fe; border-radius: 14px; padding: 20px 24px; }
+        .funnel-card .funnel-title { font-size: 14px; font-weight: bold; color: #3730a3; margin-bottom: 12px; }
+        .funnel { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .funnel-step { color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .funnel-step .funnel-num { font-weight: 900; margin-right: 6px; }
+        .funnel-1 { width: 96%; background: #4338ca; }
+        .funnel-2 { width: 82%; background: #6366f1; }
+        .funnel-3 { width: 68%; background: #818cf8; }
+        .funnel-4 { width: 54%; background: #a5b4fc; color: #1e1b4b; }
+        .funnel-5 { width: 40%; background: #c7d2fe; color: #1e1b4b; }
+
+        /* ============ ВИДЕОПЛЕЕР ============ */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #10b981; }
+        .rt-btn:hover { background: #059669; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ============ ТЕКСТ ЛЕКТОРА ============ */
+        .notes-header { font-size: 17px; color: #5eead4; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #5eead4; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fcd34d; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fcd34d; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #064e3b; color: #6ee7b7; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* ============ НОВЫЙ ДИЗАЙН: СЛОВАРЬ-КАРТОЧКИ ============ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #5eead4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #10b981; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #10b981; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #6ee7b7; font-size: 13px; min-width: 60px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fcd34d; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ============ НОВЫЙ ДИЗАЙН: ИСТОЧНИКИ-ЛЕНТА ============ */
+        .sources-ribbon { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #5eead4; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-category { margin-bottom: 18px; }
+        .source-cat-header { font-size: 12px; font-weight: bold; color: #fcd34d; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; padding-left: 4px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #10b981; color: #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #6ee7b7; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 4. Эволюция электронной коммерции
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO STAT -->
+            <div class="hero-stat">
+                <div class="hero-icon">🛒</div>
+                <div class="hero-data">
+                    <div class="hero-number">11,5 трлн ₽</div>
+                    <div class="hero-label">Объём рынка e-commerce в России (2025)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">8,3 млрд</div>
+                    <div class="hero-label">Заказов оформлено онлайн (+24%)</div>
+                </div>
+            </div>
+
+            <!-- SVG LINE CHART -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Динамика рынка e-commerce в России, трлн ₽ <span>2020 → 2025</span></div>
+                <svg viewBox="0 0 600 180" style="width: 100%; height: auto;">
+                    <!-- Сетка -->
+                    <line x1="40" y1="20" x2="40" y2="150" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="40" y1="150" x2="580" y2="150" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="40" y1="110" x2="580" y2="110" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="40" y1="70" x2="580" y2="70" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="40" y1="30" x2="580" y2="30" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Подписи Y -->
+                    <text x="32" y="154" font-size="9" fill="#64748b" text-anchor="end">0</text>
+                    <text x="32" y="114" font-size="9" fill="#64748b" text-anchor="end">4</text>
+                    <text x="32" y="74" font-size="9" fill="#64748b" text-anchor="end">8</text>
+                    <text x="32" y="34" font-size="9" fill="#64748b" text-anchor="end">12</text>
+
+                    <!-- Заливка под графиком -->
+                    <polygon points="90,122 188,110 286,93 384,75 482,60 580,35 580,150 90,150"
+                             fill="url(#grad-ecom)" opacity="0.25"/>
+                    <defs>
+                        <linearGradient id="grad-ecom" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Линия -->
+                    <polyline points="90,122 188,110 286,93 384,75 482,60 580,35"
+                              fill="none" stroke="#10b981" stroke-width="3" stroke-linejoin="round"/>
+
+                    <!-- Точки -->
+                    <circle cx="90" cy="122" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="188" cy="110" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="286" cy="93" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="384" cy="75" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="482" cy="60" r="5" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="580" cy="35" r="7" fill="#e11d48" stroke="white" stroke-width="2.5"/>
+
+                    <!-- Значения над точками -->
+                    <text x="90" y="115" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">3,2</text>
+                    <text x="188" y="103" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">4,1</text>
+                    <text x="286" y="86" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">5,7</text>
+                    <text x="384" y="68" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">7,5</text>
+                    <text x="482" y="53" font-size="9" fill="#064e3b" text-anchor="middle" font-weight="bold">9,0</text>
+                    <text x="580" y="28" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="900">11,5</text>
+
+                    <!-- Подписи X -->
+                    <text x="90" y="168" font-size="10" fill="#475569" text-anchor="middle">2020</text>
+                    <text x="188" y="168" font-size="10" fill="#475569" text-anchor="middle">2021</text>
+                    <text x="286" y="168" font-size="10" fill="#475569" text-anchor="middle">2022</text>
+                    <text x="384" y="168" font-size="10" fill="#475569" text-anchor="middle">2023</text>
+                    <text x="482" y="168" font-size="10" fill="#475569" text-anchor="middle">2024</text>
+                    <text x="580" y="168" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="bold">2025</text>
+                </svg>
+            </div>
+
+            <!-- DONUT CHART -->
+            <div class="donut-card">
+                <div class="donut-chart">
+                    <div class="donut-center">
+                        <div class="donut-pct">68%</div>
+                        <div class="donut-cap">маркетплейсы</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <div class="legend-text">
+                            <strong>Маркетплейсы — 68%</strong>
+                            <small>Wildberries, Ozon, Яндекс.Маркет</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <div class="legend-text">
+                            <strong>D2C-магазины — 21%</strong>
+                            <small>Собственные интернет-магазины брендов</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b82f6;"></div>
+                        <div class="legend-text">
+                            <strong>Социальная коммерция — 11%</strong>
+                            <small>Соцсети, мессенджеры, стриминг</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAIRCASE -->
+            <div class="stair-card">
+                <div class="stair-title">🪜 Пять ступеней развития электронной коммерции</div>
+                <div class="staircase">
+                    <div class="step step-1">
+                        <div class="step-year">1995</div>
+                        <div class="step-label">eBay<br>Amazon</div>
+                    </div>
+                    <div class="step step-2">
+                        <div class="step-year">2000</div>
+                        <div class="step-label">Кризис<br>доткомов</div>
+                    </div>
+                    <div class="step step-3">
+                        <div class="step-year">2003</div>
+                        <div class="step-label">Массовые<br>интернет-магазины</div>
+                    </div>
+                    <div class="step step-4">
+                        <div class="step-year">2007</div>
+                        <div class="step-label">Мобильная<br>коммерция</div>
+                    </div>
+                    <div class="step step-5">
+                        <div class="step-year">2025</div>
+                        <div class="step-label">AI-commerce<br>и экосистемы</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FUNNEL -->
+            <div class="funnel-card">
+                <div class="funnel-title">🔻 Путь покупателя в e-commerce (2025)</div>
+                <div class="funnel">
+                    <div class="funnel-step funnel-1"><span class="funnel-num">100%</span>Визит на маркетплейс / сайт</div>
+                    <div class="funnel-step funnel-2"><span class="funnel-num">62%</span>Просмотр карточек товаров</div>
+                    <div class="funnel-step funnel-3"><span class="funnel-num">28%</span>Добавление в корзину</div>
+                    <div class="funnel-step funnel-4"><span class="funnel-num">14%</span>Оформление заказа</div>
+                    <div class="funnel-step funnel-5"><span class="funnel-num">11%</span>Оплата и получение</div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: История e-commerce</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Маркетплейсы России</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Будущее онлайн-торговли</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 4 из 5
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0f172a; padding: 20px 20px 10px 20px; border-bottom: 1px solid #334155; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня мы разберём эволюцию электронной коммерции — от первых интернет-аукционов середины 1990-х до современных AI-опосредованных экосистем. Эта тема принципиально важна для менеджера: e-commerce сегодня — это не просто «продажи через сайт», а фундаментально иная экономическая модель, в которой стираются географические границы, а данные о клиенте становятся ключевым активом.</p>
+
+            <div class="action-hint">Обратите внимание студентов на SVG-график роста рынка e-commerce в России.</div>
+
+            <h3>📌 Этапы коммерциализации интернета</h3>
+
+            <p>Первые электронные сделки начали совершаться на заре коммерциализации Сети. Академические исследования выделяют четыре ключевых этапа эволюции электронной коммерции:</p>
+
+            <ul>
+                <li><strong>Становление (1994–1997):</strong> первые онлайн-транзакции, минимальная аудитория, отсутствие доверия к цифровым платежам.</li>
+                <li><strong>Ранний рост (1998–2000):</strong> бум доткомов, приток венчурного капитала, массовый запуск интернет-магазинов.</li>
+                <li><strong>Стабилизация (2001–2014):</strong> после краха доткомов выжили компании с реальной бизнес-моделью. Развитие логистики и платёжных систем.</li>
+                <li><strong>Современная интеграция (с 2015):</strong> мобильная коммерция, социальная коммерция, AI-персонализация, интеграция офлайн и онлайн.</li>
+            </ul>
+
+            <h3>📌 Ключевые события в развитии электронной торговли</h3>
+
+            <p>Давайте пройдёмся по ключевым вехам, отражённым на лестничной схеме на слайде:</p>
+
+            <ul>
+                <li><strong>1995 год:</strong> запуск eBay (3 сентября) и Amazon (5 июля). Обе компании начинали как малые стартапы, а сегодня их рыночная капитализация превышает 2 трлн долларов.</li>
+                <li><strong>2000 год:</strong> крах доткомов. Индекс NASDAQ упал на 78% с пика. Это был критический урок: технология без работающей бизнес-модели не создаёт стоимости.</li>
+                <li><strong>2003–2005:</strong> массовый запуск интернет-магазинов. В России появляются Ozon (1998, но массовый рост с 2003), Wildberries (2004), Яндекс.Маркет (2000).</li>
+                <li><strong>2007–2010:</strong> запуск iPhone и появление мобильной коммерции. Сегодня мировой рынок мобильной коммерции оценивается в <span class="stat-inline">$2,24 трлн</span>.</li>
+                <li><strong>2020-е — настоящее время:</strong> AI-commerce, генеративный поиск товаров, голосовые ассистенты покупок.</li>
+            </ul>
+
+            <div class="action-hint">Перейдите к разбору структуры российского рынка e-commerce (круговая диаграмма).</div>
+
+            <h3>📌 Структура рынка e-commerce в России</h3>
+
+            <p>Объём российского рынка электронной коммерции по итогам 2025 года достиг <span class="stat-inline">11,5 трлн рублей</span>, увеличившись на 28% по сравнению с 2024 годом. Российские потребители совершили <span class="stat-inline">8,3 млрд заказов</span> в интернете — на 24% больше, чем годом ранее.</p>
+
+            <p>Структура рынка распределяется следующим образом:</p>
+
+            <ul>
+                <li><strong>Маркетплейсы (68%):</strong> Wildberries, Ozon, Яндекс.Маркет, Мегамаркет. Доминирующий сегмент с огромной аудиторией и логистической инфраструктурой.</li>
+                <li><strong>D2C-магазины (21%):</strong> собственные интернет-магазины брендов, ориентированные на прямой контакт с клиентом и контроль над клиентским опытом.</li>
+                <li><strong>Социальная коммерция (11%):</strong> продажи через социальные сети, мессенджеры и стриминговые платформы. Наиболее быстрорастущий сегмент.</li>
+            </ul>
+
+            <p>Интересная деталь: рост рынка замедлился с 45% в 2024 году до 28% в 2025. Это сигнал о насыщении рынка и переходе к конкурентной борьбе за качество клиентского опыта, а не только за привлечение новых покупателей.</p>
+
+            <h3>📌 Развитие рекламы в интернете</h3>
+
+            <p>Электронная коммерция тесно связана с развитием интернет-рекламы. Ключевые вехи:</p>
+
+            <ul>
+                <li><strong>1994:</strong> первый баннер с моделью «оплата за клик» (AT&T на HotWired).</li>
+                <li><strong>1997:</strong> технологии синдикации контента (создание первых рекламных сетей).</li>
+                <li><strong>2000:</strong> запуск Google AdWords — самообслуживаемая рекламная платформа, революция в PPC.</li>
+                <li><strong>2001:</strong> поп-ап и поп-андер реклама — новый, но быстро ставший спорным формат.</li>
+                <li><strong>2012:</strong> объём интернет-рекламы достиг 4 млрд долларов, догнав телевизионную рекламу.</li>
+                <li><strong>2025:</strong> российский рынок рекламы и продвижения в интернете — <span class="stat-inline">1,57 трлн рублей</span>, из которых на e-retail media приходится 580 млрд руб.</li>
+            </ul>
+
+            <h3>📌 Возможности электронной коммерции</h3>
+
+            <p>Электронная коммерция предоставляет симметричные возможности для продавцов и покупателей. Покупатель получает:</p>
+
+            <ul>
+                <li>Поиск товаров без географических ограничений.</li>
+                <li>Оформление заказа в любое время суток.</li>
+                <li>Электронный перевод средств (карты, СБП, цифровые кошельки).</li>
+                <li>Поддержку от продавца через чаты, email, соцсети.</li>
+            </ul>
+
+            <p>Продавец получает доступ к огромной аудитории без необходимости физической инфраструктуры, к аналитике поведения покупателей и к возможностям персонализации предложений в реальном времени.</p>
+
+            <h3>📌 Воронка покупательского пути (2025)</h3>
+
+            <p>Обратите внимание на воронку на слайде. Средние данные по рынку в 2025 году:</p>
+
+            <ul>
+                <li><strong>100%</strong> — визит на маркетплейс или сайт.</li>
+                <li><strong>62%</strong> — просмотр карточек товаров.</li>
+                <li><strong>28%</strong> — добавление в корзину.</li>
+                <li><strong>14%</strong> — оформление заказа.</li>
+                <li><strong>11%</strong> — оплата и получение.</li>
+            </ul>
+
+            <p>Таким образом, общая конверсия воронки составляет около 11%, что считается хорошим показателем для российского рынка. Основные потери происходят на этапах просмотра карточек и оформления заказа — здесь работают инструменты A/B-тестирования, персонализации и оптимизации UX.</p>
+
+            <h3>📌 Современные тренды (2025–2026)</h3>
+
+            <ul>
+                <li><strong>AI-персонализация.</strong> Персонализация стала ключевым направлением инвестиций: расходы выросли с 19,3% маркетингового бюджета в 2024 году до 25,9% в 2025 году.</li>
+                <li><strong>Социальная коммерция.</strong> Интеграция покупок непосредственно в социальные сети и мессенджеры. На emerging markets этот сегмент становится главным драйвером роста.</li>
+                <li><strong>Голосовая коммерция.</strong> Всё больше пользователей совершают покупки через голосовые ассистенты (Алиса, Siri, ChatGPT Voice).</li>
+                <li><strong>Экосистемная модель.</strong> Wildberries и Ozon превращаются в полноценные экосистемы с банковскими, логистическими и медийными сервисами.</li>
+            </ul>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы прошли путь от первых интернет-аукционов 1995 года до современных AI-опосредованных экосистем. Ключевые выводы:</p>
+
+            <ul>
+                <li>E-commerce прошёл четыре этапа: становление, ранний рост, стабилизация, современная интеграция.</li>
+                <li>Российский рынок e-commerce достиг 11,5 трлн рублей в 2025 году, но темпы роста замедляются.</li>
+                <li>Структура рынка: маркетплейсы (68%), D2C (21%), социальная коммерция (11%).</li>
+                <li>Общая конверсия воронки покупателя — около 11%, что оставляет огромный потенциал для оптимизации.</li>
+                <li>Главные тренды: AI-персонализация, социальная коммерция, голосовые покупки, экосистемы.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём эволюцию веб-технологий и переход к рынку услуг интернет-маркетинга. Спасибо за внимание!</p>
+
+            <!-- ============ СЛОВАРЬ (новый дизайн) ============ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AI / ИИ</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Artificial Intelligence / Искусственный интеллект</div>
+                            <div class="gloss-def">Технологии, позволяющие машинам выполнять задачи, требующие человеческого интеллекта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">B2B / B2C</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Business-to-Business / Business-to-Consumer</div>
+                            <div class="gloss-def">Модели продаж: продажа компаниям или конечным потребителям</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">C2C</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Consumer-to-Consumer</div>
+                            <div class="gloss-def">Модель, при которой продавцами и покупателями выступают частные лица (Avito, Юла)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">D2C</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Direct-to-Consumer</div>
+                            <div class="gloss-def">Прямые продажи бренда конечному потребителю, минуя посредников</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">D2D</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Direct-to-Device</div>
+                            <div class="gloss-def">Продажа цифрового контента напрямую на устройство пользователя (Apple App Store, Google Play)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ERP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Enterprise Resource Planning</div>
+                            <div class="gloss-def">Корпоративная информационная система управления ресурсами предприятия</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GMV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Gross Merchandise Value</div>
+                            <div class="gloss-def">Общая стоимость проданных товаров на платформе за период — ключевая метрика маркетплейсов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">LTV</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Lifetime Value</div>
+                            <div class="gloss-def">Совокупная прибыль, которую клиент приносит за всё время взаимодействия с компанией</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SaaS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Software as a Service</div>
+                            <div class="gloss-def">Программное обеспечение как услуга, доступное через интернет по подписке</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">СБП</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Система быстрых платежей</div>
+                            <div class="gloss-def">Российская платёжная система Банка России для мгновенных переводов между счетами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">UX</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">User Experience</div>
+                            <div class="gloss-def">Пользовательский опыт взаимодействия с продуктом или сервисом</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ ИСТОЧНИКИ (новый дизайн) ============ -->
+            <div class="sources-ribbon">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-category">
+                    <div class="source-cat-header">🛒 Рынок e-commerce в России</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">АКИТ: Интернет-торговля в России по итогам 2025 года выросла на 28% — до 11,5 трлн руб. — <a href="https://akit.ru/news/analiz-sostoyaniya-internet-torgovli-v-rossii-po-itogam-2025-goda" target="_blank">akit.ru</a> <span class="src-date">25.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Рынок электронной коммерции в России замедлил рост по итогам 2025 года. — <a href="https://fomag.ru" target="_blank">Fomag.ru</a> <span class="src-date">19.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Data Insight: количество заказов в интернете достигло 8,3 млрд. — <a href="https://datainsight.ru" target="_blank">DataInsight.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-category">
+                    <div class="source-cat-header">📊 История e-commerce</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Ortegón-Cortázar et al. Historical evolution of digital marketing: bibliometric analysis. — <a href="https://www.mendeley.com/catalogue/986a4f29-61a2-3c47-83ca-970b9eb1d313/" target="_blank">Mendeley.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">The History of E-commerce: From ARPANET to AI. — <a href="https://www.shopify.com/enterprise/blog/history-of-ecommerce" target="_blank">Shopify Enterprise Blog</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">BigCommerce: The Evolution of E-commerce (1994–2025). — <a href="https://www.bigcommerce.com" target="_blank">BigCommerce.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-category">
+                    <div class="source-cat-header">📱 Мобильная коммерция</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">TAdviser: мировой рынок мобильной коммерции достиг $2,24 трлн. — <a href="https://tadviser.ru" target="_blank">TAdviser.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Statista: Mobile Commerce Revenue Worldwide 2020–2025. — <a href="https://www.statista.com" target="_blank">Statista.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-category">
+                    <div class="source-cat-header">🎯 Персонализация и AI-commerce</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Gartner: Magic Quadrant for Personalization Engines. — <a href="https://www.gartner.com" target="_blank">Gartner.com</a> <span class="src-date">03.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Contentstack: How personal is *too* personal. — <a href="https://www.contentstack.com" target="_blank">Contentstack.com</a> <span class="src-date">29.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Сектор рекламы и продвижения в Рунете вырос на 27%. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">28.04.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-category">
+                    <div class="source-cat-header">📈 Воронка и конверсия</div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Unbounce: The State of A/B Testing in 2025. — <a href="https://unbounce.com" target="_blank">Unbounce.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">Baymard Institute: E-commerce UX Research 2025. — <a href="https://baymard.com" target="_blank">Baymard.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

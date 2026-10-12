@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 16. Подбор ключевых слов, семантическое ядро</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #0d1f1a; color: #d1fae5; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #064e3b; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #10b981; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #064e3b 0%, #059669 60%, #10b981 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* CONVERSION BAR CHART */
+        .bar-card { background: #ecfdf5; border: 2px solid #a7f3d0; border-radius: 14px; padding: 20px 24px; }
+        .bar-card .bar-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 14px; }
+        .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .bar-label { font-size: 12px; color: #1e293b; width: 120px; font-weight: 500; text-align: right; }
+        .bar-track { flex: 1; background: #d1fae5; height: 24px; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: bold; color: white; }
+        .bar-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+        .bar-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .bar-fill.green { background: linear-gradient(90deg, #15803d, #22c55e); }
+        .bar-fill.emerald { background: linear-gradient(90deg, #047857, #10b981); }
+
+        /* EVOLUTION SCHEMA */
+        .evolution-card { background: #f0fdf4; border: 2px solid #a7f3d0; border-radius: 14px; padding: 20px 24px; }
+        .evolution-card .evo-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 14px; }
+        .evo-flow { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .evo-node { flex: 1; min-width: 120px; background: white; border: 2px solid #10b981; border-radius: 10px; padding: 14px 10px; text-align: center; }
+        .evo-node.old { border-color: #94a3b8; background: #f8fafc; }
+        .evo-node .en-icon { font-size: 22px; margin-bottom: 6px; }
+        .evo-node .en-name { font-size: 12px; font-weight: bold; color: #1e293b; margin-bottom: 4px; }
+        .evo-node .en-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+        .evo-arrow { font-size: 20px; color: #10b981; font-weight: bold; }
+
+        /* GEO VS SEO TABLE */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .compare-table th { padding: 10px 12px; text-align: left; font-weight: 600; color: white; }
+        .compare-table th:first-child { background: #334155; border-radius: 8px 0 0 0; }
+        .compare-table th:nth-child(2) { background: #64748b; }
+        .compare-table th:last-child { background: #10b981; border-radius: 0 8px 0 0; }
+        .compare-table td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; line-height: 1.4; }
+        .compare-table tr:nth-child(even) td { background: #f0fdf4; }
+        .compare-table td:first-child { font-weight: 600; color: #1e293b; }
+
+        /* AI TOOLS GRID */
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .tool-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px 12px; text-align: center; transition: transform 0.15s; }
+        .tool-card:hover { transform: translateY(-2px); }
+        .tool-card .tool-icon { font-size: 22px; margin-bottom: 6px; }
+        .tool-card .tool-name { font-size: 12px; font-weight: bold; color: #064e3b; margin-bottom: 4px; }
+        .tool-card .tool-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+
+        /* SVG CHART */
+        .chart-card { background: #ffffff; border: 2px solid #a7f3d0; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* EXAMPLE CORE */
+        .core-card { background: #fffbeb; border: 2px solid #fde68a; border-radius: 14px; padding: 18px 22px; }
+        .core-card .core-title { font-size: 14px; font-weight: bold; color: #78350f; margin-bottom: 10px; }
+        .core-cluster { margin-bottom: 10px; }
+        .core-cluster .cluster-name { font-size: 12px; font-weight: bold; color: #92400e; margin-bottom: 4px; }
+        .core-cluster .cluster-keys { font-size: 11px; color: #475569; line-height: 1.5; }
+
+        /* TRENDS GRID */
+        .trends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .trend-card { border-radius: 12px; padding: 16px; }
+        .trend-card.t1 { background: #eff6ff; border: 2px solid #93c5fd; }
+        .trend-card.t2 { background: #fdf2f8; border: 2px solid #f9a8d4; }
+        .trend-card.t3 { background: #f5f3ff; border: 2px solid #c4b5fd; }
+        .trend-card.t4 { background: #fef3c7; border: 2px solid #fcd34d; }
+        .trend-card h5 { font-size: 12.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .trend-card p { font-size: 11px; color: #475569; line-height: 1.45; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #10b981; }
+        .rt-btn:hover { background: #059669; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #6ee7b7; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #065f46; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #d1fae5; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #6ee7b7; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #065f46; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #064e3b; color: #6ee7b7; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #6ee7b7; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #10b981; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #10b981; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #6ee7b7; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #6ee7b7; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #10b981; color: #0d1f1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #6ee7b7; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 16. Подбор ключевых слов, семантическое ядро
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🔑</div>
+                <div class="hero-data">
+                    <div class="hero-number">36%</div>
+                    <div class="hero-label">Конверсия long-tail запросов (3+ слова)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">70–92%</div>
+                    <div class="hero-label">Поискового трафика — long-tail</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">94,7%</div>
+                    <div class="hero-label">Ключевых слов ищут ≤10 раз в месяц</div>
+                </div>
+            </div>
+
+            <!-- CONVERSION BAR CHART -->
+            <div class="bar-card">
+                <div class="bar-title">📊 Конверсия по длине поискового запроса (2025)</div>
+                <div class="bar-row">
+                    <div class="bar-label">1 слово</div>
+                    <div class="bar-track"><div class="bar-fill rose" style="width: 9%;">0,17%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">2 слова</div>
+                    <div class="bar-track"><div class="bar-fill rose" style="width: 18%;">0,35%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">3 слова</div>
+                    <div class="bar-track"><div class="bar-fill amber" style="width: 53%;">1,02%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">4 слова</div>
+                    <div class="bar-track"><div class="bar-fill green" style="width: 83%;">1,61%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">6 слов</div>
+                    <div class="bar-track"><div class="bar-fill emerald" style="width: 100%;">1,94%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">7+ слов</div>
+                    <div class="bar-track"><div class="bar-fill emerald" style="width: 94%;">1,83%</div></div>
+                </div>
+                <div style="font-size: 11px; color: #064e3b; margin-top: 8px;">Источник: NP Digital, май 2025. Long-tail запросы (3+ слова) дают до 70% всех конверсий[reference:0].</div>
+            </div>
+
+            <!-- EVOLUTION SCHEMA -->
+            <div class="evolution-card">
+                <div class="evo-title">🔄 Эволюция подхода к семантике: от ключевых слов к сценариям</div>
+                <div class="evo-flow">
+                    <div class="evo-node old">
+                        <div class="en-icon">📝</div>
+                        <div class="en-name">2010-е</div>
+                        <div class="en-desc">Ключевые слова<br>Частотность<br>Точное вхождение</div>
+                    </div>
+                    <div class="evo-arrow">→</div>
+                    <div class="evo-node old">
+                        <div class="en-icon">📚</div>
+                        <div class="en-name">2015-2020</div>
+                        <div class="en-desc">LSI-слова<br>Семантическая<br>релевантность</div>
+                    </div>
+                    <div class="evo-arrow">→</div>
+                    <div class="evo-node">
+                        <div class="en-icon">🧠</div>
+                        <div class="en-name">2023-2026</div>
+                        <div class="en-desc">Интенты<br>Сценарии<br>Намерения</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #065f46; margin-top: 10px;">Нейросети (Yandex YATI, Google MUM и SNAP) ищут не слова, а намерения. Запросы одного сценария группируются, а не ранжируются отдельно[reference:1].</div>
+            </div>
+
+            <!-- GEO VS SEO TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 10px;">⚖️ Традиционное SEO vs GEO-подход к семантике</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Критерий</th>
+                            <th>Традиционное SEO</th>
+                            <th>GEO / AI-поиск</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Единица анализа</td>
+                            <td>Ключевое слово / фраза</td>
+                            <td>Сценарий / намерение</td>
+                        </tr>
+                        <tr>
+                            <td>Целевая метрика</td>
+                            <td>Позиция, трафик, CTR</td>
+                            <td>Цитируемость в AI-ответе</td>
+                        </tr>
+                        <tr>
+                            <td>Оптимизация</td>
+                            <td>Точное вхождение ключа</td>
+                            <td>Глубина темы, покрытие вопросов</td>
+                        </tr>
+                        <tr>
+                            <td>Структура</td>
+                            <td>Одна страница — один ключ</td>
+                            <td>Кластер контента — один сценарий</td>
+                        </tr>
+                        <tr>
+                            <td>Роль частотности</td>
+                            <td>Высокая (ВЧ = приоритет)</td>
+                            <td>Низкая (важен интент, не объём)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- AI TOOLS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 10px;">🤖 AI-инструменты подбора ключевых слов (2025–2026)</div>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-name">Яндекс.Вордстат + AI</div>
+                        <div class="tool-desc">Частотность, сезонность, география. AI-агенты автоматически чистят шум и размечают интенты</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🔍</div>
+                        <div class="tool-name">Keys.so</div>
+                        <div class="tool-desc">Сбор семантики и анализ конкурентов. Базы по Москве и 17 регионам России</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📈</div>
+                        <div class="tool-name">Topvisor</div>
+                        <div class="tool-desc">Российская облачная платформа для SEO-анализа с AI-кластеризацией по интентам</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🧠</div>
+                        <div class="tool-name">ChatGPT / Claude</div>
+                        <div class="tool-desc">Генерация маски запросов, мозговой штурм, кластеризация и чистка от информационного мусора</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📉</div>
+                        <div class="tool-name">Serpstat / Ahrefs</div>
+                        <div class="tool-desc">Анализ конкурентов, поиск ключевых слов, оценка сложности</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📝</div>
+                        <div class="tool-name">Мутаген / Букварикс</div>
+                        <div class="tool-desc">Бесплатные инструменты подбора на основе данных Вордстата и Google</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG CHART -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Доля long-tail в поисковом трафике и конверсии <span>2025</span></div>
+                <svg viewBox="0 0 600 160" style="width: 100%; height: auto;">
+                    <line x1="50" y1="15" x2="50" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="130" x2="580" y2="130" stroke="#94a3b8" stroke-width="1"/>
+
+                    <!-- Long-tail доля -->
+                    <rect x="80" y="40" width="120" height="90" rx="8" fill="#10b981" opacity="0.85"/>
+                    <text x="140" y="85" font-size="20" fill="white" text-anchor="middle" font-weight="900">70–92%</text>
+                    <text x="140" y="105" font-size="10" fill="white" text-anchor="middle">Трафик</text>
+                    <text x="140" y="150" font-size="11" fill="#064e3b" text-anchor="middle" font-weight="bold">Long-tail</text>
+
+                    <!-- Short-tail доля -->
+                    <rect x="280" y="95" width="120" height="35" rx="8" fill="#e11d48" opacity="0.85"/>
+                    <text x="340" y="118" font-size="16" fill="white" text-anchor="middle" font-weight="900">8–30%</text>
+                    <text x="340" y="150" font-size="11" fill="#991b1b" text-anchor="middle" font-weight="bold">Short-tail</text>
+
+                    <!-- Конверсия long-tail -->
+                    <rect x="460" y="30" width="100" height="100" rx="8" fill="#059669"/>
+                    <text x="510" y="75" font-size="24" fill="white" text-anchor="middle" font-weight="900">36%</text>
+                    <text x="510" y="98" font-size="10" fill="white" text-anchor="middle">Конверсия</text>
+                    <text x="510" y="150" font-size="11" fill="#064e3b" text-anchor="middle" font-weight="bold">Long-tail</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Long-tail запросы (3+ слова) дают 70–92% трафика и конверсию 36% — почти в 2,5 раза выше, чем short-tail[reference:2].</div>
+            </div>
+
+            <!-- EXAMPLE CORE -->
+            <div class="core-card">
+                <div class="core-title">📋 Пример семантического ядра: интернет-магазин электроники</div>
+                <div class="core-cluster">
+                    <div class="cluster-name">🛒 Транзакционные (покупка)</div>
+                    <div class="cluster-keys">«купить ноутбук», «заказать iPhone 15 в Москве», «цена на MacBook Air», «доставка бесплатно»</div>
+                </div>
+                <div class="core-cluster">
+                    <div class="cluster-name">🔍 Коммерческие (сравнение)</div>
+                    <div class="cluster-keys">«какой ноутбук лучше для учёбы», «сравнение Xiaomi и Samsung», «HP или Lenovo для работы»</div>
+                </div>
+                <div class="core-cluster">
+                    <div class="cluster-name">📖 Информационные (изучение)</div>
+                    <div class="cluster-keys">«как выбрать ноутбук», «типы процессоров Intel и AMD», «что такое Apple Silicon»</div>
+                </div>
+                <div class="core-cluster">
+                    <div class="cluster-name">📍 Гео-запросы</div>
+                    <div class="cluster-keys">«купить ноутбук в Екатеринбурге», «магазин техники рядом со мной», «самовывоз в Новосибирске»</div>
+                </div>
+                <div class="core-cluster" style="margin-bottom: 0;">
+                    <div class="cluster-name">🔤 Опечатки и синонимы</div>
+                    <div class="cluster-keys">«наутбук», «ноут купить», «лаптоп», «HP» / «Hewlett Packard»</div>
+                </div>
+            </div>
+
+            <!-- TRENDS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #064e3b; margin-bottom: 10px;">🔥 Ключевые тренды 2025–2026</div>
+                <div class="trends-grid">
+                    <div class="trend-card t1">
+                        <h5>🤖 AI-генерация семантики</h5>
+                        <p>ChatGPT и Claude генерируют маски запросов, чистят шум и кластеризуют ядро по интентам. Джун-AI анализирует лендинг за 30 секунд и выдаёт готовую семантику[reference:3]</p>
+                    </div>
+                    <div class="trend-card t2">
+                        <h5>📊 AI Overviews и zero-click</h5>
+                        <p>58% поисков без клика. Short-tail ключи теряют трафик из-за AI Overviews. Long-tail остаётся главным источником конверсий[reference:4]</p>
+                    </div>
+                    <div class="trend-card t3">
+                        <h5>🧠 Кластеризация по интентам</h5>
+                        <p>Запросы группируются по сценариям: learn, evaluate, buy. Вместо «одна страница — один ключ» — кластер контента на один сценарий[reference:5]</p>
+                    </div>
+                    <div class="trend-card t4">
+                        <h5>📈 Prompt Research</h5>
+                        <p>Новая дисциплина наряду с keyword research. Учитывает, как люди взаимодействуют с AI-инструментами — структура запросов и интент отличаются от традиционного поиска[reference:6]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Семантическое ядро</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Long-tail запросы</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: AI в подборе ключевых слов</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 16 из 20
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #0d1f1a; padding: 20px 20px 10px 20px; border-bottom: 1px solid #065f46; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Мы начинаем новый блок курса, посвящённый практическому SEO и контекстной рекламе. Сегодня мы разберём подбор ключевых слов и формирование семантического ядра — фундамент любого продвижения.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми метриками.</div>
+
+            <h3>📌 Введение: зачем нужны ключевые слова</h3>
+
+            <p>Ключевые слова — это фундамент SEO и контекстной рекламы. От качества семантического ядра зависит эффективность всего продвижения. Представьте: вы продаёте компьютерную технику. Ваша аудитория ищет по-разному: кто-то вводит «купить ноутбук», кто-то — «какой ноутбук лучше для учёбы», а кто-то — «HP Pavilion 15 цена». Все эти запросы — разные сценарии, и каждый требует своей страницы и своего подхода.</p>
+
+            <h3>📌 Анализ предпочтений клиента</h3>
+
+            <p>Первый этап — анализ предпочтений клиента. Что ищет ваша аудитория? Определяем бренды: HP, Mac, IBM, Lenovo, Asus, Acer, MSI. Спецификации: тип процессора (Intel, AMD, Apple Silicon), размер экрана, объём ОЗУ, тип видеокарты. Цена: запросы «дешёвый компьютер», «ноутбук до 50 000», «бюджетный игровой». Доставка: «бесплатная доставка», «доставка за 1 день», «самовывоз».</p>
+
+            <p>На основе этого анализа мы формируем портреты целевых запросов под каждый сегмент.</p>
+
+            <div class="action-hint">Обратите внимание студентов на диаграмму конверсии по длине запроса.</div>
+
+            <h3>📌 Почему long-tail важнее short-tail</h3>
+
+            <p>Ключевой инсайт 2025 года: длинные запросы конвертируют значительно лучше. По данным NP Digital, однословные запросы конвертируют в 0,17%, двухсловные — в 0,35%, трёхсловные — уже в 1,02%, четырёхсловные — в 1,61%[reference:7]. Long-tail запросы (3+ слова) дают 70–92% всего поискового трафика и конверсию 36% — почти в 2,5 раза выше, чем short-tail[reference:8].</p>
+
+            <p>Кроме того, 94,74% ключевых слов ищут 10 раз в месяц или меньше. Это означает, что огромная часть трафика приходит от узких, специфичных запросов[reference:9]. 15% поисковых запросов вообще никогда не были заданы ранее — это новые, emerging-запросы[reference:10].</p>
+
+            <h3>📌 Эволюция подхода к семантике</h3>
+
+            <p>Ещё несколько лет назад семантическое ядро строилось по простой логике: чем выше частотность и конкурентность выдачи, тем больше приоритет. SEO-специалисты подбирали запросы по объёму трафика, конкуренции и потенциальной конверсии, а сайты оптимизировались под точное совпадение с формулировками из поисковой строки[reference:11].</p>
+
+            <p>Сегодня эта модель изменилась. Причина — развитие нейровыдачи и голосового поиска. Нейросетевые алгоритмы (Yandex YATI, Google с MUM и SNAP) ищут не слова, а намерения. Они анализируют, какую проблему решает пользователь, на каком этапе принятия решения находится, что за сценарии рассматривает[reference:12].</p>
+
+            <p>Запросы одного намерения теперь группируются, а не ранжируются отдельно. Поисковик понимает, что запросы «сломалась стиралка — что делать?», «срочно нужен мастер по стиральным машинам» и «почему не крутит барабан в стиралке» — это вариации одного сценария — аварийный ремонт. И вместо того чтобы выводить три разных сайта под три разных запроса, он покажет один — тот, который полноценно закрывает всё намерение[reference:13].</p>
+
+            <div class="action-hint">Перейдите к сравнению SEO и GEO-подхода.</div>
+
+            <h3>📌 Традиционное SEO vs GEO-подход</h3>
+
+            <p>Ключевое отличие: традиционное SEO работает с ключевыми словами, GEO — со сценариями. В традиционном SEO единица анализа — ключевое слово, целевая метрика — позиция и трафик. В GEO единица анализа — сценарий и намерение, целевая метрика — цитируемость в AI-ответе.</p>
+
+            <p>В традиционном SEO структура строится по принципу «одна страница — один ключ». В GEO — «кластер контента — один сценарий». Роль частотности в традиционном SEO высокая (ВЧ = приоритет), в GEO — низкая (важен интент, а не объём).</p>
+
+            <h3>📌 Методика построения дериватов</h3>
+
+            <p>Как строить семантическое ядро в 2025–2026? Начинаем с корневой фразы: «новая машина». Строим ветви с увеличением длины фразы: «самый надёжный новый автомобиль». Используем хвостовые запросы (long-tail) — они дают более высокую конверсию. Получаем полную совокупность ключевых фраз — до 10 000+ вариантов.</p>
+
+            <p>Далее — ревизия ключевых слов. Ограничиваем список по бюджету, отсекаем фразы с низкой конверсией, нерелевантные и нецелевые. Учитываем стратегию компании и защиту патентами. Анализируем конкуренцию и потенциальный трафик. Формируем семантическое ядро — финальный список ключевых слов.</p>
+
+            <p>Кластеризация по интентам — ключевой этап. Все запросы делятся на четыре категории: информационные (learn), навигационные, коммерческие (evaluate), транзакционные (buy)[reference:14]. Каждый кластер — отдельная страница или группа страниц.</p>
+
+            <div class="action-hint">Обратите внимание студентов на пример семантического ядра.</div>
+
+            <h3>📌 Пример семантического ядра: интернет-магазин электроники</h3>
+
+            <p>На слайде представлен пример семантического ядра для интернет-магазина электроники. Транзакционные запросы: «купить ноутбук», «заказать iPhone 15 в Москве», «цена на MacBook Air». Коммерческие: «какой ноутбук лучше для учёбы», «сравнение Xiaomi и Samsung». Информационные: «как выбрать ноутбук», «типы процессоров Intel и AMD». Гео-запросы: «купить ноутбук в Екатеринбурге», «магазин техники рядом со мной». Опечатки и синонимы: «наутбук», «ноут купить», «лаптоп».</p>
+
+            <h3>📌 AI-инструменты подбора ключевых слов</h3>
+
+            <p>В 2025–2026 годах подбор ключевых слов радикально изменился. AI-инструменты автоматизируют рутинные задачи.</p>
+
+            <p>Яндекс.Вордстат с AI-агентами: частотность, сезонность, география. AI автоматически чистит шум (инфо-запросы, «бесплатно/скачать», вакансии, гео-хвосты) и размечает интенты. Джун-AI анализирует посадочную страницу за 30 секунд и выдаёт готовую семантику по группам: горячие, тёплые, брендовые, long-tail[reference:15]. ChatGPT и Claude генерируют маски запросов, проводят мозговой штурм, кластеризуют и чистят ядро.</p>
+
+            <p>Ключевые тренды: Prompt Research — новая дисциплина наряду с keyword research, учитывающая, как люди взаимодействуют с AI-инструментами[reference:16]. AI Overviews на 58% запросов снижают CTR short-tail ключей, но long-tail остаётся главным источником конверсий[reference:17].</p>
+
+            <h3>📌 Важность ключевых слов в тексте</h3>
+
+            <p>Ключевые слова должны встречаться в тексте с определённой частотой и вариативностью. Однако избыточное использование (keyword stuffing) делает текст нечитаемым и снижает ранжирование. В 2025 году фокус сместился от плотности ключевых слов к семантической релевантности. Поисковики оценивают не наличие ключа, а глубину раскрытия темы и покрытие связанных вопросов[reference:18].</p>
+
+            <p>LSI-слова — устаревший термин, хотя инструменты, которые их генерируют, могут быть полезны. Современные поисковики используют NLP и трансформеры (BERT, MUM), которые понимают язык контекстуально[reference:19].</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали подбор ключевых слов и формирование семантического ядра. Ключевые выводы:</p>
+
+            <ul>
+                <li>Long-tail запросы (3+ слова) дают 70–92% трафика и конверсию 36% — в 2,5 раза выше short-tail.</li>
+                <li>94,74% ключевых слов ищут 10 раз в месяц или меньше. 15% запросов — новые, никогда не заданные ранее.</li>
+                <li>Эволюция: от ключевых слов к сценариям. Нейросети ищут намерения, а не слова.</li>
+                <li>Кластеризация по интентам: learn, evaluate, buy. Каждый кластер — отдельная страница.</li>
+                <li>AI-инструменты (Яндекс.Вордстат + AI, Джун-AI, ChatGPT) автоматизируют сбор и чистку семантики.</li>
+                <li>Prompt Research — новая дисциплина наряду с keyword research.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём оптимизацию контента и структуры сайта. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">LSI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Latent Semantic Indexing</div>
+                            <div class="gloss-def">Латентно-семантическое индексирование — устаревший метод анализа семантики</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">NLP</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Natural Language Processing</div>
+                            <div class="gloss-def">Обработка естественного языка — технологии понимания текста машинами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Generative Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация для генеративных поисковых систем и нейросетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Click-Through Rate</div>
+                            <div class="gloss-def">Показатель кликабельности — отношение кликов к показам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AI Overviews</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">AI-обзоры</div>
+                            <div class="gloss-def">Сгенерированные ИИ ответы в поисковой выдаче Google</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">BERT</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Bidirectional Encoder Representations from Transformers</div>
+                            <div class="gloss-def">Нейросетевая модель Google для понимания контекста запросов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">MUM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Multitask Unified Model</div>
+                            <div class="gloss-def">Мультимодальная нейросетевая модель Google для сложных запросов</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">YATI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Yandex AI Technology</div>
+                            <div class="gloss-def">Нейросетевая технология Яндекса для поиска по смыслу</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Конверсия и длинные запросы</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">NP Digital: Conversion Rate by Keyword Length — Long-Tail Keywords Win. — <a href="https://neilpatel.com/marketing-stats/conversion-rate-by-keyword-length/" target="_blank">NeilPatel.com</a> <span class="src-date">05.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Ranktracker: Statistiken zur Schlüsselwortforschung 2025 — 70–92% трафика от long-tail, конверсия 36%. — <a href="https://www.ranktracker.com/de/blog/keyword-research-statistics-2025/" target="_blank">Ranktracker.com</a> <span class="src-date">19.12.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Sostav.ru: Как редкие запросы могут перевернуть результаты SEO — long-tail приносят до 70% конверсий. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">05.12.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🧠 Эволюция семантики и AI-поиск</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Topvisor Journal: Семантика в ИИ-поиске — от ключевых слов к сценариям. — <a href="https://journal.topvisor.com/ru/practice/semantic-and-ai-search/" target="_blank">Topvisor.com</a> <span class="src-date">26.01.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Neil Patel: How to Do Keyword Research for SEO — 2026 Update. — <a href="https://neilpatel.com/blog/keyword-research/" target="_blank">NeilPatel.com</a> <span class="src-date">10.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">HubSpot: What are semantic keywords? How to find & use them in 2026. — <a href="https://blog.hubspot.com/marketing/semantic-keywords" target="_blank">HubSpot.com</a> <span class="src-date">01.07.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 AI-инструменты и кластеризация</div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Single Grain: Automated Keyword Research with AI — cluster by meaning, intent classification. — <a href="https://www.singlegrain.com" target="_blank">SingleGrain.com</a> <span class="src-date">14.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Search Engine Journal: How To Cluster Keywords By Search Intent At Scale Using Python. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">29.05.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">PPC.World: Как собрать семантическое ядро для Директа с помощью ИИ — пошаговая инструкция. — <a href="https://ppc.world" target="_blank">PPC.World</a> <span class="src-date">17.12.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🇷🇺 Российские инструменты</div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Sostav.ru: Сервисы для поиска ключевых слов — Topvisor, Букварикс, Мутаген. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">eLama: Keys.so — инструмент для сбора семантики и анализа конкурентов. — <a href="https://elama.ru" target="_blank">eLama.ru</a> <span class="src-date">13.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">Chrome Web Store: Джун-AI — умный помощник директолога, AI-анализ лендингов. — <a href="https://chromewebstore.google.com" target="_blank">Chrome Web Store</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

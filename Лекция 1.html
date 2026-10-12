@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 1. Введение в курс по интернет-маркетингу</title>
+    <style>
+        /* Базовые сбросы и жёсткое деление экрана 2/3 на 1/3 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ: Экран студентов (66.66%) */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 35px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ: Скрипт лектора (33.34%) */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a202c; color: #edf2f7; padding: 30px; overflow-y: auto; }
+
+        /* Стили слайда студентов */
+        .slide-header { font-size: 26px; color: #1a365d; font-weight: bold; line-height: 1.3; margin-bottom: 18px; border-bottom: 4px solid #3182ce; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 18px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #a0aec0; text-align: right; margin-top: 12px; }
+
+        /* Визуальные контейнеры */
+        .visual-row { display: flex; gap: 20px; align-items: stretch; }
+        .visual-col { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+        .chart-box { background: #f7fafc; border: 2.5px dashed #cbd5e0; padding: 20px; border-radius: 12px; flex: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .chart-box strong { font-size: 16px; display: block; margin-bottom: 6px; }
+        .chart-box p { font-size: 13px; color: #4a5568; line-height: 1.45; }
+
+        /* Схема «Экосистема» */
+        .ecosystem { display: flex; flex-direction: column; gap: 10px; }
+        .eco-layer { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; font-size: 13px; }
+        .eco-layer.core { background: #ebf8ff; border-left: 5px solid #3182ce; }
+        .eco-layer.channels { background: #f0fff4; border-left: 5px solid #38a169; }
+        .eco-layer.analytics { background: #fffaf0; border-left: 5px solid #dd6b20; }
+        .eco-layer.infra { background: #faf5ff; border-left: 5px solid #805ad5; }
+        .eco-icon { font-size: 20px; min-width: 28px; text-align: center; }
+        .eco-text { flex: 1; }
+        .eco-text strong { display: block; font-size: 13px; margin-bottom: 2px; }
+        .eco-text span { font-size: 12px; color: #4a5568; }
+
+        /* Таймлайн */
+        .timeline { display: flex; justify-content: space-between; margin: 15px 0; position: relative; padding: 0 5px; }
+        .timeline::before { content: ''; position: absolute; top: 18px; left: 0; width: 100%; height: 5px; background: #e2e8f0; z-index: 1; }
+        .timeline-item { position: relative; z-index: 2; background: white; padding: 0 6px; text-align: center; width: 19%; }
+        .timeline-dot { width: 38px; height: 38px; background: #3182ce; border-radius: 50%; margin: 0 auto 8px; border: 4px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; font-weight: bold; }
+        .timeline-item.active .timeline-dot { background: #e53e3e; transform: scale(1.15); box-shadow: 0 6px 12px rgba(229,62,62,0.3); }
+        .timeline-year { font-weight: bold; color: #1a202c; font-size: 14px; margin-bottom: 3px; }
+        .timeline-text { font-size: 11px; color: #4a5568; line-height: 1.3; font-weight: 500; }
+
+        /* Таблица метрик */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .metrics-table th { background: #1a365d; color: white; padding: 10px 12px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; color: #2d3748; }
+        .metrics-table tr:nth-child(even) td { background: #f7fafc; }
+        .metrics-table .highlight { color: #e53e3e; font-weight: bold; }
+
+        /* Видеоплеер */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s, background 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #00a877; }
+        .rt-btn:hover { background: #008f65; }
+        .stop-btn { background: #dc143c; }
+        .stop-btn:hover { background: #b01030; }
+
+        /* Стили текста лекции (Правая панель) */
+        .notes-header { font-size: 17px; color: #63b3ed; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #4a5568; padding-bottom: 10px; }
+        .timer-badge { background: #e53e3e; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #63b3ed; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #2d3748; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .lecture-text .source { color: #a0aec0; font-size: 12px; font-style: italic; }
+        .action-hint { color: #fbd38d; font-style: italic; background: #2d3748; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbd38d; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ (2/3): ЭКРАН ДЛЯ СТУДЕНТОВ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 1. Введение в курс по интернет-маркетингу
+        </div>
+
+        <div class="slide-body">
+
+            <!-- Определение и сравнение с традиционным маркетингом -->
+            <div class="visual-row">
+                <div class="chart-box" style="background: #ebf8ff; border-color: #90cdf4;">
+                    <strong style="color: #2b6cb0;">🎯 Интернет-маркетинг</strong>
+                    <p>Стратегическое использование онлайн-каналов и цифровых платформ для продвижения товаров, услуг или брендов целевой аудитории. Включает SEO, контент-маркетинг, SMM, email, PPC, партнёрский маркетинг.<br><span class="source">Digital Vidya, 2026</span></p>
+                </div>
+                <div style="display: flex; align-items: center; font-size: 24px; color: #a0aec0; font-weight: bold;">↔️</div>
+                <div class="chart-box" style="background: #fffaf0; border-color: #fbd38d;">
+                    <strong style="color: #975a16;">🔄 Цифровой маркетинг</strong>
+                    <p>Более широкое понятие: включает интернет-маркетинг, а также офлайн-цифровые каналы (ТВ-реклама, SMS, цифровые билборды, экраны в магазинах).<br><span class="source">Sostav.ru, 2026</span></p>
+                </div>
+            </div>
+
+            <!-- Экосистема интернет-маркетинга -->
+            <div>
+                <div style="font-size: 15px; font-weight: bold; color: #1a365d; margin-bottom: 10px;">📐 Структура экосистемы интернет-маркетинга</div>
+                <div class="ecosystem">
+                    <div class="eco-layer core">
+                        <div class="eco-icon">🏠</div>
+                        <div class="eco-text"><strong>Ядро: веб-сайт</strong><span>Центральная платформа сбора спроса, конверсии и аналитики</span></div>
+                    </div>
+                    <div class="eco-layer channels">
+                        <div class="eco-icon">📡</div>
+                        <div class="eco-text"><strong>Каналы привлечения</strong><span>SEO · Контент-маркетинг · SMM · Email · PPC · Партнёрский маркетинг</span></div>
+                    </div>
+                    <div class="eco-layer analytics">
+                        <div class="eco-icon">📊</div>
+                        <div class="eco-text"><strong>Аналитический слой</strong><span>Веб-аналитика (GA4) · CRM · Сквозная аналитика · A/B-тестирование</span></div>
+                    </div>
+                    <div class="eco-layer infra">
+                        <div class="eco-icon">⚙️</div>
+                        <div class="eco-text"><strong>Инфраструктура</strong><span>CMS · Хостинг · Домен · Системы автоматизации · API-интеграции</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Таймлайн эволюции интернет-маркетинга -->
+            <div>
+                <div style="font-size: 15px; font-weight: bold; color: #1a365d; margin-bottom: 5px;">🕐 Эволюция интернет-маркетинга</div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot">📧</div>
+                        <div class="timeline-year">1990-е</div>
+                        <div class="timeline-text">Баннеры<br>Email-рассылки</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">🔍</div>
+                        <div class="timeline-year">2000-е</div>
+                        <div class="timeline-text">Поисковая реклама<br>Google AdWords</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">📱</div>
+                        <div class="timeline-year">2010-е</div>
+                        <div class="timeline-text">Социальные сети<br>Мобильный маркетинг</div>
+                    </div>
+                    <div class="timeline-item active">
+                        <div class="timeline-dot">🤖</div>
+                        <div class="timeline-year">2020-е — н.в.</div>
+                        <div class="timeline-text">ИИ и персонализация<br>First-party data</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Таблица ключевых метрик рынка -->
+            <div>
+                <div style="font-size: 15px; font-weight: bold; color: #1a365d; margin-bottom: 8px;">📊 Ключевые метрики рынка интернет-маркетинга в России (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Объём рынка рекламы и продвижения в интернете</td>
+                            <td><strong>1,57 трлн руб.</strong></td>
+                            <td class="highlight">+28%</td>
+                            <td>АРИР / AdIndex</td>
+                        </tr>
+                        <tr>
+                            <td>Сегмент онлайн-рекламы (ЕРИР)</td>
+                            <td>691 млрд руб.</td>
+                            <td style="color: #38a169;">–19,5%*</td>
+                            <td>ЕРИР / AdIndex</td>
+                        </tr>
+                        <tr>
+                            <td>E-retail media</td>
+                            <td>580 млрд руб.</td>
+                            <td class="highlight">+58%</td>
+                            <td>АРИР</td>
+                        </tr>
+                        <tr>
+                            <td>Перформанс-реклама</td>
+                            <td>471,1 млрд руб.</td>
+                            <td>+7%</td>
+                            <td>АРИР</td>
+                        </tr>
+                        <tr>
+                            <td>Инфлюенс-маркетинг</td>
+                            <td>57 млрд руб.</td>
+                            <td>+20%</td>
+                            <td>АРИР</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 11px; color: #a0aec0; margin-top: 4px;">* Снижение связано с регуляторными изменениями и изменением классификации рекламы в ЕРИР.</p>
+            </div>
+
+            <!-- Видеоплеер и кнопки -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/9bff4d74e2d2c6234a9e746a0bf1aa57/')" class="video-btn rt-btn">📜 Ролик 1: Что такое интернет-маркетинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/30ac6de4a2f359b167f736ff15e86332/')" class="video-btn rt-btn">📹 Ролик 2: Каналы продвижения</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Введение в цифровой маркетинг</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 1 из 5
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ (1/3): СКРИПТ ПРЕПОДАВАТЕЛЯ -->
+    <div class="speaker-notes">
+        <!-- Фиксированная верхняя часть с плеером -->
+        <div style="position: sticky; top: 0; background: #1a202c; padding: 20px 20px 10px 20px; border-bottom: 1px solid #4a5568; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Рад приветствовать вас на первом занятии курса «Интернет-маркетинг». Этот курс носит обзорный характер и состоит из пяти мини-лекций. Сегодня мы заложим фундамент: разберёмся, что такое интернет-маркетинг, почему он стал центральным элементом современного бизнеса, и познакомимся с ключевыми метриками рынка.</p>
+
+            <div class="action-hint">Обратите внимание студентов на схему экосистемы на слайде.</div>
+
+            <h3>📌 Определение: интернет-маркетинг vs цифровой маркетинг</h3>
+
+            <p>Начнём с терминологии. <strong>Интернет-маркетинг</strong> — это стратегическое использование онлайн-каналов и цифровых платформ для продвижения товаров, услуг или брендов целевой аудитории. Сюда входят SEO, контент-маркетинг, SMM, email-рассылки, PPC-реклама и партнёрский маркетинг[reference:0].</p>
+
+            <p>Однако существует и более широкое понятие — <strong>цифровой маркетинг</strong>. Он охватывает не только интернет-каналы, но и офлайн-цифровые точки контакта: электронные экраны в магазинах, QR-коды на упаковке, программы лояльности в приложениях[reference:1]. Для менеджера принципиально важно видеть эту разницу: интернет-маркетинг — это подмножество цифрового, но именно оно обеспечивает основную измеримую эффективность.</p>
+
+            <p>Классическое определение Дэйва Чаффи, автора бестселлера «Digital Marketing: Strategy, Implementation and Practice», звучит так: «Цифровой маркетинг позволяет достигать маркетинговых целей через использование технологий и цифровых медиа»[reference:2]. Обратите внимание: акцент делается на <em>цели</em>, а не на инструменты. Это принципиально важно — инструменты меняются, цели остаются.</p>
+
+            <h3>📌 Экосистема интернет-маркетинга</h3>
+
+            <p>Интернет-маркетинг — это не набор разрозненных тактик, а управляемая система. Как показано на слайде, её можно представить в виде четырёхуровневой экосистемы:</p>
+
+            <ul>
+                <li><strong>Ядро — веб-сайт.</strong> Центральная платформа, где происходит сбор спроса, конверсия и аналитика.</li>
+                <li><strong>Каналы привлечения:</strong> SEO, контент-маркетинг, SMM, email, PPC, партнёрский маркетинг.</li>
+                <li><strong>Аналитический слой:</strong> веб-аналитика (Google Analytics 4), CRM-системы, сквозная аналитика, A/B-тестирование.</li>
+                <li><strong>Инфраструктура:</strong> CMS, хостинг, домен, системы автоматизации, API-интеграции.</li>
+            </ul>
+
+            <p>Такая структура позволяет бизнесу не просто «присутствовать» в интернете, а вести человека от первого контакта к покупке и повторному обращению[reference:3].</p>
+
+            <div class="action-hint">Перейдите к разбору таймлайна эволюции интернет-маркетинга.</div>
+
+            <h3>📌 Эволюция интернет-маркетинга</h3>
+
+            <p>Посмотрите на таймлайн на слайде. Каждая эпоха была ответом на конкретный экономический вызов:</p>
+
+            <ul>
+                <li><strong>1990-е: баннеры и email.</strong> Первые формы цифровой рекламы. Ограниченный охват, низкая таргетированность.</li>
+                <li><strong>2000-е: поисковая реклама.</strong> Запуск Google AdWords в 2000 году произвёл революцию: реклама стала самообслуживаемой и измеримой.</li>
+                <li><strong>2010-е: социальные сети и мобильность.</strong> Появление смартфонов и социальных платформ сделало маркетинг интерактивным и персонализированным.</li>
+                <li><strong>2020-е — настоящее время: ИИ и first-party data.</strong> Генеративный искусственный интеллект, гиперперсонализация и переход к собственным данным о клиентах. 76% респондентов отмечают рост значимости first-party data[reference:4].</li>
+            </ul>
+
+            <h3>📌 Ключевые метрики рынка (2025)</h3>
+
+            <p>Теперь — к цифрам. Объём российского рынка рекламы и продвижения в интернете по итогам 2025 года достиг <strong>1,57 трлн рублей</strong>, увеличившись на 28% по сравнению с 2024 годом[reference:5]. Однако темпы роста замедлились: в 2024 году динамика составляла 53%[reference:6].</p>
+
+            <p>Наиболее динамичные сегменты:</p>
+
+            <ul>
+                <li><strong>E-retail media:</strong> +58%, до 580 млрд руб. — реклама на маркетплейсах и в ритейл-медиа[reference:7].</li>
+                <li><strong>Брендинговая реклама:</strong> +33%, до 161,9 млрд руб.[reference:8].</li>
+                <li><strong>Инфлюенс-маркетинг:</strong> +20%, до 57 млрд руб.[reference:9].</li>
+            </ul>
+
+            <p>Важный нюанс: по данным Единого реестра интернет-рекламы (ЕРИР), сегмент онлайн-рекламы в 2025 году составил 691 млрд руб., что на 19,5% меньше, чем годом ранее[reference:10]. Это расхождение связано с регуляторными изменениями и переклассификацией ряда инструментов продвижения. Для менеджера это сигнал: цифры нужно читать в контексте методологии.</p>
+
+            <h3>📌 Тренды 2025–2026</h3>
+
+            <p>Завершим обзор тремя ключевыми трендами, которые определят развитие отрасли в ближайшие годы:</p>
+
+            <ul>
+                <li><strong>Искусственный интеллект.</strong> ИИ перестал быть дополнительной функцией — он стал основой персонализации и автоматизации кампаний[reference:11].</li>
+                <li><strong>First-party data.</strong> В условиях ужесточения политики конфиденциальности собственные данные о клиентах становятся ключевым активом[reference:12].</li>
+                <li><strong>Переход от SEO к GEO.</strong> Оптимизация для генеративных поисковых систем (Generative Engine Optimization) — новый стандарт, поскольку пользователи всё чаще обращаются к ИИ-ассистентам вместо традиционного поиска[reference:13].</li>
+            </ul>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы заложили фундамент курса. Запомните главное: интернет-маркетинг — это управляемая экосистема, а не набор разрозненных инструментов. Рынок продолжает расти, но темпы замедляются — это переход от экстенсивного роста к интенсивному, где качество данных и персонализация становятся решающими.</p>
+
+            <p>На следующей лекции мы детально разберём структуру интернет-маркетинга, инструменты и специализации. Спасибо за внимание!</p>
+<!-- ============================================================ -->
+<!-- БЛОК: СЛОВАРЬ АББРЕВИАТУР И ИСТОЧНИКИ                       -->
+<!-- Вставить в конец .student-view, после .video-section          -->
+<!-- ============================================================ -->
+
+<div style="margin-top: 25px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- СЛОВАРЬ АББРЕВИАТУР -->
+    <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 22px 25px;">
+        <div style="font-size: 17px; font-weight: bold; color: #1a365d; margin-bottom: 15px; border-bottom: 3px solid #3182ce; padding-bottom: 10px;">
+            📖 Словарь аббревиатур
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr>
+                    <th style="background: #1a365d; color: white; padding: 9px 12px; text-align: left; font-weight: 600; width: 12%;">Аббревиатура</th>
+                    <th style="background: #1a365d; color: white; padding: 9px 12px; text-align: left; font-weight: 600; width: 30%;">Расшифровка</th>
+                    <th style="background: #1a365d; color: white; padding: 9px 12px; text-align: left; font-weight: 600;">Пояснение</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">АКАР</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Ассоциация коммуникационных агентств России</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Крупнейшее отраслевое объединение, публикующее данные по объёму рекламного рынка России</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">АКИТ</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Ассоциация компаний интернет-торговли</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Отраслевая ассоциация, публикующая статистику по рынку электронной коммерции в России</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">АРИР</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Ассоциация развития интерактивной рекламы</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Ключевая организация, публикующая данные по объёму рынка интернет-рекламы и продвижения в России</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">API</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Application Programming Interface</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Интерфейс программирования приложений — набор правил, по которым программы взаимодействуют друг с другом</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">CMS</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Content Management System</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Система управления контентом — платформа для создания и управления веб-сайтом без программирования</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">CRM</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Customer Relationship Management</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Система управления взаимоотношениями с клиентами — база данных и инструменты для работы с клиентской базой</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">GA4</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Google Analytics 4</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Платформа веб-аналитики от Google для отслеживания трафика, конверсий и поведения пользователей</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">GEO</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Generative Engine Optimization</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Оптимизация контента для генеративных поисковых систем и нейросетей (ChatGPT, Алиса AI, Perplexity и др.)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">ЕРИР</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Единый реестр интернет-рекламы</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Государственная система учёта всей интернет-рекламы в России, оператором которой является Роскомнадзор</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">ИИ</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Искусственный интеллект</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Технологии, позволяющие машинам выполнять задачи, требующие человеческого интеллекта</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">KPI</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Key Performance Indicator</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Ключевой показатель эффективности — метрика, по которой оценивается успешность достижения цели</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">PPC</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Pay-Per-Click</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Модель оплаты рекламы, при которой рекламодатель платит за каждый клик по объявлению</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">ROI</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Return on Investment</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Возврат инвестиций — показатель эффективности вложений в маркетинг</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">SEO</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Search Engine Optimization</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Оптимизация сайта для повышения его позиций в поисковых системах (Google, Яндекс и др.)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">SMM</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">Social Media Marketing</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Маркетинг в социальных сетях — продвижение через контент и рекламу на социальных платформах</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #2b6cb0;">UX/UI</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0;">User Experience / User Interface</td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #4a5568;">Пользовательский опыт / Пользовательский интерфейс — дизайн и удобство взаимодействия с продуктом</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 12px; font-weight: bold; color: #2b6cb0;">A/B-тест</td>
+                    <td style="padding: 8px 12px;">A/B Testing (Split Testing)</td>
+                    <td style="padding: 8px 12px; color: #4a5568;">Сравнительный тест двух версий веб-страницы или рекламного объявления для определения более эффективной</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ИСТОЧНИКИ -->
+    <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 22px 25px;">
+        <div style="font-size: 17px; font-weight: bold; color: #1a365d; margin-bottom: 15px; border-bottom: 3px solid #38a169; padding-bottom: 10px;">
+            📚 Источники и литература
+        </div>
+
+        <div style="font-size: 13px; line-height: 1.7; color: #2d3748;">
+
+            <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px; margin-top: 5px;">📊 Рынок интернет-рекламы и маркетинга</p>
+            <ol style="margin: 0 0 15px 18px; padding: 0;">
+                <li style="margin-bottom: 6px;">АРИР: российский рынок рекламы и продвижения в интернете в 2025 году вырос на 28% — до 1,569 трлн рублей. — <a href="https://interactivead.ru/products/arir-obem-rossijskogo-rynka-reklamy-i-prodvizheniya-v-internete-v-2025-godu-vyros-na-28-do-1569-trln-rublej/" target="_blank" style="color: #3182ce;">interactivead.ru</a>, 09.04.2026.</li>
+                <li style="margin-bottom: 6px;">Рынок рекламы в интернете превысил 1,5 трлн рублей в 2025 году — АРИР. — <a href="https://adindex.ru/news/ad_budjet/2026/04/9/344048.phtml" target="_blank" style="color: #3182ce;">AdIndex.ru</a>, 09.04.2026.</li>
+                <li style="margin-bottom: 6px;">РКН зафиксировал снижение объёма «белой» интернет-рекламы в 2025 году. — <a href="https://www.vedomosti.ru/media/articles/2026/07/13/1213372-rkn-zafiksiroval-snizhenie" target="_blank" style="color: #3182ce;">Ведомости</a>, 13.07.2026.</li>
+                <li style="margin-bottom: 6px;">Оценка AdIndex: в 2025 году интернет-сегмент развивался в полтора раза интенсивнее, чем годом ранее. — <a href="https://adindex.ru" target="_blank" style="color: #3182ce;">AdIndex.ru</a>, 01.04.2026.</li>
+            </ol>
+
+            <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px;">🛒 Электронная коммерция</p>
+            <ol style="margin: 0 0 15px 18px; padding: 0;" start="5">
+                <li style="margin-bottom: 6px;">АКИТ: Интернет-торговля в России по итогам 2025 года. — <a href="https://akit.ru/news/analiz-sostoyaniya-internet-torgovli-v-rossii-po-itogam-2025-goda" target="_blank" style="color: #3182ce;">akit.ru</a>, 25.02.2026.</li>
+                <li style="margin-bottom: 6px;">Рынок электронной коммерции в России замедлил рост по итогам 2025 года. — <a href="https://fomag.ru" target="_blank" style="color: #3182ce;">Fomag.ru</a>, 19.02.2026.</li>
+            </ol>
+
+            <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px;">🎯 Digital-маркетинг и стратегия</p>
+            <ol style="margin: 0 0 15px 18px; padding: 0;" start="7">
+                <li style="margin-bottom: 6px;">Dave Chaffey, Smart Insights. Digital Marketing: Strategy, Implementation and Practice. — <a href="https://www.smartinsights.com/srace/plan/" target="_blank" style="color: #3182ce;">SmartInsights.com</a>, 2025.</li>
+                <li style="margin-bottom: 6px;">Digital Marketing Institute: Career Paths and Certifications. — <a href="https://digitalmarketinginstitute.com" target="_blank" style="color: #3182ce;">DigitalMarketingInstitute.com</a>, 2025.</li>
+                <li style="margin-bottom: 6px;">«Рейтинг Рунета»: Затраты бизнеса и государства на digital-услуги выросли на 8,7%. — <a href="https://www.likeni.ru/events/zatraty-biznesa-i-gosudarstva-na-digital-uslugi-vyrosli-na-8-7-reyting-runeta/" target="_blank" style="color: #3182ce;">Likeni.ru</a>, 04.09.2026.</li>
+                <li style="margin-bottom: 6px;">«Рейтинг Рунета»: рынок услуг интернет-маркетинга в России. — <a href="https://ratingruneta.ru" target="_blank" style="color: #3182ce;">RatingRuneta.ru</a>, 2025.</li>
+            </ol>
+
+            <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px;">🤖 GEO и генеративный ИИ</p>
+            <ol style="margin: 0 0 15px 18px; padding: 0;" start="11">
+                <li style="margin-bottom: 6px;">70% российских компаний адаптируют контент под нейросети (GEO). — <a href="https://www.sostav.ru/publication/70-rossijskikh-kompanij-adaptiruyut-kontent-pod-nejroseti-85306.html" target="_blank" style="color: #3182ce;">Sostav.ru</a>, 16.07.2026.</li>
+                <li style="margin-bottom: 6px;">Гайд по GEO/AEO на 2026 год: как попасть в ИИ-ответы нейросетей. — <a href="https://habr.com" target="_blank" style="color: #3182ce;">Habr.com</a>, 02.06.2026.</li>
+            </ol>
+
+            <p style="font-weight: bold; color: #1a365d; margin-bottom: 8px;">📈 Дополнительные источники</p>
+            <ol style="margin: 0 0 5px 18px; padding: 0;" start="13">
+                <li style="margin-bottom: 6px;">McKinsey: данные по персонализации в маркетинге. — <a href="https://www.mckinsey.com" target="_blank" style="color: #3182ce;">McKinsey.com</a>.</li>
+                <li style="margin-bottom: 6px;">Unbounce: The State of A/B Testing in 2025. — <a href="https://unbounce.com" target="_blank" style="color: #3182ce;">Unbounce.com</a>, 2025.</li>
+                <li style="margin-bottom: 6px;">impact.com: Global State of Affiliate Marketing Report. — <a href="https://impact.com" target="_blank" style="color: #3182ce;">Impact.com</a>, 2025.</li>
+                <li style="margin-bottom: 6px;">TAdviser: мировой рынок мобильной коммерции. — <a href="https://tadviser.ru" target="_blank" style="color: #3182ce;">TAdviser.ru</a>, 2025.</li>
+                <li style="margin-bottom: 6px;">Kommersant: рынок краудфандинга в России. — <a href="https://www.kommersant.ru" target="_blank" style="color: #3182ce;">Kommersant.ru</a>, 2025.</li>
+                <li style="margin-bottom: 6px;">БНТУ: Особенности интернет-маркетинга в современности. — <a href="https://bntu.by" target="_blank" style="color: #3182ce;">БНТУ</a>, 2025.</li>
+            </ol>
+
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <!-- СКРИПТ -->
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

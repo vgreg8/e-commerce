@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 14. Как работает поисковая машина</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a1a2e; color: #e2e8f0; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #0c4a6e; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #0ea5e9; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 26px;
+            background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 60%, #38bdf8 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 12px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 66px; background: rgba(255,255,255,0.3); }
+
+        /* SEARCH STAGES */
+        .stages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .stage-card { border-radius: 12px; padding: 18px 14px; text-align: center; transition: transform 0.15s; }
+        .stage-card:hover { transform: translateY(-2px); }
+        .stage-card.crawl { background: #eff6ff; border: 2px solid #93c5fd; }
+        .stage-card.index { background: #f0fdf4; border: 2px solid #86efac; }
+        .stage-card.rank { background: #fef3c7; border: 2px solid #fcd34d; }
+        .stage-card .stage-icon { font-size: 30px; margin-bottom: 8px; }
+        .stage-card .stage-name { font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 6px; }
+        .stage-card .stage-desc { font-size: 11px; color: #475569; line-height: 1.45; }
+
+        /* DONUT: SEARCH MARKET */
+        .donut-card { display: flex; gap: 24px; align-items: center; background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 14px; padding: 20px 24px; }
+        .donut-chart { width: 160px; height: 160px; border-radius: 50%; position: relative; flex-shrink: 0;
+            background: conic-gradient(#e11d48 0deg 264deg, #3b82f6 264deg 354deg, #10b981 354deg 360deg); }
+        .donut-chart::after { content: ''; position: absolute; inset: 32px; background: #f0f9ff; border-radius: 50%; }
+        .donut-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .donut-center .donut-pct { font-size: 24px; font-weight: 900; color: #0c4a6e; }
+        .donut-center .donut-cap { font-size: 9px; color: #0c4a6e; text-transform: uppercase; letter-spacing: 0.4px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .donut-legend .legend-color { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+        .donut-legend .legend-text strong { color: #0c4a6e; font-size: 12px; }
+        .donut-legend .legend-text small { color: #64748b; display: block; font-size: 10.5px; }
+
+        /* INVERTED INDEX SVG */
+        .chart-card { background: #ffffff; border: 2px solid #bae6fd; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* RANKING FACTORS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #0c4a6e; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #f0f9ff; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .medium { color: #f59e0b; font-weight: bold; }
+        .metrics-table .low { color: #e11d48; font-weight: bold; }
+
+        /* ZERO-CLICK */
+        .zero-card { background: #fef2f2; border: 2px solid #fecaca; border-radius: 14px; padding: 18px 22px; }
+        .zero-card .zero-title { font-size: 14px; font-weight: bold; color: #991b1b; margin-bottom: 10px; }
+        .zero-row { display: flex; gap: 14px; align-items: center; }
+        .zero-metric { flex: 1; text-align: center; padding: 12px; background: white; border-radius: 10px; border: 1.5px solid #fecaca; }
+        .zero-metric .zm-val { font-size: 26px; font-weight: 900; color: #be123c; line-height: 1; }
+        .zero-metric .zm-cap { font-size: 10px; color: #991b1b; margin-top: 4px; line-height: 1.3; }
+
+        /* AI SEARCH TREND */
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .compare-card { border-radius: 12px; padding: 16px; }
+        .compare-card.traditional { background: #eff6ff; border: 2px solid #93c5fd; }
+        .compare-card.ai { background: #faf5ff; border: 2px solid #c4b5fd; }
+        .compare-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .compare-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #334155; }
+        .compare-card li { margin-bottom: 4px; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #0ea5e9; }
+        .rt-btn:hover { background: #0284c7; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #7dd3fc; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #e2e8f0; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #7dd3fc; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #0c4a6e; color: #7dd3fc; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #0ea5e9; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #0ea5e9; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #7dd3fc; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #7dd3fc; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #0ea5e9; color: #1a1a2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #7dd3fc; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 14. Как работает поисковая машина
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">🔍</div>
+                <div class="hero-data">
+                    <div class="hero-number">73,34%</div>
+                    <div class="hero-label">Доля Яндекса на поисковом рынке России</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">24,95%</div>
+                    <div class="hero-label">Доля Google</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">42,8%</div>
+                    <div class="hero-label">Пользователей начинают поиск в нейросетях</div>
+                </div>
+            </div>
+
+            <!-- SEARCH STAGES -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">⚙️ Три фундаментальные задачи поисковой системы</div>
+                <div class="stages-grid">
+                    <div class="stage-card crawl">
+                        <div class="stage-icon">🕷️</div>
+                        <div class="stage-name">Сканирование (Crawling)</div>
+                        <div class="stage-desc">Поисковые роботы обходят веб-страницы, переходя по ссылкам, и собирают информацию о содержимом</div>
+                    </div>
+                    <div class="stage-card index">
+                        <div class="stage-icon">📇</div>
+                        <div class="stage-name">Индексация (Indexing)</div>
+                        <div class="stage-desc">Система анализирует и сохраняет содержание документов в виде инвертированного индекса</div>
+                    </div>
+                    <div class="stage-card rank">
+                        <div class="stage-icon">🏆</div>
+                        <div class="stage-name">Ранжирование (Ranking)</div>
+                        <div class="stage-desc">Алгоритмы оценивают релевантность и качество документов, выстраивая результаты по порядку</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DONUT: SEARCH MARKET -->
+            <div class="donut-card">
+                <div class="donut-chart">
+                    <div class="donut-center">
+                        <div class="donut-pct">Рынок</div>
+                        <div class="donut-cap">поиска</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div style="font-size: 13px; font-weight: bold; color: #0c4a6e; margin-bottom: 4px;">Доли поисковых систем в России (2025–2026)</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e11d48;"></div>
+                        <div class="legend-text">
+                            <strong>Яндекс — 73,34%</strong>
+                            <small>Рост +2,6 п.п. год к году. 110 млн пользователей</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b82f6;"></div>
+                        <div class="legend-text">
+                            <strong>Google — 24,95%</strong>
+                            <small>Снижение доли. 30% запросов</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10b981;"></div>
+                        <div class="legend-text">
+                            <strong>Другие — менее 1%</strong>
+                            <small>Rambler, Mail.ru и другие</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INVERTED INDEX SVG -->
+            <div class="chart-card">
+                <div class="chart-title">📇 Как устроен инвертированный индекс <span>Пример: запрос «купить ноутбук»</span></div>
+                <svg viewBox="0 0 600 180" style="width: 100%; height: auto;">
+                    <!-- Документы -->
+                    <rect x="30" y="20" width="120" height="40" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="90" y="38" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="bold">Документ 1</text>
+                    <text x="90" y="52" font-size="9" fill="#475569" text-anchor="middle">«купить ноутбук в Москве»</text>
+
+                    <rect x="30" y="70" width="120" height="40" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="90" y="88" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="bold">Документ 2</text>
+                    <text x="90" y="102" font-size="9" fill="#475569" text-anchor="middle">«ноутбук недорого»</text>
+
+                    <rect x="30" y="120" width="120" height="40" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="90" y="138" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="bold">Документ 3</text>
+                    <text x="90" y="152" font-size="9" fill="#475569" text-anchor="middle">«купить компьютер»</text>
+
+                    <!-- Стрелки -->
+                    <text x="170" y="90" font-size="20" fill="#94a3b8" text-anchor="middle">→</text>
+
+                    <!-- Инвертированный индекс -->
+                    <rect x="210" y="20" width="360" height="140" rx="10" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+                    <text x="390" y="42" font-size="11" fill="#065f46" text-anchor="middle" font-weight="bold">Инвертированный индекс</text>
+
+                    <text x="225" y="65" font-size="10" fill="#065f46" font-weight="bold">«купить» →</text>
+                    <text x="320" y="65" font-size="10" fill="#475569">[Документ 1, Документ 3]</text>
+
+                    <text x="225" y="85" font-size="10" fill="#065f46" font-weight="bold">«ноутбук» →</text>
+                    <text x="320" y="85" font-size="10" fill="#475569">[Документ 1, Документ 2]</text>
+
+                    <text x="225" y="105" font-size="10" fill="#065f46" font-weight="bold">«москва» →</text>
+                    <text x="320" y="105" font-size="10" fill="#475569">[Документ 1]</text>
+
+                    <text x="225" y="125" font-size="10" fill="#065f46" font-weight="bold">«недорого» →</text>
+                    <text x="320" y="125" font-size="10" fill="#475569">[Документ 2]</text>
+
+                    <text x="225" y="145" font-size="10" fill="#065f46" font-weight="bold">«компьютер» →</text>
+                    <text x="320" y="145" font-size="10" fill="#475569">[Документ 3]</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Инвертированный индекс — это структура данных, где каждому слову соответствует список документов, в которых оно встречается. Это позволяет мгновенно находить релевантные документы.</div>
+            </div>
+
+            <!-- RANKING FACTORS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 8px;">📊 Факторы ранжирования поисковых систем (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Фактор</th>
+                            <th>Вес</th>
+                            <th>Описание</th>
+                            <th>Эволюция</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Релевантность контента</strong></td>
+                            <td class="high">Высокий</td>
+                            <td>Соответствие контента запросу, тематическая полнота</td>
+                            <td>Растёт (Semantic Search)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Качество и глубина контента</strong></td>
+                            <td class="high">Высокий</td>
+                            <td>Экспертность, уникальность, польза для читателя</td>
+                            <td>Растёт (E-E-A-T)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Поведенческие факторы</strong></td>
+                            <td class="high">Высокий</td>
+                            <td>CTR, время на странице, отказы, pogo-sticking</td>
+                            <td>Растёт (NavBoost)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ссылочный авторитет (PageRank)</strong></td>
+                            <td class="medium">Средний</td>
+                            <td>Количество и качество внешних ссылок</td>
+                            <td>Снижается</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Технические факторы</strong></td>
+                            <td class="medium">Средний</td>
+                            <td>Скорость загрузки, мобильная адаптация, HTTPS</td>
+                            <td>Стабильно важен</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Структурированные данные</strong></td>
+                            <td class="medium">Средний</td>
+                            <td>Schema.org, микроразметка, entity-граф</td>
+                            <td>Растёт (AI-поиск)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ZERO-CLICK -->
+            <div class="zero-card">
+                <div class="zero-title">📉 Проблема Zero-Click: пользователи уходят без клика</div>
+                <div class="zero-row">
+                    <div class="zero-metric">
+                        <div class="zm-val">58%</div>
+                        <div class="zm-cap">Поисков заканчиваются без клика</div>
+                    </div>
+                    <div class="zero-metric">
+                        <div class="zm-val">–25%</div>
+                        <div class="zm-cap">Падение органического трафика к 2026</div>
+                    </div>
+                    <div class="zero-metric">
+                        <div class="zm-val">48%</div>
+                        <div class="zm-cap">Запросов с AI Overviews</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #991b1b; margin-top: 10px;">AI Overviews появляются на 86,7% бизнес-запросов (апрель 2026). AI-трафик конвертируется на 42% лучше обычного. Источник: Pew Research, Peec AI, 2026.</div>
+            </div>
+
+            <!-- AI SEARCH TREND -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #0c4a6e; margin-bottom: 10px;">⚖️ Традиционный поиск vs AI-поиск</div>
+                <div class="compare-grid">
+                    <div class="compare-card traditional">
+                        <h5 style="color: #1d4ed8;">🔍 Традиционный поиск (SEO)</h5>
+                        <ul>
+                            <li>10 синих ссылок в выдаче</li>
+                            <li>Пользователь сам выбирает источник</li>
+                            <li>CTR топ-1: 25–30%</li>
+                            <li>Метрика: позиция, трафик, клики</li>
+                        </ul>
+                    </div>
+                    <div class="compare-card ai">
+                        <h5 style="color: #7c3aed;">🤖 AI-поиск (GEO)</h5>
+                        <ul>
+                            <li>AI Overviews на 48% запросов</li>
+                            <li>ИИ формирует ответ, цитируя источники</li>
+                            <li>CTR падает до 8%</li>
+                            <li>Метрика: цитируемость, доля в ответе</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Как работает поиск</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Индексация сайтов</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: AI-поиск и Zero-Click</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 14 из 15
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a1a2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #1e293b; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали CMS — системы управления контентом. Сегодня мы поговорим о том, как работает поисковая машина. Понимание этих процессов — фундамент для любого специалиста по интернет-маркетингу. Без этого невозможно ни продвигать сайт, ни оценивать эффективность контента.</p>
+
+            <div class="action-hint">Обратите внимание студентов на блок с тремя фундаментальными задачами.</div>
+
+            <h3>📌 Аналогия с «Жёлтыми страницами»</h3>
+
+            <p>Поисковая система работает как «Жёлтые страницы»: она обновляет информацию и удовлетворяет запросы пользователей. Две ключевые функции — пополнение информации (индексация) и удовлетворение запросов (выдача результатов).</p>
+
+            <h3>📌 Три фундаментальные задачи поисковой системы</h3>
+
+            <p>Современные поисковые системы выполняют три основные задачи. Первая — <strong>сканирование (crawling)</strong>. Поисковые роботы обходят веб-страницы, переходя по ссылкам, и собирают информацию о содержимом. Вторая — <strong>индексация (indexing)</strong>. Система анализирует и сохраняет содержание документов в виде инвертированного индекса — структуры данных, где каждому слову соответствует список документов, в которых оно встречается. Третья — <strong>ранжирование (ranking)</strong>. Алгоритмы оценивают релевантность и качество документов, выстраивая результаты по порядку.</p>
+
+            <p>Этот процесс непрерывный и масштабный. Инвертированный индекс для миллиардов страниц требует огромных вычислительных ресурсов. Именно поэтому поисковые системы — одни из самых сложных инженерных проектов в истории человечества.</p>
+
+            <div class="action-hint">Обратите внимание студентов на круговую диаграмму долей поисковых систем.</div>
+
+            <h3>📌 Доли поисковых систем в России</h3>
+
+            <p>По итогам 2025–2026 годов «Яндекс» усилил доминирование на российском рынке и достиг <span class="stat-inline">73,34%</span> — рост на 2,6 п.п. год к году. Доля Google снизилась до <span class="stat-inline">24,95%</span>. Остальные поисковики (Rambler, Mail.ru) занимают менее 1%.</p>
+
+            <p>На десктопах доля Яндекса достигла рекордных 73,47%, на мобильных устройствах — 68,4%. Ежемесячная аудитория «Яндекс Поиска» — 110 млн активных пользователей.</p>
+
+            <p>Важный тренд: 42,8% пользователей начинают поиск информации в нейросетях, а не в классических поисковиках. Это меняет всю логику поискового маркетинга.</p>
+
+            <h3>📌 Факторы ранжирования поисковых систем</h3>
+
+            <p>Давайте разберём, какие факторы влияют на позицию сайта в поисковой выдаче.</p>
+
+            <p><strong>Релевантность контента.</strong> Соответствие контента запросу, тематическая полнота. Вес этого фактора растёт с развитием семантического поиска. Поисковики уже не просто ищут точное вхождение ключевых слов, а понимают смысл запроса.</p>
+
+            <p><strong>Качество и глубина контента.</strong> Экспертность, уникальность, польза для читателя. Концепция E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) стала центральной в алгоритмах Google. Контент должен демонстрировать реальный опыт, экспертизу, авторитет и надёжность.</p>
+
+            <p><strong>Поведенческие факторы.</strong> CTR (кликабельность сниппета), время на странице, отказы, pogo-sticking (возврат в выдачу после клика). Google в рамках антимонопольного дела 2025 года подтвердил, что сигналы NavBoost — данные о кликах пользователей — играют центральную роль в ранжировании.</p>
+
+            <p><strong>Ссылочный авторитет (PageRank).</strong> Количество и качество внешних ссылок. Роль этого фактора снижается: если раньше PageRank был доминирующим, то сегодня он уступает место контенту и поведенческим факторам. Согласно исследованию Editorial.Link, 73,2% SEO-специалистов считают, что обратные ссылки по-прежнему влияют на результаты, но их значимость упала.</p>
+
+            <p><strong>Технические факторы.</strong> Скорость загрузки, мобильная адаптация, HTTPS, Core Web Vitals. Эти факторы стабильно важны, но не являются решающими.</p>
+
+            <p><strong>Структурированные данные.</strong> Schema.org, микроразметка, entity-граф. Роль этого фактора растёт в контексте AI-поиска: структурированные данные помогают ИИ-системам понимать контент и цитировать его.</p>
+
+            <h3>📌 Проблема Zero-Click</h3>
+
+            <p>Один из ключевых вызовов современного поиска — Zero-Click. <span class="stat-inline">58%</span> поисковых запросов заканчиваются без клика на сайт. Пользователь получает ответ прямо в выдаче или в AI Overviews.</p>
+
+            <p>AI Overviews — сгенерированные ИИ ответы, которые появляются над традиционными результатами. По данным BrightEdge, в 2026 году AI Overviews появляются на 48% запросов, в то время как годом ранее — на 30%. Для бизнес-запросов эта цифра достигает 86,7%.</p>
+
+            <p>Как следствие, органический трафик падает на 25–50% к 2026 году. CTR топ-1 позиции в поиске с AI Overviews снижается до 8% против 25–30% без него. Исследование Ahrefs показало, что AI Overviews коррелируют со снижением CTR на 58% для страниц с высоким рейтингом.</p>
+
+            <p>Однако есть и позитивный момент: AI-трафик конвертируется на 42% лучше обычного. Пользователи, которые всё-таки переходят по ссылке из AI Overview, более мотивированы и целенаправлены.</p>
+
+            <div class="action-hint">Перейдите к сравнению традиционного поиска и AI-поиска.</div>
+
+            <h3>📌 Традиционный поиск vs AI-поиск</h3>
+
+            <p>Ключевое отличие в том, что традиционный поиск показывает 10 синих ссылок, и пользователь сам выбирает источник. AI-поиск формирует готовый ответ, цитируя источники. Это меняет метрики: вместо позиции и трафика ключевыми становятся цитируемость и доля в AI-ответе.</p>
+
+            <p>По данным исследования, URL на позиции 1 в Google цитируются хотя бы одной AI-платформой в 54% случаев. Это означает, что традиционное SEO по-прежнему важно — но теперь оно должно работать на то, чтобы попасть в AI-ответ.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали, как работает поисковая машина. Ключевые выводы:</p>
+
+            <ul>
+                <li>Поисковая система выполняет три задачи: сканирование, индексацию и ранжирование.</li>
+                <li>Яндекс доминирует на российском рынке — 73,34%. Google — 24,95%.</li>
+                <li>Ключевые факторы ранжирования: релевантность, качество контента, поведенческие факторы, ссылки, технические параметры.</li>
+                <li>Zero-Click стал реальностью: 58% запросов без клика. AI Overviews появляются на 48% запросов.</li>
+                <li>AI-трафик конвертируется на 42% лучше, но его объём падает.</li>
+                <li>Понимание работы поисковиков — основа для SEO и GEO.</li>
+            </ul>
+
+            <p>На следующей, заключительной лекции мы разберём SEO-факторы и эволюцию их веса. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AI Overviews</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">AI-обзоры</div>
+                            <div class="gloss-def">Сгенерированные ИИ ответы в поисковой выдаче Google</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CTR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Click-Through Rate</div>
+                            <div class="gloss-def">Показатель кликабельности — отношение кликов к показам</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Crawling</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Сканирование</div>
+                            <div class="gloss-def">Процесс обхода веб-страниц поисковыми роботами</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">E-E-A-T</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Experience, Expertise, Authoritativeness, Trustworthiness</div>
+                            <div class="gloss-def">Опыт, экспертиза, авторитет, надёжность — критерии качества контента</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Generative Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация для генеративных поисковых систем и нейросетей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">PageRank</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Алгоритм PageRank</div>
+                            <div class="gloss-def">Алгоритм оценки авторитетности страницы на основе внешних ссылок</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Pogo-sticking</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Пого-стикинг</div>
+                            <div class="gloss-def">Возврат пользователя в выдачу после клика — сигнал неудовлетворённости</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SEO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Search Engine Optimization</div>
+                            <div class="gloss-def">Оптимизация сайта для поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Zero-Click</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Нулевой клик</div>
+                            <div class="gloss-def">Ситуация, когда пользователь получает ответ в выдаче без перехода на сайт</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Поисковые системы и рынок</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Sostav.ru: Поисковые системы и нейросети 2026 — Яндекс 73,34%. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">IntelliNews: Yandex captures 70% of Russia's search market. — <a href="https://www.intellinews.com" target="_blank">IntelliNews.com</a> <span class="src-date">08.04.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">SEOnews: 42,8% пользователей начинают поиск в нейросетях. — <a href="https://www.seonews.ru" target="_blank">SEONews.ru</a> <span class="src-date">26.06.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">⚙️ Как работают поисковики</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Agima: Как работают поисковики — 4 точки зрения. — <a href="https://www.agima.ru" target="_blank">Agima.ru</a> <span class="src-date">09.04.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Microsoft Learn: How Search Engines Work — Crawling, Indexing, Ranking. — <a href="https://learn.microsoft.com" target="_blank">Microsoft.com</a> <span class="src-date">14.01.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 SEO-факторы</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">ScienceDirect: Estimating Google's ranking function from SEO perspective. — <a href="https://www.sciencedirect.com" target="_blank">ScienceDirect.com</a> <span class="src-date">29.06.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Raptive: What Google's December 2025 core update tells us about quality. — <a href="https://raptive.com" target="_blank">Raptive.com</a> <span class="src-date">04.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Search Engine Journal: Google's Quality Rankings — 7 core content factors. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">10.07.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🤖 AI-поиск и Zero-Click</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Pew Research: Users click traditional results 8% of the time with AI Overviews. — <a href="https://www.pewresearch.org" target="_blank">PewResearch.org</a> <span class="src-date">2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Search Engine Journal: AI Overviews correlate with 58% CTR reduction. — <a href="https://www.searchenginejournal.com" target="_blank">SEJ.com</a> <span class="src-date">01.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Peec AI: 70+ GEO Statistics for 2026 — AI Overviews on 86.7% of business queries. — <a href="https://peec.ai" target="_blank">Peec.ai</a> <span class="src-date">31.03.2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

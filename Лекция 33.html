@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 33. Анализ эффективности</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a0f2e; color: #f3e8ff; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #6b21a8; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #a855f7; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-stat {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, #6b21a8 0%, #9333ea 60%, #c084fc 100%);
+            border-radius: 16px; padding: 24px 30px; color: white;
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.25);
+        }
+        .hero-stat .hero-icon { font-size: 52px; }
+        .hero-stat .hero-data { flex: 1; }
+        .hero-stat .hero-number { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .hero-stat .hero-label { font-size: 11px; opacity: 0.9; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat .hero-divider { width: 2px; height: 60px; background: rgba(255,255,255,0.3); }
+
+        /* MASON MATRIX SVG */
+        .chart-card { background: #ffffff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.08); }
+        .chart-card .chart-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .chart-card .chart-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* 6 SYSTEMS GRID */
+        .systems-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .system-card { border-radius: 12px; padding: 14px 12px; }
+        .system-card.s1 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .system-card.s2 { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .system-card.s3 { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .system-card.s4 { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .system-card.s5 { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 2px solid #8b5cf6; }
+        .system-card.s6 { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 2px solid #dc2626; }
+        .system-card .sc-icon { font-size: 20px; margin-bottom: 5px; }
+        .system-card .sc-name { font-size: 11.5px; font-weight: 900; margin-bottom: 4px; }
+        .system-card.s1 .sc-name { color: #1e3a8a; }
+        .system-card.s2 .sc-name { color: #065f46; }
+        .system-card.s3 .sc-name { color: #78350f; }
+        .system-card.s4 .sc-name { color: #831843; }
+        .system-card.s5 .sc-name { color: #5b21b6; }
+        .system-card.s6 .sc-name { color: #991b1b; }
+        .system-card .sc-desc { font-size: 9.5px; color: #1e293b; line-height: 1.4; margin-bottom: 5px; }
+        .system-card .sc-tools { font-size: 9.5px; color: #7c3aed; font-weight: 600; }
+
+        /* FUNNEL SVG */
+        .funnel-card { background: #faf5ff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 20px 24px; }
+        .funnel-card .fn-title { font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 14px; }
+
+        /* CONVERSION GRID */
+        .conv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .conv-card { border-radius: 12px; padding: 16px; }
+        .conv-card.c1 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border: 2px solid #3b82f6; }
+        .conv-card.c2 { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #10b981; }
+        .conv-card.c3 { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .conv-card.c4 { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 2px solid #ec4899; }
+        .conv-card .cc-icon { font-size: 22px; margin-bottom: 5px; }
+        .conv-card .cc-name { font-size: 12px; font-weight: 900; margin-bottom: 5px; }
+        .conv-card.c1 .cc-name { color: #1e3a8a; }
+        .conv-card.c2 .cc-name { color: #065f46; }
+        .conv-card.c3 .cc-name { color: #78350f; }
+        .conv-card.c4 .cc-name { color: #831843; }
+        .conv-card .cc-formula { font-size: 10.5px; color: #475569; font-family: 'Consolas', monospace; background: rgba(255,255,255,0.6); padding: 6px 8px; border-radius: 6px; margin-bottom: 6px; line-height: 1.4; }
+        .conv-card .cc-desc { font-size: 10px; color: #1e293b; line-height: 1.4; }
+
+        /* ONSITE OFFSITE */
+        .onsite-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .onsite-card { border-radius: 12px; padding: 16px; }
+        .onsite-card.on { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #16a34a; }
+        .onsite-card.off { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .onsite-card h5 { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .onsite-card ul { margin: 0 0 0 16px; font-size: 11px; line-height: 1.55; color: #1e293b; }
+        .onsite-card li { margin-bottom: 4px; }
+        .onsite-card .tools { font-size: 10px; color: #7c3aed; margin-top: 6px; font-weight: 600; }
+
+        /* EVOLUTION TIMELINE */
+        .evolution-card { background: #f0fdfa; border: 2px solid #99f6e4; border-radius: 14px; padding: 20px 24px; }
+        .evolution-card .evo-title { font-size: 14px; font-weight: bold; color: #134e4a; margin-bottom: 16px; }
+        .evo-track { display: flex; justify-content: space-between; position: relative; padding: 0 10px; }
+        .evo-track::before { content: ''; position: absolute; top: 22px; left: 0; width: 100%; height: 4px; background: #99f6e4; z-index: 1; }
+        .evo-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 24%; }
+        .evo-dot { width: 44px; height: 44px; border-radius: 50%; background: #0d9488; border: 4px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-bottom: 8px; font-weight: 900; }
+        .evo-item.final .evo-dot { background: #e11d48; transform: scale(1.1); }
+        .evo-year { font-size: 10px; font-weight: 900; color: #134e4a; }
+        .evo-label { font-size: 9.5px; color: #475569; text-align: center; line-height: 1.25; margin-top: 3px; }
+
+        /* METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .metrics-table th { background: #6b21a8; color: white; padding: 9px 10px; text-align: left; font-weight: 600; }
+        .metrics-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #2d3748; line-height: 1.4; }
+        .metrics-table tr:nth-child(even) td { background: #faf5ff; }
+        .metrics-table .high { color: #059669; font-weight: bold; }
+        .metrics-table .cat { color: #7c3aed; font-weight: bold; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #a855f7; }
+        .rt-btn:hover { background: #9333ea; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #d8b4fe; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #6b21a8; padding-bottom: 10px; }
+        .timer-badge { background: #fbbf24; color: #1a0f2e; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; font-weight: bold; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #f3e8ff; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #d8b4fe; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #6b21a8; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #6b21a8; color: #d8b4fe; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #d8b4fe; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #a855f7; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #1e293b; border-left: 3px solid #a855f7; border-radius: 6px; padding: 10px 14px; align-items: flex-start; }
+        .gloss-card:hover { background: #334155; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #d8b4fe; font-size: 13px; min-width: 100px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #d8b4fe; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #1e293b; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #a855f7; color: #1a0f2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #d8b4fe; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 33. Анализ эффективности
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-stat">
+                <div class="hero-icon">📊</div>
+                <div class="hero-data">
+                    <div class="hero-number">58%</div>
+                    <div class="hero-label">Запросов без клика (Zero-Click)</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">2,4×</div>
+                    <div class="hero-label">Доверие UGC vs реклама</div>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-data">
+                    <div class="hero-number">×36</div>
+                    <div class="hero-label">ROI e-mail-маркетинга</div>
+                </div>
+            </div>
+
+            <!-- MASON MATRIX SVG -->
+            <div class="chart-card">
+                <div class="chart-title">🎯 Матрица Нила Мейсона: 6 систем анализа эффективности <span>Мониторинг ↔ Диагностика</span></div>
+                <svg viewBox="0 0 600 320" style="width: 100%; height: auto;">
+                    <!-- Оси -->
+                    <line x1="60" y1="280" x2="580" y2="280" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="60" y1="20" x2="60" y2="280" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="320" y1="20" x2="320" y2="280" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 3"/>
+                    <line x1="60" y1="150" x2="580" y2="150" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 3"/>
+
+                    <!-- Подписи осей -->
+                    <text x="320" y="15" font-size="11" fill="#6b21a8" text-anchor="middle" font-weight="bold">Мониторинг ← → Диагностика</text>
+                    <text x="40" y="160" font-size="11" fill="#6b21a8" font-weight="bold">Отношение</text>
+                    <text x="40" y="90" font-size="11" fill="#6b21a8" font-weight="bold">Поведение</text>
+
+                    <!-- Квадранты -->
+                    <text x="190" y="50" font-size="10" fill="#64748b" text-anchor="middle" font-weight="bold">Мониторинг + Отношение</text>
+                    <text x="450" y="50" font-size="10" fill="#64748b" text-anchor="middle" font-weight="bold">Диагностика + Отношение</text>
+                    <text x="190" y="200" font-size="10" fill="#64748b" text-anchor="middle" font-weight="bold">Мониторинг + Поведение</text>
+                    <text x="450" y="200" font-size="10" fill="#64748b" text-anchor="middle" font-weight="bold">Диагностика + Поведение</text>
+
+                    <!-- Точки систем -->
+                    <circle cx="190" cy="90" r="14" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+                    <text x="190" y="94" font-size="11" text-anchor="middle" font-weight="bold" fill="#78350f">3</text>
+                    <text x="190" y="118" font-size="9.5" fill="#78350f" text-anchor="middle" font-weight="bold">Голос клиента</text>
+
+                    <circle cx="450" cy="90" r="14" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>
+                    <text x="450" y="94" font-size="11" text-anchor="middle" font-weight="bold" fill="#991b1b">6</text>
+                    <text x="450" y="118" font-size="9.5" fill="#991b1b" text-anchor="middle" font-weight="bold">Исследования опыта</text>
+
+                    <circle cx="190" cy="230" r="14" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="190" y="234" font-size="11" text-anchor="middle" font-weight="bold" fill="#1e3a8a">1</text>
+                    <text x="190" y="258" font-size="9.5" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Веб-аналитика</text>
+
+                    <circle cx="300" cy="230" r="14" fill="#dcfce7" stroke="#10b981" stroke-width="2.5"/>
+                    <text x="300" y="234" font-size="11" text-anchor="middle" font-weight="bold" fill="#065f46">2</text>
+                    <text x="300" y="258" font-size="9.5" fill="#065f46" text-anchor="middle" font-weight="bold">Анализ сессий</text>
+
+                    <circle cx="350" cy="90" r="14" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2.5"/>
+                    <text x="350" y="94" font-size="11" text-anchor="middle" font-weight="bold" fill="#5b21b6">5</text>
+                    <text x="350" y="118" font-size="9.5" fill="#5b21b6" text-anchor="middle" font-weight="bold">Соц. слушание</text>
+
+                    <circle cx="450" cy="230" r="14" fill="#fce7f3" stroke="#ec4899" stroke-width="2.5"/>
+                    <text x="450" y="234" font-size="11" text-anchor="middle" font-weight="bold" fill="#831843">4</text>
+                    <text x="450" y="258" font-size="9.5" fill="#831843" text-anchor="middle" font-weight="bold">Тестирование</text>
+                </svg>
+            </div>
+
+            <!-- 6 SYSTEMS GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 10px;">🔍 Шесть систем анализа эффективности</div>
+                <div class="systems-grid">
+                    <div class="system-card s1">
+                        <div class="sc-icon">📈</div>
+                        <div class="sc-name">1. Веб-аналитика</div>
+                        <div class="sc-desc">Что происходит на сайте. Агрегированные данные</div>
+                        <div class="sc-tools">GA4, Яндекс.Метрика</div>
+                    </div>
+                    <div class="system-card s2">
+                        <div class="sc-icon">🖱️</div>
+                        <div class="sc-name">2. Анализ сессий</div>
+                        <div class="sc-desc">Отдельные сессии, карты кликов, тепловые карты</div>
+                        <div class="sc-tools">Hotjar, Crazy Egg, Яндекс.Вебвизор</div>
+                    </div>
+                    <div class="system-card s3">
+                        <div class="sc-icon">💬</div>
+                        <div class="sc-name">3. Голос клиента</div>
+                        <div class="sc-desc">Опросы удовлетворённости, NPS, прямая обратная связь</div>
+                        <div class="sc-tools">Qualtrics, SurveyMonkey</div>
+                    </div>
+                    <div class="system-card s4">
+                        <div class="sc-icon">🧪</div>
+                        <div class="sc-name">4. Тестирование</div>
+                        <div class="sc-desc">Лабораторное и удалённое A/B-тестирование</div>
+                        <div class="sc-tools">UserTesting, Maze, VWO</div>
+                    </div>
+                    <div class="system-card s5">
+                        <div class="sc-icon">👂</div>
+                        <div class="sc-name">5. Соц. слушание</div>
+                        <div class="sc-desc">Sentiment-анализ высказываний в соцмедиа</div>
+                        <div class="sc-tools">Brand Analytics, YouScan</div>
+                    </div>
+                    <div class="system-card s6">
+                        <div class="sc-icon">🎤</div>
+                        <div class="sc-name">6. Исследования опыта</div>
+                        <div class="sc-desc">Фокус-группы, глубинные интервью</div>
+                        <div class="sc-tools">Nielsen, Kantar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FUNNEL SVG -->
+            <div class="funnel-card">
+                <div class="fn-title">🔻 Бренд-воронка и этапы анализа эффективности</div>
+                <svg viewBox="0 0 600 300" style="width: 100%; height: auto;">
+                    <!-- Слой 1: Бренд-воронка -->
+                    <text x="15" y="25" font-size="10" fill="#6b21a8" font-weight="bold">Бренд-воронка:</text>
+                    <rect x="130" y="10" width="70" height="22" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="165" y="25" font-size="9" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Осведомлённость</text>
+
+                    <rect x="205" y="10" width="70" height="22" rx="4" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="240" y="25" font-size="9" fill="#065f46" text-anchor="middle" font-weight="bold">Знакомство</text>
+
+                    <rect x="280" y="10" width="70" height="22" rx="4" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="315" y="25" font-size="9" fill="#78350f" text-anchor="middle" font-weight="bold">Симпатия</text>
+
+                    <rect x="355" y="10" width="70" height="22" rx="4" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+                    <text x="390" y="25" font-size="9" fill="#831843" text-anchor="middle" font-weight="bold">Рассмотрение</text>
+
+                    <rect x="430" y="10" width="70" height="22" rx="4" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+                    <text x="465" y="25" font-size="9" fill="#5b21b6" text-anchor="middle" font-weight="bold">Покупка</text>
+
+                    <rect x="505" y="10" width="70" height="22" rx="4" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+                    <text x="540" y="25" font-size="9" fill="#991b1b" text-anchor="middle" font-weight="bold">Владение</text>
+
+                    <!-- Слой 2: Веб-стратегия -->
+                    <text x="15" y="65" font-size="10" fill="#6b21a8" font-weight="bold">Веб-стратегия:</text>
+                    <rect x="130" y="50" width="70" height="22" rx="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                    <text x="165" y="65" font-size="8.5" fill="#334155" text-anchor="middle">Привлечь</text>
+                    <rect x="205" y="50" width="70" height="22" rx="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                    <text x="240" y="65" font-size="8.5" fill="#334155" text-anchor="middle">Связаться</text>
+                    <rect x="280" y="50" width="70" height="22" rx="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                    <text x="315" y="65" font-size="8.5" fill="#334155" text-anchor="middle">Внушить</text>
+                    <rect x="355" y="50" width="70" height="22" rx="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                    <text x="390" y="65" font-size="8.5" fill="#334155" text-anchor="middle">Убедить</text>
+                    <rect x="430" y="50" width="70" height="22" rx="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                    <text x="465" y="65" font-size="8.5" fill="#334155" text-anchor="middle">Конверсия</text>
+                    <rect x="505" y="50" width="70" height="22" rx="4" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                    <text x="540" y="65" font-size="8.5" fill="#334155" text-anchor="middle">Удержать</text>
+
+                    <!-- Слой 3: Параметры достижения -->
+                    <text x="15" y="105" font-size="10" fill="#6b21a8" font-weight="bold">Параметры:</text>
+                    <text x="165" y="105" font-size="8.5" fill="#475569" text-anchor="middle">Объём и качество</text>
+                    <text x="240" y="105" font-size="8.5" fill="#475569" text-anchor="middle">Юзабилити</text>
+                    <text x="315" y="105" font-size="8.5" fill="#475569" text-anchor="middle">Контент</text>
+                    <text x="390" y="105" font-size="8.5" fill="#475569" text-anchor="middle">Продажи</text>
+                    <text x="465" y="105" font-size="8.5" fill="#475569" text-anchor="middle">Расчёты</text>
+                    <text x="540" y="105" font-size="8.5" fill="#475569" text-anchor="middle">Повторные</text>
+
+                    <!-- Слой 4: Источники данных -->
+                    <text x="15" y="150" font-size="10" fill="#6b21a8" font-weight="bold">Источники:</text>
+                    <text x="400" y="150" font-size="9" fill="#334155">Конкурентный анализ · Юзабилити-тесты · Качественные исследования · Анализ воронки · NPS · CRM · Клик-стримы</text>
+
+                    <!-- Слой 5: KPIs -->
+                    <text x="15" y="200" font-size="10" fill="#6b21a8" font-weight="bold">KPIs:</text>
+                    <rect x="130" y="185" width="70" height="35" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+                    <text x="165" y="200" font-size="8.5" fill="#1e3a8a" text-anchor="middle" font-weight="bold">Уникальные</text>
+                    <text x="165" y="213" font-size="8.5" fill="#1e3a8a" text-anchor="middle" font-weight="bold">посетители</text>
+
+                    <rect x="205" y="185" width="70" height="35" rx="4" fill="#dcfce7" stroke="#10b981" stroke-width="1"/>
+                    <text x="240" y="200" font-size="8.5" fill="#065f46" text-anchor="middle" font-weight="bold">Индекс</text>
+                    <text x="240" y="213" font-size="8.5" fill="#065f46" text-anchor="middle" font-weight="bold">вовлечения</text>
+
+                    <rect x="280" y="185" width="70" height="35" rx="4" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+                    <text x="315" y="200" font-size="8.5" fill="#78350f" text-anchor="middle" font-weight="bold">Индекс</text>
+                    <text x="315" y="213" font-size="8.5" fill="#78350f" text-anchor="middle" font-weight="bold">контента</text>
+
+                    <rect x="355" y="185" width="70" height="35" rx="4" fill="#fce7f3" stroke="#ec4899" stroke-width="1"/>
+                    <text x="390" y="200" font-size="8.5" fill="#831843" text-anchor="middle" font-weight="bold">Корзина /</text>
+                    <text x="390" y="213" font-size="8.5" fill="#831843" text-anchor="middle" font-weight="bold">конверсия</text>
+
+                    <rect x="430" y="185" width="70" height="35" rx="4" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1"/>
+                    <text x="465" y="200" font-size="8.5" fill="#5b21b6" text-anchor="middle" font-weight="bold">% удержания</text>
+                    <text x="465" y="213" font-size="8.5" fill="#5b21b6" text-anchor="middle" font-weight="bold">клиентов</text>
+
+                    <!-- Легенда -->
+                    <text x="300" y="270" font-size="10" fill="#6b21a8" text-anchor="middle" font-weight="bold">От осведомлённости до владения → каждый этап воронки имеет свой KPI</text>
+                    <text x="300" y="290" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">Выпадение на любом этапе — сигнал для оптимизации</text>
+                </svg>
+            </div>
+
+            <!-- CONVERSION GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 10px;">🎯 Четыре вида конверсии</div>
+                <div class="conv-grid">
+                    <div class="conv-card c1">
+                        <div class="cc-icon">🖼️</div>
+                        <div class="cc-name">Конверсия рекламного материала</div>
+                        <div class="cc-formula">Число перешедших по ссылке<br>÷ Число видевших рекламу</div>
+                        <div class="cc-desc">Показывает, насколько эффективно рекламное объявление привлекает внимание</div>
+                    </div>
+                    <div class="conv-card c2">
+                        <div class="cc-icon">📄</div>
+                        <div class="cc-name">Конверсия рекламной страницы</div>
+                        <div class="cc-formula">Число перешедших по ссылке<br>÷ Число посетивших страницу</div>
+                        <div class="cc-desc">Насколько удачно landing page удерживает пользователя</div>
+                    </div>
+                    <div class="conv-card c3">
+                        <div class="cc-icon">👤</div>
+                        <div class="cc-name">Качественный посетитель</div>
+                        <div class="cc-formula">Загрузил &gt; 1 страницы,<br>не ушёл сразу</div>
+                        <div class="cc-desc">Проявил интерес, готов к вовлечению</div>
+                    </div>
+                    <div class="conv-card c4">
+                        <div class="cc-icon">✅</div>
+                        <div class="cc-name">Конверсия целевого действия</div>
+                        <div class="cc-formula">Число клиентов<br>÷ Число совершивших действие</div>
+                        <div class="cc-desc">Финальная метрика: покупка, подписка, звонок</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONSITE OFFSITE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 10px;">⚖️ On-site vs Off-site аналитика</div>
+                <div class="onsite-grid">
+                    <div class="onsite-card on">
+                        <h5 style="color: #065f46;">🖥️ On-site аналитика</h5>
+                        <ul>
+                            <li>Владелец сайта измеряет коммерческую производительность</li>
+                            <li>Воронка продаж, конверсии, отказы</li>
+                            <li>A/B-тесты посадочных страниц</li>
+                            <li>Влияние каналов трафика на выручку</li>
+                        </ul>
+                        <div class="tools">Google Analytics 4, Яндекс.Метрика, Adobe Analytics</div>
+                    </div>
+                    <div class="onsite-card off">
+                        <h5 style="color: #78350f;">🌐 Off-site аналитика</h5>
+                        <ul>
+                            <li>Анализ аудитории без собственного сайта</li>
+                            <li>Интересы, структура, тренды</li>
+                            <li>Конкурентный анализ рынка</li>
+                            <li>Поведенческие срезы по сегментам</li>
+                        </ul>
+                        <div class="tools">Mediascope, SimilarWeb, Brand Analytics, ComScore</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVOLUTION TIMELINE -->
+            <div class="evolution-card">
+                <div class="evo-title">📅 Эволюция аналитики по Forrester: 4 этапа</div>
+                <div class="evo-track">
+                    <div class="evo-item">
+                        <div class="evo-dot">📁</div>
+                        <div class="evo-year">1993–1999</div>
+                        <div class="evo-label">Log Files<br>Анализ серверных логов</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">🌐</div>
+                        <div class="evo-year">2000–2006</div>
+                        <div class="evo-label">Web Analytics<br>JavaScript-теги, GA</div>
+                    </div>
+                    <div class="evo-item">
+                        <div class="evo-dot">📊</div>
+                        <div class="evo-year">2007–2010</div>
+                        <div class="evo-label">Digital Analytics<br>Соцмедиа, многоканальность</div>
+                    </div>
+                    <div class="evo-item final">
+                        <div class="evo-dot">🤖</div>
+                        <div class="evo-year">2011–н.в.</div>
+                        <div class="evo-label">Digital Intelligence<br>AI, Big Data, real-time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRICS TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #6b21a8; margin-bottom: 8px;">📋 Ключевые показатели эффективности российского digital-маркетинга (2025)</div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Значение</th>
+                            <th>Динамика</th>
+                            <th>Источник</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Доля performance-бюджетов</td>
+                            <td class="high">96,7%</td>
+                            <td class="cat">растёт</td>
+                            <td>CFO Russia</td>
+                        </tr>
+                        <tr>
+                            <td>Запросы без клика (Zero-Click)</td>
+                            <td class="high">58%</td>
+                            <td class="cat">растёт</td>
+                            <td>Zenodo</td>
+                        </tr>
+                        <tr>
+                            <td>ROI email-маркетинга</td>
+                            <td class="high">×36</td>
+                            <td class="cat">стабильно</td>
+                            <td>Litmus</td>
+                        </tr>
+                        <tr>
+                            <td>Доверие UGC vs реклама</td>
+                            <td class="high">2,4×</td>
+                            <td class="cat">растёт</td>
+                            <td>Nielsen</td>
+                        </tr>
+                        <tr>
+                            <td>Средний ER в соцсетях</td>
+                            <td>1,5–3%</td>
+                            <td class="cat">стабильно</td>
+                            <td>Hootsuite</td>
+                        </tr>
+                        <tr>
+                            <td>Доля компаний с AI в маркетинге</td>
+                            <td class="high">93%</td>
+                            <td class="cat">растёт</td>
+                            <td>RB.ru</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Матрица Мейсона</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Виды конверсии</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: Эволюция аналитики</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 33 из 33
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a0f2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #6b21a8; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! Сегодня — заключительная лекция нашего курса. Мы разберём анализ эффективности — как измерять результаты маркетинговых кампаний и принимать решения на основе данных. Это финальный, самый важный этап цикла интернет-маркетинга.</p>
+
+            <div class="action-hint">Обратите внимание студентов на hero-блок с ключевыми метриками.</div>
+
+            <h3>📌 Ограничения веб-аналитики</h3>
+
+            <p>Исторически так сложилось, что наибольшее распространение получили системы веб-аналитики. Однако они имеют определённые ограничения. Например, с помощью веб-аналитики мы можем проследить, что пользователи, выбирающие товар в интернет-магазине, не доходят до оплаты набранной корзины. Мы видим, на каком этапе происходит выпадение из воронки продаж. Но зачастую мы не можем ответить на вопросы, <em>почему</em> это происходит. Нам не хватает диагностики: связано ли это с плохой юзабилити сайта, с высокой ценой товара или с другими причинами.</p>
+
+            <p>Поэтому для полного анализа эффективности необходимы разные методы и системы.</p>
+
+            <div class="action-hint">Перейдите к матрице Нила Мейсона.</div>
+
+            <h3>📌 Матрица Нила Мейсона: 6 систем анализа</h3>
+
+            <p>Нил Мейсон предложил матрицу из четырёх квадрантов. По горизонтальной оси: мониторинг и диагностика. По вертикальной: поведение и отношение аудитории.</p>
+
+            <p><strong>Веб-аналитика</strong> — мониторинг + поведение. Отвечает на вопрос «что происходит на сайте». Данные представляются в агрегированном виде. Инструменты: Google Analytics 4, Яндекс.Метрика.</p>
+
+            <p><strong>Системы анализа общения с ресурсом</strong> — диагностика + поведение. Позволяют анализировать небольшое количество пользователей, отдельные сессии. Пример: heat maps — карты кликов и тепловые карты. Инструменты: Hotjar, Crazy Egg, Яндекс.Вебвизор.</p>
+
+            <p><strong>Голос клиента</strong> — мониторинг + отношение. Отслеживание степени удовлетворённости клиентов, прямые вопросы о том, насколько удобна та или иная функция. Инструменты: Qualtrics, SurveyMonkey.</p>
+
+            <p><strong>Тестирование пользователей</strong> — наполовину поведенческие, наполовину отношенческие системы. Лабораторное и удалённое тестирование. Инструменты: UserTesting, Maze, VWO.</p>
+
+            <p><strong>Социальное слушание</strong> — мониторинг + отношение. Анализ настроений, мнений в социальных сетях. Sentiment-анализ. Инструменты: Brand Analytics, YouScan.</p>
+
+            <p><strong>Исследования опыта</strong> — диагностика + отношение. Фокус-группы, где моделируется аудитория. Отвечает на вопрос, как разные группы относятся к брендам и услугам. Инструменты: Nielsen, Kantar.</p>
+
+            <div class="action-hint">Перейдите к бренд-воронке.</div>
+
+            <h3>📌 Бренд-воронка и этапы анализа</h3>
+
+            <p>Комплексная схема анализа эффективности включает несколько слоёв.</p>
+
+            <p><strong>Слой 1 — Бренд-воронка:</strong> осведомлённость → знакомство → симпатия → рассмотрение → покупка → владение.</p>
+
+            <p><strong>Слой 2 — Поведение покупателей:</strong> формирование мнения → исследование → выбор → действие → повторная покупка.</p>
+
+            <p><strong>Слой 3 — Веб-стратегия:</strong> привлечь внимание → связаться → внушить необходимость → убедить → конверсия → удержать.</p>
+
+            <p><strong>Слой 4 — Параметры достижения цели:</strong> увеличение объёма и качества посетителей → оптимизация юзабилити → оптимизация контента → увеличение продаж → оптимизация расчётов → повторные покупки.</p>
+
+            <p><strong>Слой 5 — Источники данных:</strong> конкурентный анализ, юзабилити-тестирование, качественные исследования, анализ выпадения из воронки, NPS, CRM, клик-стримы.</p>
+
+            <p><strong>Слой 6 — KPIs:</strong> уникальные посетители → индекс вовлечения → индекс контента → продукты в корзине → конверсия → удержание.</p>
+
+            <div class="action-hint">Перейдите к видам конверсии.</div>
+
+            <h3>📌 Четыре вида конверсии</h3>
+
+            <p><strong>Конверсия рекламного материала:</strong> число перешедших по ссылке к числу видевших рекламу. Показывает, насколько эффективно реклама привлекает внимание.</p>
+
+            <p><strong>Конверсия рекламной страницы:</strong> число перешедших по ссылке к числу посетивших страницу. Насколько landing page удерживает пользователя.</p>
+
+            <p><strong>Качественный посетитель:</strong> загрузил больше одной страницы, не ушёл сразу. Проявил интерес, готов к вовлечению.</p>
+
+            <p><strong>Конверсия целевого действия:</strong> число клиентов к числу совершивших целевое действие. Финальная метрика.</p>
+
+            <p>Под целевым действием подразумевается любое запланированное действие: покупка, подписка, заполнение формы, звонок в компанию. Видов целевого действия может быть множество — зависит от бизнес-модели.</p>
+
+            <div class="action-hint">Перейдите к on-site и off-site аналитике.</div>
+
+            <h3>📌 On-site vs Off-site аналитика</h3>
+
+            <p>Аналитика делится на две большие части.</p>
+
+            <p><strong>On-site аналитика</strong> — инструмент для владельцев сайтов, измеряющий коммерческую производительность. В большинстве случаев используется в интернет-магазинах: изменение вида целевой страницы и просмотр того, как это влияет на объём продаж. Инструменты: Google Analytics 4, Яндекс.Метрика, Adobe Analytics.</p>
+
+            <p><strong>Off-site аналитика</strong> — анализ аудитории, интересов, структуры, трендов. Если вы занимаетесь off-site аналитикой, у вас может вообще не быть сайта — вы аналитик, который исследует потенциальную аудиторию. Компании: Mediascope, SimilarWeb, Brand Analytics, ComScore.</p>
+
+            <div class="action-hint">Перейдите к эволюции аналитики.</div>
+
+            <h3>📌 Эволюция аналитики по Forrester: 4 этапа</h3>
+
+            <p><strong>1993–1999 — Log Files.</strong> Этап становления. Аналитика базируется на логах сервера. Компании пытаются понять и оценить объём активности на своих сайтах. Создаются первые коммерческие платформы веб-аналитики.</p>
+
+            <p><strong>2000–2006 — Web Analytics.</strong> Становление базовых интерактивных каналов: сайты, поисковые машины, электронная почта. JavaScript используется как средство сбора данных. Появляется Google Analytics — бесплатный продукт, самый популярный по сей день.</p>
+
+            <p><strong>2007–2010 — Digital Analytics.</strong> Становление каналов на базе социальных медиа. Компании пытаются понять взаимодействие между интерактивными каналами. Расширенный многоканальный сбор данных. Развитие хранилищ данных.</p>
+
+            <p><strong>2011–н.в. — Digital Intelligence.</strong> Мобильные приложения, real-time решения, прогнозная аналитика. Big Data Analytics. Вендоры устремляются в новые ниши: управление данными, предиктивные модели.</p>
+
+            <h3>📌 Big Data: три V</h3>
+
+            <p><strong>Volume</strong> — объём данных. <strong>Variety</strong> — разнородность информации. <strong>Velocity</strong> — скорость поступления. Совокупность этих факторов требует высокопроизводительных вычислений и больших ресурсов для хранения и обработки.</p>
+
+            <h3>📌 Ключевые вопросы для оптимизации сайта</h3>
+
+            <p>Полезно задать себе набор вопросов для диагностики эффективности.</p>
+
+            <p><strong>Деньги:</strong> на чём зарабатывает сайт? <strong>Удовлетворённость:</strong> процент посетителей, добившихся целей? Что нравится, что нет? Какие источники трафика ценнее? Сколько возвращается? <strong>Входные страницы:</strong> топ-10 важнейших, их конверсия и bounce rate. <strong>Контент:</strong> какой тип востребован, ценность посетителей по типу. <strong>Внутренний поиск:</strong> процент использования, что ищут, соотношение ВЧ/НЧ, конверсионные запросы. <strong>Ссылки:</strong> какие URL ссылаются, как влияют на конверсию. <strong>Карта кликов:</strong> где кликают на важных страницах. <strong>Путь к цели:</strong> где выпадают из воронки. <strong>Соцмедиа:</strong> как отслеживается влияние, каков ROI. <strong>Рекламные кампании:</strong> какие прибыльны, есть ли KPI-панели. <strong>Сегментирование:</strong> распределение метрик по сегментам. <strong>Сплит-тестирование:</strong> проводится ли, есть ли механизм передачи результатов.</p>
+
+            <h3>📌 Масштаб 2025</h3>
+
+            <p>Доля performance-бюджетов достигла <span class="stat-inline">96,7%</span>. Zero-Click — <span class="stat-inline">58%</span> запросов. ROI email-маркетинга — <span class="stat-inline">×36</span>. Доверие UGC в 2,4 раза выше рекламы. <span class="stat-inline">93%</span> компаний используют AI в маркетинге.</p>
+
+            <h3>📌 Итоги курса</h3>
+
+            <p>Мы завершили курс «Интернет-маркетинг». За 33 лекции мы прошли путь от введения до практических аспектов анализа эффективности. Ключевые выводы:</p>
+
+            <ul>
+                <li>Анализ эффективности — финальный этап цикла: цели → стратегия → реализация → измерение → корректировка.</li>
+                <li>Матрица Мейсона: 6 систем — от веб-аналитики до исследований опыта.</li>
+                <li>Бренд-воронка: 6 этапов, каждый со своим KPI.</li>
+                <li>4 вида конверсии: рекламный материал → посадочная страница → качественный посетитель → целевое действие.</li>
+                <li>On-site (сайт) vs Off-site (аудитория) аналитика.</li>
+                <li>Эволюция: Log Files → Web Analytics → Digital Analytics → Digital Intelligence.</li>
+                <li>Главный принцип: без постоянного анализа эффективности маркетинг превращается в гадание.</li>
+            </ul>
+
+            <p>Спасибо за внимание! Курс завершён. Успехов в изучении интернет-маркетинга и в вашей профессиональной карьере!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">КPI</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Key Performance Indicator</div>
+                            <div class="gloss-def">Ключевой показатель эффективности</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">NPS</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Net Promoter Score</div>
+                            <div class="gloss-def">Индекс потребительской лояльности — от -100 до +100</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Bounce Rate</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Bounce Rate</div>
+                            <div class="gloss-def">Показатель отказов — доля посетителей, ушедших сразу</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Heat Map</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Тепловая карта</div>
+                            <div class="gloss-def">Визуализация кликов и внимания пользователей на странице</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">A/B-тест</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">A/B Testing</div>
+                            <div class="gloss-def">Сравнение двух версий страницы для определения лучшей</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GA4</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Google Analytics 4</div>
+                            <div class="gloss-def">Платформа веб-аналитики Google нового поколения</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Big Data</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Big Data</div>
+                            <div class="gloss-def">Технология обработки больших массивов разнородной информации</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">On-site</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">On-site аналитика</div>
+                            <div class="gloss-def">Анализ поведения пользователей на собственном сайте</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Off-site</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Off-site аналитика</div>
+                            <div class="gloss-def">Анализ внешней аудитории без использования собственного сайта</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Digital Intelligence</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Digital Intelligence</div>
+                            <div class="gloss-def">Современный этап аналитики: AI, real-time, прогнозные модели</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Системы анализа</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">Mason N. The 6 Types of Website Analytics Tools. — 2024.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Kaushik A. Web Analytics 2.0. — Wiley, 2010.</div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Вирин Ф. Интернет-маркетинг: полный практический курс. — М.: Эксмо, 2024.</div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📈 Эволюция и Forrester</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">Forrester Research: The Evolution of Web Analytics to Digital Intelligence. — <a href="https://www.forrester.com" target="_blank">Forrester.com</a> <span class="src-date">2024</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Clifton B. Advanced Web Metrics with Google Analytics. — Wiley, 2024.</div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📊 Метрики и данные</div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">CFO Russia: Российские компании перераспределили рекламные бюджеты в пользу performance. — <a href="https://www.cfo-russia.ru" target="_blank">CFO-Russia.ru</a> <span class="src-date">20.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">Litmus: Email Marketing ROI — ×36. — <a href="https://www.litmus.com" target="_blank">Litmus.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">Nielsen: Global Trust in Advertising Survey — доверие UGC ×2,4. — <a href="https://www.nielsen.com" target="_blank">Nielsen.com</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🇷🇺 Российские инструменты</div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">Mediascope: Измерение аудитории и кросс-медийные исследования. — <a href="https://www.mediascope.net" target="_blank">Mediascope.net</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Brand Analytics: Мониторинг и sentiment-анализ соцмедиа. — <a href="https://br-analytics.ru" target="_blank">Br-Analytics.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Яндекс.Вебвизор: Запись действий пользователей на сайте. — <a href="https://yandex.ru/support/metrica" target="_blank">Yandex.ru</a> <span class="src-date">2025</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>

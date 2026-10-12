@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-лекция 7. Интернет-маркетинг и интерактивный маркетинг</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #ffffff; }
+
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .student-view {
+            width: 66.66%;
+            height: 100vh;
+            background: #ffffff;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .speaker-notes { width: 33.34%; height: 100%; background: #1a0e2e; color: #ede9fe; padding: 30px; overflow-y: auto; }
+
+        .slide-header { font-size: 25px; color: #5b21b6; font-weight: bold; line-height: 1.3; margin-bottom: 20px; border-bottom: 4px solid #8b5cf6; padding-bottom: 12px; }
+        .slide-body { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 5px 0; }
+        .slide-footer { font-size: 13px; color: #94a3b8; text-align: right; margin-top: 15px; }
+
+        /* HERO */
+        .hero-def {
+            display: flex; gap: 18px;
+            background: linear-gradient(135deg, #5b21b6 0%, #8b5cf6 50%, #a78bfa 100%);
+            border-radius: 16px; padding: 24px 28px; color: white;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.25);
+        }
+        .hero-def .hd-icon { font-size: 48px; flex-shrink: 0; }
+        .hero-def .hd-body { flex: 1; }
+        .hero-def .hd-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero-def .hd-text { font-size: 13px; line-height: 1.5; opacity: 0.95; }
+        .hero-def .hd-quote { font-size: 12px; font-style: italic; opacity: 0.85; margin-top: 6px; border-left: 3px solid rgba(255,255,255,0.4); padding-left: 10px; }
+
+        /* VENN DIAGRAM */
+        .venn-card { background: #faf5ff; border: 2px solid #ddd6fe; border-radius: 14px; padding: 18px 22px; }
+        .venn-card .venn-title { font-size: 14px; font-weight: bold; color: #5b21b6; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .venn-card .venn-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* COMPARE TABLE */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .compare-table th { padding: 10px 12px; text-align: left; font-weight: 600; color: white; }
+        .compare-table th:first-child { background: #334155; border-radius: 8px 0 0 0; }
+        .compare-table th:nth-child(2) { background: #0ea5e9; }
+        .compare-table th:nth-child(3) { background: #8b5cf6; }
+        .compare-table th:nth-child(4) { background: #10b981; }
+        .compare-table th:last-child { background: #f59e0b; border-radius: 0 8px 0 0; }
+        .compare-table td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; line-height: 1.4; }
+        .compare-table tr:nth-child(even) td { background: #f8fafc; }
+        .compare-table td:first-child { font-weight: 600; color: #1e293b; }
+
+        /* GOOGLE TRENDS SVG */
+        .trends-card { background: #ffffff; border: 2px solid #e9d5ff; border-radius: 14px; padding: 18px 22px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08); }
+        .trends-card .trends-title { font-size: 14px; font-weight: bold; color: #5b21b6; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .trends-card .trends-title span { font-size: 11px; font-weight: normal; color: #64748b; margin-left: auto; }
+
+        /* EXAMPLES GRID */
+        .examples-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .example-card { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 14px 16px; }
+        .example-card .ex-icon { font-size: 22px; margin-bottom: 6px; }
+        .example-card .ex-title { font-size: 12.5px; font-weight: bold; color: #166534; margin-bottom: 4px; }
+        .example-card .ex-desc { font-size: 11px; color: #475569; line-height: 1.45; }
+        .example-card .ex-metric { font-size: 11px; font-weight: bold; color: #059669; margin-top: 6px; }
+
+        /* CIRCULAR PROGRESS */
+        .progress-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .progress-card { background: #fefce8; border: 2px solid #fde68a; border-radius: 12px; padding: 16px; text-align: center; }
+        .progress-ring { width: 90px; height: 90px; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .progress-ring .ring-inner { width: 66px; height: 66px; background: #fefce8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .progress-ring .ring-val { font-size: 18px; font-weight: 900; color: #92400e; line-height: 1; }
+        .progress-ring .ring-cap { font-size: 8px; color: #92400e; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+        .progress-label { font-size: 11px; font-weight: bold; color: #78350f; line-height: 1.3; }
+
+        /* GAMIFICATION BARS */
+        .gamif-card { background: #fef2f2; border: 2px solid #fecaca; border-radius: 14px; padding: 20px 24px; }
+        .gamif-card .gamif-title { font-size: 14px; font-weight: bold; color: #991b1b; margin-bottom: 14px; }
+        .gamif-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .gamif-label { font-size: 12px; color: #1e293b; width: 180px; font-weight: 500; text-align: right; }
+        .gamif-track { flex: 1; background: #fee2e2; height: 22px; border-radius: 6px; overflow: hidden; }
+        .gamif-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10.5px; font-weight: bold; color: white; }
+        .gamif-fill.rose { background: linear-gradient(90deg, #be123c, #e11d48); }
+        .gamif-fill.amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+        .gamif-fill.violet { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+
+        /* EVOLUTION TIMELINE */
+        .evo-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 14px; padding: 20px 24px; }
+        .evo-card .evo-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 14px; }
+        .evo-track { display: flex; justify-content: space-between; position: relative; padding: 0 10px; }
+        .evo-track::before { content: ''; position: absolute; top: 20px; left: 0; width: 100%; height: 4px; background: #e2e8f0; z-index: 1; }
+        .evo-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 24%; }
+        .evo-dot { width: 40px; height: 40px; border-radius: 50%; background: #8b5cf6; border: 4px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-bottom: 8px; }
+        .evo-item.active .evo-dot { background: #e11d48; transform: scale(1.15); box-shadow: 0 6px 12px rgba(225,29,72,0.3); }
+        .evo-year { font-size: 12px; font-weight: bold; color: #0f172a; }
+        .evo-label { font-size: 10.5px; color: #64748b; text-align: center; line-height: 1.3; }
+
+        /* ВИДЕОПЛЕЕР */
+        .video-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 5px; }
+        .video-container { width: 100%; max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); background: #000; aspect-ratio: 16 / 9; }
+        .links-hub { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .video-btn { text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; color: white; display: flex; align-items: center; gap: 6px; transition: transform 0.2s; cursor: pointer; border: none; }
+        .video-btn:hover { transform: translateY(-2px); }
+        .rt-btn { background: #8b5cf6; }
+        .rt-btn:hover { background: #7c3aed; }
+        .stop-btn { background: #e11d48; }
+        .stop-btn:hover { background: #be123c; }
+
+        /* ТЕКСТ ЛЕКТОРА */
+        .notes-header { font-size: 17px; color: #c4b5fd; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3b1f6e; padding-bottom: 10px; }
+        .timer-badge { background: #e11d48; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+        .lecture-text { font-size: 14.5px; line-height: 1.65; color: #ede9fe; text-align: justify; }
+        .lecture-text p { margin-bottom: 14px; }
+        .lecture-text h3 { color: #c4b5fd; font-size: 15px; margin: 18px 0 10px; border-bottom: 1px solid #3b1f6e; padding-bottom: 5px; }
+        .lecture-text ul { margin: 8px 0 14px 18px; }
+        .lecture-text li { margin-bottom: 6px; }
+        .action-hint { color: #fbbf24; font-style: italic; background: #2a1a4e; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #fbbf24; margin: 16px 0; font-size: 13px; line-height: 1.4; }
+        .lecture-text .stat-inline { background: #5b21b6; color: #c4b5fd; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+
+        /* СЛОВАРЬ */
+        .glossary-wrap { margin-top: 30px; }
+        .glossary-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .glossary-title::before { content: ''; width: 4px; height: 20px; background: #8b5cf6; border-radius: 2px; }
+        .glossary-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .gloss-card { display: flex; gap: 12px; background: #2a1a4e; border-left: 3px solid #8b5cf6; border-radius: 6px; padding: 10px 14px; align-items: flex-start; transition: background 0.2s; }
+        .gloss-card:hover { background: #3b1f6e; }
+        .gloss-card .gloss-abbr { font-weight: 900; color: #c4b5fd; font-size: 13px; min-width: 70px; letter-spacing: -0.3px; }
+        .gloss-card .gloss-body { flex: 1; }
+        .gloss-card .gloss-full { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 2px; }
+        .gloss-card .gloss-def { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; }
+
+        /* ИСТОЧНИКИ */
+        .sources-wrap { margin-top: 30px; }
+        .sources-title { font-size: 16px; color: #c4b5fd; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .sources-title::before { content: ''; width: 4px; height: 20px; background: #f59e0b; border-radius: 2px; }
+        .source-cat { margin-bottom: 16px; }
+        .source-cat-header { font-size: 11.5px; font-weight: bold; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 4px 10px; background: #2a1a4e; border-radius: 4px; display: inline-block; }
+        .source-item { display: flex; gap: 10px; margin-bottom: 8px; }
+        .source-num { flex-shrink: 0; width: 22px; height: 22px; background: #8b5cf6; color: #1a0e2e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+        .source-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+        .source-body a { color: #c4b5fd; text-decoration: none; }
+        .source-body a:hover { text-decoration: underline; }
+        .source-body .src-date { color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <!-- ЛЕВАЯ ЧАСТЬ -->
+    <div class="student-view">
+        <div class="slide-header">
+            Мини-лекция 7. Интернет-маркетинг и интерактивный маркетинг
+        </div>
+
+        <div class="slide-body">
+
+            <!-- HERO -->
+            <div class="hero-def">
+                <div class="hd-icon">🔄</div>
+                <div class="hd-body">
+                    <div class="hd-title">Интерактивный маркетинг — это стратегия, которая вовлекает аудиторию в активное взаимодействие с брендом</div>
+                    <div class="hd-text">В отличие от традиционного маркетинга, где сообщение идёт в одну сторону, интерактивный маркетинг создаёт двусторонний диалог. Пользователь становится не пассивным получателем, а активным участником — он кликает, отвечает, выбирает, играет и делится.</div>
+                    <div class="hd-quote">«Интерактивный маркетинг идёт на шаг дальше — он приглашает к участию: квизы, опросы, калькуляторы, микро-сайты и динамические истории» — Truelio, 2025[reference:0]</div>
+                </div>
+            </div>
+
+            <!-- VENN DIAGRAM -->
+            <div class="venn-card">
+                <div class="venn-title">📐 Вложенность терминов: интернет-, веб-, мобильный и интерактивный маркетинг <span>Схема множеств</span></div>
+                <svg viewBox="0 0 600 220" style="width: 100%; height: auto;">
+                    <!-- Интерактивный маркетинг (внешний круг) -->
+                    <circle cx="300" cy="110" r="100" fill="rgba(139, 92, 246, 0.08)" stroke="#8b5cf6" stroke-width="2.5" stroke-dasharray="6 3"/>
+                    <text x="300" y="22" font-size="12" fill="#5b21b6" text-anchor="middle" font-weight="bold">Интерактивный маркетинг</text>
+
+                    <!-- Интернет-маркетинг (средний круг) -->
+                    <circle cx="260" cy="110" r="70" fill="rgba(14, 165, 233, 0.10)" stroke="#0ea5e9" stroke-width="2.5"/>
+                    <text x="260" y="52" font-size="11" fill="#0c4a6e" text-anchor="middle" font-weight="bold">Интернет-маркетинг</text>
+
+                    <!-- Веб-маркетинг (внутренний) -->
+                    <circle cx="245" cy="110" r="42" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="2"/>
+                    <text x="245" y="104" font-size="9" fill="#065f46" text-anchor="middle" font-weight="bold">Веб-</text>
+                    <text x="245" y="116" font-size="9" fill="#065f46" text-anchor="middle" font-weight="bold">маркетинг</text>
+
+                    <!-- Мобильный маркетинг (пересекается) -->
+                    <circle cx="370" cy="110" r="55" fill="rgba(245, 158, 11, 0.12)" stroke="#f59e0b" stroke-width="2.5"/>
+                    <text x="390" y="100" font-size="10" fill="#92400e" text-anchor="middle" font-weight="bold">Мобильный</text>
+                    <text x="390" y="114" font-size="10" fill="#92400e" text-anchor="middle" font-weight="bold">маркетинг</text>
+
+                    <!-- Подписи -->
+                    <text x="300" y="205" font-size="10" fill="#64748b" text-anchor="middle">Интерактивный маркетинг ⊃ интернет-маркетинг ⊃ веб-маркетинг</text>
+                    <text x="300" y="218" font-size="10" fill="#64748b" text-anchor="middle">Мобильный маркетинг может быть как частью интернет-маркетинга, так и самостоятельным (SMS)</text>
+                </svg>
+            </div>
+
+            <!-- COMPARE TABLE -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #5b21b6; margin-bottom: 10px;">⚖️ Сравнение понятий</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Критерий</th>
+                            <th>Интернет-маркетинг</th>
+                            <th>Интерактивный маркетинг</th>
+                            <th>Контент-маркетинг</th>
+                            <th>SMM</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Определение</td>
+                            <td>Продвижение товаров и услуг онлайн</td>
+                            <td>Вовлечение аудитории в активное взаимодействие</td>
+                            <td>Создание и распространение полезного контента</td>
+                            <td>Продвижение через социальные платформы</td>
+                        </tr>
+                        <tr>
+                            <td>Каналы</td>
+                            <td>Сайт, SEO, email, PPC, соцсети</td>
+                            <td>Квизы, опросы, игры, AR/VR, микро-сайты</td>
+                            <td>Блоги, статьи, видео, подкасты, инфографика</td>
+                            <td>Социальные сети, мессенджеры, блоги</td>
+                        </tr>
+                        <tr>
+                            <td>Ключевая метрика</td>
+                            <td>Конверсия, трафик, ROI</td>
+                            <td>Вовлечённость, время взаимодействия, UGC</td>
+                            <td>Трафик, лиды, узнаваемость</td>
+                            <td>Охват, подписчики, ER</td>
+                        </tr>
+                        <tr>
+                            <td>Основная цель</td>
+                            <td>Продажа, лидогенерация</td>
+                            <td>Диалог, лояльность, вовлечение</td>
+                            <td>Доверие, экспертиза, привлечение</td>
+                            <td>Сообщество, охват, коммуникация</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- GOOGLE TRENDS SVG -->
+            <div class="trends-card">
+                <div class="trends-title">📈 Динамика популярности терминов: интернет vs цифровой vs интерактивный <span>Google Trends, 2004–2026</span></div>
+                <svg viewBox="0 0 600 170" style="width: 100%; height: auto;">
+                    <!-- Сетка -->
+                    <line x1="50" y1="15" x2="50" y2="140" stroke="#e2e8f0" stroke-width="1"/>
+                    <line x1="50" y1="140" x2="580" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="50" y1="100" x2="580" y2="100" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+                    <line x1="50" y1="60" x2="580" y2="60" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3 3"/>
+
+                    <!-- Интернет-маркетинг (снижение) -->
+                    <polyline points="90,40 160,50 230,62 300,78 370,90 440,100 510,108 580,112"
+                              fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-linejoin="round" opacity="0.6"/>
+                    <text x="92" y="34" font-size="9" fill="#0c4a6e" font-weight="bold">Интернет-маркетинг</text>
+
+                    <!-- Цифровой маркетинг (рост) -->
+                    <polyline points="90,120 160,115 230,105 300,90 370,72 440,55 510,42 580,32"
+                              fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linejoin="round"/>
+                    <circle cx="580" cy="32" r="5" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+                    <text x="560" y="24" font-size="9" fill="#5b21b6" font-weight="bold">Цифровой</text>
+
+                    <!-- Интерактивный маркетинг (стабильный) -->
+                    <polyline points="90,130 160,128 230,125 300,122 370,120 440,118 510,116 580,114"
+                              fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round" stroke-dasharray="5 3"/>
+                    <text x="480" y="108" font-size="9" fill="#92400e" font-weight="bold">Интерактивный</text>
+
+                    <!-- Подписи X -->
+                    <text x="90" y="155" font-size="9" fill="#64748b" text-anchor="middle">2004</text>
+                    <text x="230" y="155" font-size="9" fill="#64748b" text-anchor="middle">2010</text>
+                    <text x="370" y="155" font-size="9" fill="#64748b" text-anchor="middle">2016</text>
+                    <text x="510" y="155" font-size="9" fill="#64748b" text-anchor="middle">2022</text>
+                    <text x="580" y="155" font-size="9" fill="#64748b" text-anchor="middle">2026</text>
+                </svg>
+                <div style="font-size: 11px; color: #64748b; margin-top: 4px;">С 2004 по 2011 год популярность «интернет-маркетинга» снижалась, тогда как «цифровой» и «интерактивный» маркетинг росли с 2007 года[reference:1].</div>
+            </div>
+
+            <!-- EXAMPLES GRID -->
+            <div>
+                <div style="font-size: 14px; font-weight: bold; color: #5b21b6; margin-bottom: 10px;">💡 Примеры интерактивного маркетинга (2025–2026)</div>
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <div class="ex-icon">🎮</div>
+                        <div class="ex-title">AR-игра для болельщиков «АК Барс»</div>
+                        <div class="ex-desc">Компания LikeVR разработала интерактивный AR-маркетинговый проект для бренда «Купер» совместно с хоккейным клубом[reference:2].</div>
+                        <div class="ex-metric">Смарт-маркетинг на трибунах</div>
+                    </div>
+                    <div class="example-card">
+                        <div class="ex-icon">❓</div>
+                        <div class="ex-title">Квизы «Аптечная сеть 36,6»</div>
+                        <div class="ex-desc">Пользователю нужно ответить на несколько вопросов, чтобы получить промокод. Конверсия из акции в заказ на 4,5 п.п. выше, чем у обычных промо[reference:3].</div>
+                        <div class="ex-metric">+4,5 п.п. конверсия</div>
+                    </div>
+                    <div class="example-card">
+                        <div class="ex-icon">📱</div>
+                        <div class="ex-title">Мини-приложение «Тромбо АСС»</div>
+                        <div class="ex-desc">Кастомное мини-приложение в «Одноклассниках» с конкурсной механикой. Кампания прошла с 17 апреля по 8 октября 2025 года[reference:4].</div>
+                        <div class="ex-metric">Интерактивная механика</div>
+                    </div>
+                    <div class="example-card">
+                        <div class="ex-icon">🎯</div>
+                        <div class="ex-title">Промопост VK × Сбер</div>
+                        <div class="ex-desc">Интерактивный промопост с 21 млн показов. Механика помогла превысить маркеры эффективности переходов в 24 раза[reference:5].</div>
+                        <div class="ex-metric">×24 к переходам</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CIRCULAR PROGRESS: CONTENT MARKETING -->
+            <div class="progress-grid">
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#8b5cf6 0deg 313deg, #ede9fe 313deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">87%</div>
+                            <div class="ring-cap">компаний</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Используют контент-маркетинг (РБК, 2025)</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#10b981 0deg 194deg, #d1fae5 194deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">54%</div>
+                            <div class="ring-cap">аудитории</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">Предпочитают короткие рекламные сообщения</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-ring" style="background: conic-gradient(#f59e0b 0deg 234deg, #fef3c7 234deg 360deg);">
+                        <div class="ring-inner">
+                            <div class="ring-val">65%</div>
+                            <div class="ring-cap">GDPR</div>
+                        </div>
+                    </div>
+                    <div class="progress-label">AI-запросы через ассистентов к 2026 (Gartner)</div>
+                </div>
+            </div>
+
+            <!-- GAMIFICATION BARS -->
+            <div class="gamif-card">
+                <div class="gamif-title">🎮 Геймификация в маркетинге: эффекты и метрики</div>
+                <div class="gamif-row">
+                    <div class="gamif-label">Рост вовлечённости</div>
+                    <div class="gamif-track"><div class="gamif-fill rose" style="width: 85%;">+85%</div></div>
+                </div>
+                <div class="gamif-row">
+                    <div class="gamif-label">Улучшение удержания</div>
+                    <div class="gamif-track"><div class="gamif-fill amber" style="width: 60%;">+60%</div></div>
+                </div>
+                <div class="gamif-row">
+                    <div class="gamif-label">Рост конверсии</div>
+                    <div class="gamif-track"><div class="gamif-fill violet" style="width: 45%;">+45%</div></div>
+                </div>
+                <div style="font-size: 11px; color: #991b1b; margin-top: 8px;">Мировой рынок геймификации достиг $37,4 млрд в 2025 году, прогноз до $93,8 млрд к 2030 (Research and Markets)[reference:6].</div>
+            </div>
+
+            <!-- ВИДЕОПЛЕЕР -->
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe id="lecture-player" src="https://rutube.ru" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+                <div class="links-hub">
+                    <button onclick="changeVideo('https://rutube.ru/')" class="video-btn stop-btn">⏹ СТОП</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/27e2cbab33fddaff1c3ffdfdf334ea11/')" class="video-btn rt-btn">📜 Ролик 1: Интерактивный маркетинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/8616fb0810a203971487ec1b2c8be3ba/')" class="video-btn rt-btn">📹 Ролик 2: Контент-маркетинг</button>
+                    <button onclick="changeVideo('https://rutube.ru/play/embed/dad7c09ab9673ea4bd217d82971c31cf/')" class="video-btn rt-btn">📜 Ролик 3: SMM и геймификация</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            Направление «Менеджмент» | 1 курс | Курс: Интернет-маркетинг | Мини-лекция 7 из 10
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="speaker-notes">
+        <div style="position: sticky; top: 0; background: #1a0e2e; padding: 20px 20px 10px 20px; border-bottom: 1px solid #3b1f6e; width: 100%; z-index: 100;">
+            <div class="notes-header">
+                <span>📖 Скрипт преподавателя</span>
+                <span class="timer-badge">Время: 20 минут</span>
+            </div>
+            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <iframe id="right-lecture-player" src="https://rutube.ru/play/embed/954a12977faae58ea3b8978043957dbb"  allow="clipboard-write; autoplay" width="100%" height="100%" frameborder="0" allow="clipboard-write; autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen style="border: none;"></iframe>
+            </div>
+        </div>
+
+        <div class="lecture-text" style="margin-top: 20px;">
+
+            <p>Добрый день, коллеги! На прошлой лекции мы разобрали рынок услуг интернет-маркетинга. Сегодня мы продолжим разговор о терминологии и разберём соотношение понятий «интернет-маркетинг», «интерактивный маркетинг», «цифровой маркетинг» и «веб-маркетинг». Эта тема важна, потому что в отрасли до сих пор нет единого мнения о том, как эти понятия соотносятся друг с другом.</p>
+
+            <div class="action-hint">Обратите внимание студентов на диаграмму Венна на слайде.</div>
+
+            <h3>📌 Проблема терминологии</h3>
+
+            <p>В профессиональной среде часто некорректно используются термины «интернет-маркетинг», «онлайновый маркетинг», «цифровой маркетинг», «веб-маркетинг» и «интерактивный маркетинг». Эти понятия близки, но не тождественны. Давайте разберёмся.</p>
+
+            <p>Если проанализировать динамику популярности запросов через Google Trends, мы увидим интересную картину. С 2004 по 2011 год популярность термина «интернет-маркетинг» снижалась. Одновременно с 2007 года начал расти интерес к терминам «цифровой маркетинг» и «интерактивный маркетинг»[reference:7]. Это отражает эволюцию самой отрасли: от узкого понятия «интернет» к более широкому «цифровой» и «интерактивный».</p>
+
+            <p>Сегодня наиболее точным является следующее соотношение: <strong>интерактивный маркетинг</strong> — самое широкое понятие. Оно включает в себя <strong>интернет-маркетинг</strong> и <strong>мобильный маркетинг</strong>. В свою очередь, <strong>интернет-маркетинг</strong> включает <strong>веб-маркетинг</strong> как подмножество. Мобильный маркетинг может быть основан на SMS-технологиях и не всегда относиться к интернет-маркетингу.</p>
+
+            <h3>📌 Что такое интерактивный маркетинг?</h3>
+
+            <p>Интерактивный маркетинг — это стратегия, которая фокусируется на активном участии аудитории. Вместо односторонних сообщений он создаёт двусторонние или даже многосторонние взаимодействия. Пользователь становится не пассивным получателем, а активным участником диалога с брендом[reference:8].</p>
+
+            <p>Ключевые принципы интерактивного маркетинга:</p>
+
+            <ul>
+                <li><strong>Участие и диалог:</strong> интерактивность — не дополнение, а сердце методологии. Бренд говорит — клиент отвечает — и наоборот. Этот непрерывный диалог укрепляет доверие и лояльность.</li>
+                <li><strong>Персонализация:</strong> использование данных и обратной связи в реальном времени. Каждое сообщение адаптируется под интересы и поведение пользователя.</li>
+                <li><strong>Креативность и геймификация:</strong> превращение обычных действий (заполнение формы, ответ на вопрос) в увлекательный опыт.</li>
+            </ul>
+
+            <p>Согласно схеме Троя Сабина, интерактивный маркетинг включает такие элементы, как новая реклама, дисплейная реклама, медиа и партнёрский маркетинг.</p>
+
+            <div class="action-hint">Перейдите к примерам интерактивного маркетинга.</div>
+
+            <h3>📌 Примеры интерактивного маркетинга (2025–2026)</h3>
+
+            <p>Вот несколько ярких кейсов, которые показывают, как интерактивный маркетинг работает на практике:</p>
+
+            <ul>
+                <li><strong>AR-игра для болельщиков «АК Барс»:</strong> компания LikeVR разработала интерактивный AR-маркетинговый проект для бренда «Купер» совместно с хоккейным клубом[reference:9]. Болельщики могли взаимодействовать с брендом прямо на трибунах.</li>
+                <li><strong>Квизы «Аптечная сеть 36,6»:</strong> пользователю предлагается ответить на несколько вопросов, чтобы получить промокод. Средняя конверсия из акции в заказ у квиза на <strong>4,5 п.п. выше</strong>, чем у обычной акции[reference:10].</li>
+                <li><strong>Мини-приложение «Тромбо АСС» в «Одноклассниках»:</strong> кастомное мини-приложение с конкурсной механикой. Кампания прошла с 17 апреля по 8 октября 2025 года[reference:11].</li>
+                <li><strong>Интерактивный промопост VK × Сбер:</strong> механика помогла превысить маркеры эффективности переходов в <strong>24 раза</strong> при 21 млн показов[reference:12].</li>
+            </ul>
+
+            <h3>📌 Контент-маркетинг</h3>
+
+            <p>Контент-маркетинг — это создание и распространение информационного бюллетеня, видеоконтента или иных полезных материалов. Оптимизация контента бывает внутренней (структура, семантика) и внешней (ссылки, упоминания).</p>
+
+            <p>По данным исследования РБК Компании, <span class="stat-inline">87%</span> компаний используют контент-маркетинг для продвижения. Среди тех, кто пока не использует, 78% планируют начать[reference:13]. Ключевые причины отказа: нехватка ресурсов (39%), сомнения в эффективности (27%), уверенность в том, что это не работает в их нише (23%).</p>
+
+            <p>Интересная статистика по форматам: больше половины (54%) пользователей предпочитают короткие рекламные сообщения, тогда как длинные тексты привлекают только 14% аудитории. Среди форматов контента пользователи отдают предпочтение изображениям (46%) и видео (40%)[reference:14].</p>
+
+            <p>Бренды инвестировали порядка <strong>785 млн рублей</strong> в производство контента только за первое полугодие 2025 года[reference:15]. Объём публикаций вырос в среднем на 77,5% — с 155 тыс. до 200 тыс. постов в месяц.</p>
+
+            <div class="action-hint">Перейдите к маркетингу в социальных медиа.</div>
+
+            <h3>📌 Маркетинг в социальных медиа (SMM)</h3>
+
+            <p>Маркетинг в социальных медиа включает оптимизацию в социальных сетях, рекламу, ведение микроблогов и обучение в социальных сетях. Мониторинг социальных сетей позволяет модифицировать продукт и влиять на дискуссии.</p>
+
+            <p>Ключевые тренды SMM 2026:</p>
+
+            <ul>
+                <li><strong>AIO — оптимизация контента для ИИ-ассистентов.</strong> По данным Gartner, к 2026 году более 60% онлайн-запросов будут проходить через AI-ассистентов, а не через классический поиск[reference:16]. Контент должен быть структурированным, содержать экспертные данные и давать исчерпывающие ответы.</li>
+                <li><strong>First-party data.</strong> Собственные данные о клиентах становятся ключевым активом в условиях ужесточения политики конфиденциальности.</li>
+                <li><strong>Гиперперсонализация.</strong> Каждое взаимодействие адаптируется под конкретного пользователя.</li>
+                <li><strong>Коммерция внутри соцсетей.</strong> Всё больше покупок совершается напрямую через социальные платформы[reference:17].</li>
+            </ul>
+
+            <p>Важный тренд: пользователи всё чаще отвергают полностью сгенерированный ИИ контент. Более 30% потребителей реже выбирают бренд, если знают, что реклама создана исключительно искусственным интеллектом[reference:18]. Это создаёт запрос на «крафт-контент» — аутентичные материалы, созданные людьми.</p>
+
+            <h3>📌 Мобильный маркетинг</h3>
+
+            <p>Мобильный маркетинг — это стратегия продвижения через мобильные устройства: смартфоны, планшеты, умные часы. Он включает программы лояльности от мобильных операторов, мобильную дисплейную рекламу в приложениях, мобильные купоны и мобильный теггинг[reference:19].</p>
+
+            <p>Мобильный маркетинг может быть частью интернет-маркетинга (если используется интернет-соединение), но также может работать через SMS — и тогда он относится к интерактивному маркетингу, но не к интернет-маркетингу.</p>
+
+            <div class="action-hint">Перейдите к разбору персонализации и геймификации.</div>
+
+            <h3>📌 Персонализация в маркетинге</h3>
+
+            <p>По данным Gartner, в 2025 году <span class="stat-inline">64%</span> директоров по маркетингу планировали увеличить инвестиции в персонализацию. Расходы на персонализацию выросли с 19,3% маркетингового бюджета в 2024 году до <span class="stat-inline">25,9%</span> в 2025 году[reference:20].</p>
+
+            <p>При этом <span class="stat-inline">45%</span> онлайн-покупателей активно ищут бренды, предлагающие персонализированный цифровой опыт[reference:21]. Однако только 11% потребителей «очень готовы» делиться своими персональными данными с брендами[reference:22]. Это создаёт фундаментальный конфликт: пользователи хотят персонализации, но не хотят отдавать данные.</p>
+
+            <h3>📌 Геймификация в маркетинге</h3>
+
+            <p>Геймификация — это использование игровых элементов и механик в неигровых контекстах для повышения вовлечённости пользователей[reference:23]. Мировой рынок геймификации достиг <span class="stat-inline">$37,4 млрд</span> в 2025 году, к 2030 году аналитики Research and Markets ожидают рост до <span class="stat-inline">$93,8 млрд</span>[reference:24].</p>
+
+            <p>Исследования показывают, что геймификация увеличивает вовлечённость на 85%, улучшает удержание на 60% и повышает конверсию на 45%. Наиболее популярные механики: баллы, уровни, награды, персонализированные задания и визуализация прогресса.</p>
+
+            <h3>📌 Итоги лекции</h3>
+
+            <p>Сегодня мы разобрали соотношение ключевых понятий цифрового маркетинга. Ключевые выводы:</p>
+
+            <ul>
+                <li><strong>Интерактивный маркетинг</strong> — самое широкое понятие, включающее интернет-маркетинг и мобильный маркетинг.</li>
+                <li><strong>Интернет-маркетинг</strong> включает веб-маркетинг как подмножество.</li>
+                <li><strong>Контент-маркетинг</strong> используется 87% компаний, бренды инвестируют 785 млн руб. в производство контента за полугодие.</li>
+                <li><strong>SMM-тренды 2026:</strong> AIO, first-party data, гиперперсонализация, коммерция внутри соцсетей.</li>
+                <li><strong>Геймификация</strong> — растущий инструмент: мировой рынок $37,4 млрд, вовлечённость +85%.</li>
+                <li><strong>Персонализация</strong> — ключевой тренд: 64% CMO инвестируют, но только 11% пользователей готовы делиться данными.</li>
+            </ul>
+
+            <p>На следующей лекции мы разберём преимущества интернет-маркетинга и интернет-рекламы по сравнению с традиционными каналами. Спасибо за внимание!</p>
+
+            <!-- СЛОВАРЬ -->
+            <div class="glossary-wrap">
+                <div class="glossary-title">📖 Словарь аббревиатур</div>
+                <div class="glossary-cards">
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AIO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">AI Optimization</div>
+                            <div class="gloss-def">Оптимизация контента для ИИ-ассистентов и генеративных поисковых систем</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">AR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Augmented Reality</div>
+                            <div class="gloss-def">Дополненная реальность — технология наложения цифровых объектов на реальный мир</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">CMO</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Chief Marketing Officer</div>
+                            <div class="gloss-def">Директор по маркетингу — высшее должностное лицо, отвечающее за маркетинговую стратегию</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">ER</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Engagement Rate</div>
+                            <div class="gloss-def">Показатель вовлечённости аудитории — отношение реакций к охвату</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">Gartner</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Gartner, Inc.</div>
+                            <div class="gloss-def">Ведущая исследовательская и консалтинговая компания в области ИТ</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">GDPR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">General Data Protection Regulation</div>
+                            <div class="gloss-def">Общий регламент защиты персональных данных (ЕС)</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">SMM</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Social Media Marketing</div>
+                            <div class="gloss-def">Маркетинг в социальных сетях</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">UGC</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">User-Generated Content</div>
+                            <div class="gloss-def">Пользовательский контент — материалы, созданные самими потребителями</div>
+                        </div>
+                    </div>
+                    <div class="gloss-card">
+                        <div class="gloss-abbr">VR</div>
+                        <div class="gloss-body">
+                            <div class="gloss-full">Virtual Reality</div>
+                            <div class="gloss-def">Виртуальная реальность — полностью цифровая среда</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ИСТОЧНИКИ -->
+            <div class="sources-wrap">
+                <div class="sources-title">📚 Источники и литература</div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🔄 Терминология и сравнение</div>
+                    <div class="source-item">
+                        <div class="source-num">1</div>
+                        <div class="source-body">IEBS: Qué es el marketing interactivo y qué lo diferencia del marketing digital. — <a href="https://www.iebschool.com/hub/que-es-el-marketing-interactivo-y-que-lo-diferencia-del-marketing-digital-marketing-estrategico/" target="_blank">IEBSchool.com</a> <span class="src-date">28.01.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">2</div>
+                        <div class="source-body">Truelio: The Brand-First Digital Strategy — Building Interactions That Actually Convert. — <a href="https://truelio.com" target="_blank">Truelio.com</a> <span class="src-date">30.04.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">3</div>
+                        <div class="source-body">Qualifio: Qu'est-ce que le marketing interactif? Exemples de grandes marques. — <a href="https://qualifio.com" target="_blank">Qualifio.com</a> <span class="src-date">06.08.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">💡 Примеры интерактивного маркетинга</div>
+                    <div class="source-item">
+                        <div class="source-num">4</div>
+                        <div class="source-body">LikeVR: AR-игра для болельщиков хоккейного клуба АК Барс. — <a href="https://likevr.ru" target="_blank">LikeVR.ru</a> <span class="src-date">27.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">5</div>
+                        <div class="source-body">Mindbox: Квизы на сайте Аптечной сети 36,6 — конверсия на 4,5 п.п. выше. — <a href="https://mindbox.ru" target="_blank">Mindbox.ru</a> <span class="src-date">01.10.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">6</div>
+                        <div class="source-body">AdIndex: Кейс VK и Сбера — механика интерактивного промопоста. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">29.05.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">7</div>
+                        <div class="source-body">insideok.ru: Мини-приложение «Тромбо АСС» в Одноклассниках. — <a href="https://insideok.ru" target="_blank">InsideOK.ru</a> <span class="src-date">11.02.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📝 Контент-маркетинг</div>
+                    <div class="source-item">
+                        <div class="source-num">8</div>
+                        <div class="source-body">РБК Компании: 87% компаний используют контент-маркетинг. — <a href="https://companies.rbc.ru/news/db401feb-2cf5-4902-922e-5c0fed2a4a50/" target="_blank">RBC.ru</a> <span class="src-date">16.04.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">9</div>
+                        <div class="source-body">AdIndex: Блогеры удвоили частоту публикаций за три года. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">25.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">10</div>
+                        <div class="source-body">Sostav.ru: Аудитория брендов перешла из Instagram в Telegram и VK. — <a href="https://www.sostav.ru" target="_blank">Sostav.ru</a> <span class="src-date">21.10.2025</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">📱 SMM и социальные медиа</div>
+                    <div class="source-item">
+                        <div class="source-num">11</div>
+                        <div class="source-body">Markway: Тренды в SMM — 2026 — что будет работать в соцсетях. — <a href="https://markway.ru/blog/trendy-v-smm-2026-chto-budet-rabotat-v-soczsetyah/" target="_blank">Markway.ru</a> <span class="src-date">27.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">12</div>
+                        <div class="source-body">AdIndex: Социальные медиа в 2026 году — 18 трендов. — <a href="https://adindex.ru" target="_blank">AdIndex.ru</a> <span class="src-date">21.04.2026</span></div>
+                    </div>
+                </div>
+
+                <div class="source-cat">
+                    <div class="source-cat-header">🎯 Персонализация и геймификация</div>
+                    <div class="source-item">
+                        <div class="source-num">13</div>
+                        <div class="source-body">Gartner: Magic Quadrant for Personalization Engines. — <a href="https://www.gartner.com" target="_blank">Gartner.com</a> <span class="src-date">03.02.2026</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">14</div>
+                        <div class="source-body">Contentstack: 57 stats on personalization and AI experiences. — <a href="https://www.contentstack.com" target="_blank">Contentstack.com</a> <span class="src-date">07.11.2025</span></div>
+                    </div>
+                    <div class="source-item">
+                        <div class="source-num">15</div>
+                        <div class="source-body">Research and Markets: Gamification Market — $37,4 млрд (2025). — <a href="https://www.researchandmarkets.com" target="_blank">ResearchAndMarkets.com</a> <span class="src-date">2026</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function changeVideo(embedUrl) {
+            document.getElementById('lecture-player').src = embedUrl;
+        }
+    </script>
+</body>
+</html>
