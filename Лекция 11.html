@@ -136,7 +136,197 @@
         .source-body a { color: #5eead4; text-decoration: none; }
         .source-body a:hover { text-decoration: underline; }
         .source-body .src-date { color: #64748b; font-size: 11px; }
-    </style>
+    /* ============================================================ */
+/* НАВИГАЦИЯ МЕЖДУ ЛЕКЦИЯМИ (универсальный блок)               */
+/* ============================================================ */
+.lecture-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 2px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 9999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.lecture-nav:hover {
+    transform: translateY(0);
+}
+
+.lecture-nav .nav-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    transition: width 0.3s ease;
+    border-radius: 0 3px 3px 0;
+}
+
+.lecture-nav .nav-btn-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.lecture-nav .nav-btn-arrow:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.6);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.lecture-nav .nav-btn-arrow:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-label small {
+    font-size: 9.5px;
+    font-weight: 400;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-label .arrow-title {
+    font-size: 12px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lecture-nav .nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0 20px;
+    color: #94a3b8;
+    font-size: 11px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lecture-nav .nav-counter {
+    font-size: 15px;
+    font-weight: 900;
+    color: #f1f5f9;
+    letter-spacing: -0.3px;
+}
+
+.lecture-nav .nav-counter span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.lecture-nav .nav-index-link {
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.lecture-nav .nav-index-link:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+/* Кнопки быстрого перехода по блокам */
+.lecture-nav .nav-jump {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lecture-nav .nav-jump-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.lecture-nav .nav-jump-btn:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: white;
+}
+
+.lecture-nav .nav-jump-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-color: transparent;
+    color: white;
+}
+
+/* Отступ для контента снизу, чтобы навигация не перекрывала */
+body {
+    padding-bottom: 80px !important;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
+    .lecture-nav {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    .lecture-nav .nav-btn-arrow {
+        padding: 8px 12px;
+    }
+    .lecture-nav .nav-btn-arrow .arrow-label .arrow-title {
+        max-width: 90px;
+        font-size: 11px;
+    }
+    .lecture-nav .nav-center {
+        padding: 0 10px;
+    }
+    .lecture-nav .nav-jump {
+        display: none;
+    }
+}</style>
 </head>
 <body>
 
@@ -577,5 +767,158 @@
             document.getElementById('lecture-player').src = embedUrl;
         }
     </script>
-</body>
+<!-- ============================================================ -->
+<!-- НАВИГАЦИЯ МЕЖДУ ЛЕКЦИЯМИ                                    -->
+<!-- ============================================================ -->
+<nav class="lecture-nav" id="lectureNav">
+    <!-- Прогресс-бар -->
+    <div class="nav-progress" id="navProgress" style="width: 0%;"></div>
+
+    <!-- Кнопка "Назад" -->
+    <a href="Лекция 1.html" class="nav-btn-arrow" id="prevBtn">
+        <span class="arrow-icon">←</span>
+        <span class="arrow-label">
+            <small>Назад</small>
+            <span class="arrow-title" id="prevTitle">Лекция 1</span>
+        </span>
+    </a>
+
+    <!-- Центральный блок с счётчиком -->
+    <div class="nav-center">
+        <div class="nav-counter">
+            Лекция <span id="currentNum">1</span> <span>из 33</span>
+        </div>
+        <a href="index.html" class="nav-index-link">📚 К содержанию</a>
+    </div>
+
+    <!-- Кнопка "Вперёд" -->
+    <a href="Лекция 2.html" class="nav-btn-arrow" id="nextBtn">
+        <span class="arrow-label" style="align-items: flex-end;">
+            <small>Вперёд</small>
+            <span class="arrow-title" id="nextTitle">Лекция 2</span>
+        </span>
+        <span class="arrow-icon">→</span>
+    </a>
+
+    <!-- Быстрые переходы по блокам -->
+    <div class="nav-jump">
+        <a href="Лекция 1.html" class="nav-jump-btn" data-jump="1">1-5</a>
+        <a href="Лекция 6.html" class="nav-jump-btn" data-jump="6">6-20</a>
+        <a href="Лекция 21.html" class="nav-jump-btn" data-jump="21">21-26</a>
+        <a href="Лекция 27.html" class="nav-jump-btn" data-jump="27">27-30</a>
+        <a href="Лекция 31.html" class="nav-jump-btn" data-jump="31">31-33</a>
+    </div>
+</nav>
+
+<script>
+    // ============================================================
+    // АВТОМАТИЧЕСКАЯ НАВИГАЦИЯ МЕЖДУ ЛЕКЦИЯМИ
+    // ============================================================
+    (function() {
+        // 🔧 НАСТРОЙКА: укажите номер ТЕКУЩЕЙ лекции
+        const CURRENT_LECTURE = 11; // ← ЗАМЕНИТЕ на номер текущей лекции (1, 2, 3, ..., 33)
+
+        // Полный список названий лекций
+        const LECTURES = {
+            1:  'Введение в курс',
+            2:  'Что такое интернет-маркетинг',
+            3:  'Эволюция представлений',
+            4:  'Эволюция электронной коммерции',
+            5:  'Эволюция веб-технологий',
+            6:  'Рынок услуг интернет-маркетинга',
+            7:  'Интернет-маркетинг и интерактивный',
+            8:  'Преимущества интернет-рекламы',
+            9:  'Экосистема интерактивной рекламы',
+            10: 'Элементы экосистемы',
+            11: 'Стратегия сайта',
+            12: 'Хостинг Web-сайта',
+            13: 'CMS — системы управления',
+            14: 'Как работает поисковая машина',
+            15: 'SEO-факторы и их вес',
+            16: 'Подбор ключевых слов',
+            17: 'Оптимизация контента',
+            18: 'Легальные и нелегальные методы',
+            19: 'SEO или аутсорсинг SEO',
+            20: 'Поисковая реклама',
+            21: 'Аффилированный маркетинг',
+            22: 'Поведенческая реклама',
+            23: 'Как работает AD-сервер',
+            24: 'Как работает RTB',
+            25: 'Мобильная и видеореклама',
+            26: 'E-mail маркетинг',
+            27: 'Социальные сети: теория',
+            28: 'Психология пользователей',
+            29: 'SMO и SMM',
+            30: 'UGC-ресурсы и краудсорсинг',
+            31: 'Типы соцсетей в России',
+            32: 'Медиапланирование',
+            33: 'Анализ эффективности'
+        };
+
+        const TOTAL = 33;
+        const current = CURRENT_LECTURE;
+        const prev = current > 1 ? current - 1 : null;
+        const next = current < TOTAL ? current + 1 : null;
+
+        // Обновление счётчика
+        document.getElementById('currentNum').textContent = current;
+
+        // Прогресс-бар
+        const progress = (current / TOTAL) * 100;
+        document.getElementById('navProgress').style.width = progress + '%';
+
+        // Кнопка "Назад"
+        const prevBtn = document.getElementById('prevBtn');
+        if (prev) {
+            prevBtn.href = 'Лекция ' + prev + '.html';
+            document.getElementById('prevTitle').textContent = 'Лекция ' + prev + ' · ' + LECTURES[prev];
+        } else {
+            prevBtn.removeAttribute('href');
+            prevBtn.style.opacity = '0.35';
+            prevBtn.style.cursor = 'not-allowed';
+            prevBtn.onclick = (e) => e.preventDefault();
+            document.getElementById('prevTitle').textContent = 'Это первая лекция';
+        }
+
+        // Кнопка "Вперёд"
+        const nextBtn = document.getElementById('nextBtn');
+        if (next) {
+            nextBtn.href = 'Лекция ' + next + '.html';
+            document.getElementById('nextTitle').textContent = 'Лекция ' + next + ' · ' + LECTURES[next];
+        } else {
+            nextBtn.removeAttribute('href');
+            nextBtn.style.opacity = '0.35';
+            nextBtn.style.cursor = 'not-allowed';
+            nextBtn.onclick = (e) => e.preventDefault();
+            document.getElementById('nextTitle').textContent = 'Это последняя лекция';
+        }
+
+        // Подсветка активного блока
+        document.querySelectorAll('.nav-jump-btn').forEach(btn => {
+            const jumpNum = parseInt(btn.dataset.jump);
+            // Определяем, в каком блоке находится текущая лекция
+            let isActive = false;
+            if (jumpNum === 1 && current >= 1 && current <= 5) isActive = true;
+            if (jumpNum === 6 && current >= 6 && current <= 20) isActive = true;
+            if (jumpNum === 21 && current >= 21 && current <= 26) isActive = true;
+            if (jumpNum === 27 && current >= 27 && current <= 30) isActive = true;
+            if (jumpNum === 31 && current >= 31 && current <= 33) isActive = true;
+            if (isActive) btn.classList.add('active');
+        });
+
+        // Горячие клавиши: ← и → для перелистывания
+        document.addEventListener('keydown', (e) => {
+            // Не срабатывает, если фокус в поле ввода
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            if (e.key === 'ArrowLeft' && prev) {
+                window.location.href = 'Лекция ' + prev + '.html';
+            } else if (e.key === 'ArrowRight' && next) {
+                window.location.href = 'Лекция ' + next + '.html';
+            } else if (e.key === 'Home') {
+                window.location.href = 'index.html';
+            }
+        });
+    })();
+</script></dody>
 </html>
