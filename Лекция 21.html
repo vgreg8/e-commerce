@@ -131,25 +131,197 @@
         .source-body a:hover { text-decoration: underline; }
         .source-body .src-date { color: #64748b; font-size: 11px; }
 
-        .lecture-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(12px);
-            border-top: 2px solid rgba(255, 255, 255, 0.08);
-            padding: 12px 20px; display: flex; justify-content: center; align-items: center;
-            gap: 12px; z-index: 9999; box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
-        }
-        .lecture-nav a {
-            padding: 10px 24px; border-radius: 8px; font-weight: bold; text-decoration: none;
-            font-size: 13px; transition: all 0.2s;
-        }
-        .lecture-nav .btn-prev, .lecture-nav .btn-next {
-            background: #1e293b; color: white; border: 1px solid #334155;
-        }
-        .lecture-nav .btn-prev:hover, .lecture-nav .btn-next:hover { background: #334155; }
-        .lecture-nav .btn-home { background: #10b981; color: white; }
-        .lecture-nav .btn-home:hover { background: #059669; }
-        .lecture-nav a.disabled { opacity: 0.3; pointer-events: none; }
-    </style>
+        /* ============================================================ */
+/* НАВИГАЦИЯ МЕЖДУ ЛЕКЦИЯМИ (универсальный блок)               */
+/* ============================================================ */
+.lecture-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 2px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 9999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.lecture-nav:hover {
+    transform: translateY(0);
+}
+
+.lecture-nav .nav-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    transition: width 0.3s ease;
+    border-radius: 0 3px 3px 0;
+}
+
+.lecture-nav .nav-btn-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.lecture-nav .nav-btn-arrow:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.6);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.lecture-nav .nav-btn-arrow:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-label small {
+    font-size: 9.5px;
+    font-weight: 400;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lecture-nav .nav-btn-arrow .arrow-label .arrow-title {
+    font-size: 12px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lecture-nav .nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0 20px;
+    color: #94a3b8;
+    font-size: 11px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lecture-nav .nav-counter {
+    font-size: 15px;
+    font-weight: 900;
+    color: #f1f5f9;
+    letter-spacing: -0.3px;
+}
+
+.lecture-nav .nav-counter span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.lecture-nav .nav-index-link {
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.lecture-nav .nav-index-link:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+/* Кнопки быстрого перехода по блокам */
+.lecture-nav .nav-jump {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lecture-nav .nav-jump-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.lecture-nav .nav-jump-btn:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: white;
+}
+
+.lecture-nav .nav-jump-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-color: transparent;
+    color: white;
+}
+
+/* Отступ для контента снизу, чтобы навигация не перекрывала */
+body {
+    padding-bottom: 80px !important;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
+    .lecture-nav {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    .lecture-nav .nav-btn-arrow {
+        padding: 8px 12px;
+    }
+    .lecture-nav .nav-btn-arrow .arrow-label .arrow-title {
+        max-width: 90px;
+        font-size: 11px;
+    }
+    .lecture-nav .nav-center {
+        padding: 0 10px;
+    }
+    .lecture-nav .nav-jump {
+        display: none;
+    }
+}</style>
 </head>
 <body>
 
