@@ -864,6 +864,50 @@ body {
             document.getElementById('lecture-player').src = embedUrl;
         }
     </script>
+    <!-- ============================================================ -->
+<!-- НАВИГАЦИЯ МЕЖДУ ЛЕКЦИЯМИ                                    -->
+<!-- ============================================================ -->
+<nav class="lecture-nav" id="lectureNav">
+    <!-- Прогресс-бар -->
+    <div class="nav-progress" id="navProgress" style="width: 0%;"></div>
+
+    <!-- Кнопка "Назад" -->
+    <a href="Лекция 1.html" class="nav-btn-arrow" id="prevBtn">
+        <span class="arrow-icon">←</span>
+        <span class="arrow-label">
+            <small>Назад</small>
+            <span class="arrow-title" id="prevTitle">Лекция 1</span>
+        </span>
+    </a>
+
+    <!-- Центральный блок с счётчиком -->
+    <div class="nav-center">
+        <div class="nav-counter">
+            Лекция <span id="currentNum">1</span> <span>из 33</span>
+        </div>
+        <a href="index.html" class="nav-index-link">📚 К содержанию</a>
+    </div>
+
+    <!-- Кнопка "Вперёд" -->
+    <a href="Лекция 2.html" class="nav-btn-arrow" id="nextBtn">
+        <span class="arrow-label" style="align-items: flex-end;">
+            <small>Вперёд</small>
+            <span class="arrow-title" id="nextTitle">Лекция 2</span>
+        </span>
+        <span class="arrow-icon">→</span>
+    </a>
+
+    <!-- Быстрые переходы по блокам -->
+    <div class="nav-jump">
+        <a href="Лекция 1.html" class="nav-jump-btn" data-jump="1">1-5</a>
+        <a href="Лекция 6.html" class="nav-jump-btn" data-jump="6">6-20</a>
+        <a href="Лекция 21.html" class="nav-jump-btn" data-jump="21">21-26</a>
+        <a href="Лекция 27.html" class="nav-jump-btn" data-jump="27">27-30</a>
+        <a href="Лекция 31.html" class="nav-jump-btn" data-jump="31">31-33</a>
+    </div>
+</nav>
+
+<script>
           // ============================================================
     // АВТОМАТИЧЕСКАЯ НАВИГАЦИЯ МЕЖДУ ЛЕКЦИЯМИ
     // ============================================================
