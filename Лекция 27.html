@@ -998,5 +998,196 @@ body {
             }
         });
     })();
-</script></body>
+</script>
+<!-- Индикатор + прогресс -->
+<div id="scroll-status-badge"
+     style="position:fixed; top:20px; right:20px; z-index:99999;
+            padding:8px 14px; background:rgba(15,23,42,0.9); color:#fff;
+            border:1px solid #4a5568; border-radius:6px;
+            font-family:monospace; font-size:12px; font-weight:bold;
+            cursor:pointer; user-select:none; backdrop-filter:blur(4px);">
+    ▶ ПРОБЕЛ / КЛИК — старт
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    function init() {
+        const totalDurationMs = 25 * 60 * 1000;   // ← 25 минут ровно
+        const studentBlock = document.querySelector('.student-view');
+        const speakerBlock = document.querySelector('.speaker-notes');
+        const badge        = document.getElementById('scroll-status-badge');
+
+        if (!studentBlock || !speakerBlock) {
+            console.warn('[AutoScroll] контейнеры не найдены');
+            return;
+        }
+
+        const studentBehavior = studentBlock.style.scrollBehavior;
+        const speakerBehavior = speakerBlock.style.scrollBehavior;
+
+        let isRunning      = false;
+        let completed      = false;
+        let pausedElapsed  = 0;   // мс, «прожитые» до паузы
+        let startedAt      = 0;   // performance.now() в момент старта
+        let rafId          = null;
+        let startS = 0, startP = 0;
+        let maxS = 0, maxP = 0;
+
+        function setBadge(text, color) {
+            if (!badge) return;
+            badge.style.display = 'block';
+            badge.textContent = text;
+            badge.style.borderColor = color;
+        }
+
+        function measure() {
+            maxS = Math.max(studentBlock.scrollHeight - studentBlock.clientHeight, 0);
+            maxP = Math.max(speakerBlock.scrollHeight - speakerBlock.clientHeight, 0);
+        }
+
+        function fmt(ms) {
+            const m = Math.floor(ms / 60000);
+            const s = Math.floor((ms % 60000) / 1000);
+            return m + ':' + String(s).padStart(2, '0');
+        }
+
+        function animate() {
+            if (!isRunning) return;
+
+            const elapsed  = pausedElapsed + (performance.now() - startedAt);
+            const fraction = Math.min(elapsed / totalDurationMs, 1);
+
+            // если контент догрузился — учтём
+            measure();
+
+            studentBlock.scrollTop = startS + (maxS - startS) * fraction;
+            speakerBlock.scrollTop = startP + (maxP - startP) * fraction;
+
+            // живой таймер в бейдже
+            if (badge) {
+                badge.textContent = '▶ ' + fmt(elapsed) + ' / 25:00';
+                badge.style.borderColor = '#16a34a';
+            }
+
+            if (fraction >= 1) {
+                finish();
+                return;
+            }
+
+            rafId = requestAnimationFrame(animate);
+        }
+
+        function startOrResume() {
+            if (completed) {
+                // полностью новый запуск
+                pausedElapsed = 0;
+                completed     = false;
+                studentBlock.scrollTop = 0;
+                speakerBlock.scrollTop = 0;
+            }
+
+            measure();
+            startS    = studentBlock.scrollTop;
+            startP    = speakerBlock.scrollTop;
+            startedAt = performance.now();
+            isRunning = true;
+
+            studentBlock.style.scrollBehavior = 'auto';
+            speakerBlock.style.scrollBehavior = 'auto';
+
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(animate);
+
+            console.log('[AutoScroll] START', {startS, startP, maxS, maxP, totalMin: 25});
+        }
+
+        function pause() {
+            if (isRunning) {
+                pausedElapsed += performance.now() - startedAt;
+            }
+            isRunning = false;
+            cancelAnimationFrame(rafId);
+
+            setBadge('⏸ ПАУЗА ' + fmt(pausedElapsed), '#dc2626');
+
+            studentBlock.style.scrollBehavior = studentBehavior;
+            speakerBlock.style.scrollBehavior = speakerBehavior;
+
+            console.log('[AutoScroll] PAUSE at', Math.round(pausedElapsed / 1000), 's');
+        }
+
+        function finish() {
+            isRunning = false;
+            completed = true;
+            cancelAnimationFrame(rafId);
+
+            measure();
+            studentBlock.scrollTop = maxS;
+            speakerBlock.scrollTop = maxP;
+
+            setBadge('⏱️ ЗАВЕРШЕНО (25:00)', '#4a5568');
+
+            studentBlock.style.scrollBehavior = studentBehavior;
+            speakerBlock.style.scrollBehavior = speakerBehavior;
+
+            console.log('[AutoScroll] FINISH — ровно 25 минут');
+        }
+
+        function toggle() { isRunning ? pause() : startOrResume(); }
+
+        // Space
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            const t = e.target;
+            const tag = t && t.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault();
+                toggle();
+            }
+        }, true);
+
+        // средняя кнопка мыши
+        window.addEventListener('mousedown', (e) => {
+            if (e.button === 1) { e.preventDefault(); toggle(); }
+        }, true);
+
+        // клик по бейджу
+        if (badge) badge.addEventListener('click', (e) => {
+            e.stopPropagation(); toggle();
+        });
+
+        // клик по контейнерам (кроме ссылок/кнопок/iframe)
+        [studentBlock, speakerBlock].forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('a,button,iframe,input,textarea,select,video,audio')) return;
+                if (window.getSelection().toString().length > 0) return;
+                toggle();
+            });
+        });
+
+        // Экстренная остановка
+        window.stopAutoScroll = () => {
+            isRunning = false;
+            completed = false;
+            pausedElapsed = 0;
+            cancelAnimationFrame(rafId);
+            if (badge) badge.style.display = 'none';
+            studentBlock.style.scrollBehavior = studentBehavior;
+            speakerBlock.style.scrollBehavior = speakerBehavior;
+        };
+
+        setBadge('▶ ПРОБЕЛ / КЛИК — старт', '#4a5568');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init, { once: true });
+    } else {
+        init();
+    }
+})();
+</script>
+</body>
 </html>
