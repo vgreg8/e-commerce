@@ -981,41 +981,27 @@ body {
         });
     })();
 </script>
-    <!-- Индикатор + прогресс -->
-<div id="scroll-status-badge"
-     style="position:fixed; top:20px; right:20px; z-index:99999;
-            padding:8px 14px; background:rgba(15,23,42,0.9); color:#fff;
-            border:1px solid #4a5568; border-radius:6px;
-            font-family:monospace; font-size:12px; font-weight:bold;
-            cursor:pointer; user-select:none; backdrop-filter:blur(4px);">
-    ▶ ПРОБЕЛ / КЛИК — старт
-</div>
-
-<script>
-(function () {
-    'use strict';
-
-    function init() {
-        const totalDurationMs = 25 * 60 * 1000;   // ← 25 минут ровно
+       // ============================================================
+    //  2. АВТОПРОКРУТКА + АУДИО + АВТОПЕРЕХОД
+    // ============================================================
+    function initScroll() {
         const studentBlock = document.querySelector('.student-view');
         const speakerBlock = document.querySelector('.speaker-notes');
         const badge        = document.getElementById('scroll-status-badge');
+        const audio        = document.getElementById('lecture-audio');
 
-        if (!studentBlock || !speakerBlock) {
-            console.warn('[AutoScroll] контейнеры не найдены');
-            return;
-        }
+        if (!studentBlock || !speakerBlock) return;
 
         const studentBehavior = studentBlock.style.scrollBehavior;
         const speakerBehavior = speakerBlock.style.scrollBehavior;
 
         let isRunning      = false;
         let completed      = false;
-        let pausedElapsed  = 0;   // мс, «прожитые» до паузы
-        let startedAt      = 0;   // performance.now() в момент старта
+        let pausedElapsed  = 0;
+        let startedAt      = 0;
         let rafId          = null;
-        let startS = 0, startP = 0;
-        let maxS = 0, maxP = 0;
+        let startS = 0, startP = 0, maxS = 0, maxP = 0;
+        let navigating     = false;
 
         function setBadge(text, color) {
             if (!badge) return;
@@ -1035,39 +1021,51 @@ body {
             return m + ':' + String(s).padStart(2, '0');
         }
 
+        function playAudio() {
+            if (!audio) return;
+            const p = audio.play();
+            if (p && typeof p.catch === 'function') {
+                p.catch(err => {
+                    console.warn('[AutoAudio] Браузер заблокировал звук:', err.message);
+                    setBadge('▶ ИДЕТ ПРОКРУТКА (звук заблокирован)', '#eab308');
+                });
+            }
+        }
+
+        function pauseAudio() {
+            if (audio) try { audio.pause(); } catch (_) {}
+        }
+
+        function resetAudio() {
+            if (audio) try { audio.pause(); audio.currentTime = 0; } catch (_) {}
+        }
+
         function animate() {
             if (!isRunning) return;
 
             const elapsed  = pausedElapsed + (performance.now() - startedAt);
             const fraction = Math.min(elapsed / totalDurationMs, 1);
 
-            // если контент догрузился — учтём
             measure();
-
             studentBlock.scrollTop = startS + (maxS - startS) * fraction;
             speakerBlock.scrollTop = startP + (maxP - startP) * fraction;
 
-            // живой таймер в бейдже
             if (badge) {
                 badge.textContent = '▶ ' + fmt(elapsed) + ' / 25:00';
                 badge.style.borderColor = '#16a34a';
             }
 
-            if (fraction >= 1) {
-                finish();
-                return;
-            }
-
+            if (fraction >= 1) { finish(); return; }
             rafId = requestAnimationFrame(animate);
         }
 
         function startOrResume() {
             if (completed) {
-                // полностью новый запуск
                 pausedElapsed = 0;
-                completed     = false;
+                completed = false;
                 studentBlock.scrollTop = 0;
                 speakerBlock.scrollTop = 0;
+                resetAudio();
             }
 
             measure();
@@ -1082,44 +1080,48 @@ body {
             cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(animate);
 
-            console.log('[AutoScroll] START', {startS, startP, maxS, maxP, totalMin: 25});
+            playAudio();
+            console.log('[AutoScroll] СТАРТ');
         }
 
         function pause() {
-            if (isRunning) {
-                pausedElapsed += performance.now() - startedAt;
-            }
+            if (isRunning) pausedElapsed += performance.now() - startedAt;
             isRunning = false;
             cancelAnimationFrame(rafId);
 
             setBadge('⏸ ПАУЗА ' + fmt(pausedElapsed), '#dc2626');
-
             studentBlock.style.scrollBehavior = studentBehavior;
             speakerBlock.style.scrollBehavior = speakerBehavior;
-
-            console.log('[AutoScroll] PAUSE at', Math.round(pausedElapsed / 1000), 's');
+            pauseAudio();
         }
 
         function finish() {
             isRunning = false;
             completed = true;
             cancelAnimationFrame(rafId);
-
             measure();
             studentBlock.scrollTop = maxS;
             speakerBlock.scrollTop = maxP;
-
-            setBadge('⏱️ ЗАВЕРШЕНО (25:00)', '#4a5568');
-
             studentBlock.style.scrollBehavior = studentBehavior;
             speakerBlock.style.scrollBehavior = speakerBehavior;
 
-            console.log('[AutoScroll] FINISH — ровно 25 минут');
+            const nextLec = currentLecture < TOTAL_LECTURES ? currentLecture + 1 : null;
+
+            if (nextLec) {
+                setBadge('✅ ГОТОВО → Лекция ' + nextLec, '#16a34a');
+                navigating = true;
+                setTimeout(() => {
+                    location.href = 'Лекция ' + nextLec + '.html?' + AUTOSTART_PARAM + '=1';
+                }, autoNextDelayMs);
+            } else {
+                setBadge('✅ КУРС ЗАВЕРШЕН (33 из 33)', '#16a34a');
+                pauseAudio();
+            }
         }
 
         function toggle() { isRunning ? pause() : startOrResume(); }
 
-        // Space
+        // Пробел
         window.addEventListener('keydown', (e) => {
             if (e.repeat) return;
             const t = e.target;
@@ -1131,17 +1133,8 @@ body {
             }
         }, true);
 
-        // средняя кнопка мыши
-        window.addEventListener('mousedown', (e) => {
-            if (e.button === 1) { e.preventDefault(); toggle(); }
-        }, true);
-
-        // клик по бейджу
-        if (badge) badge.addEventListener('click', (e) => {
-            e.stopPropagation(); toggle();
-        });
-
-        // клик по контейнерам (кроме ссылок/кнопок/iframe)
+        // Клики
+        if (badge) badge.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
         [studentBlock, speakerBlock].forEach(el => {
             el.addEventListener('click', (e) => {
                 if (e.target.closest('a,button,iframe,input,textarea,select,video,audio')) return;
@@ -1150,26 +1143,26 @@ body {
             });
         });
 
-        // Экстренная остановка
-        window.stopAutoScroll = () => {
-            isRunning = false;
-            completed = false;
-            pausedElapsed = 0;
-            cancelAnimationFrame(rafId);
-            if (badge) badge.style.display = 'none';
-            studentBlock.style.scrollBehavior = studentBehavior;
-            speakerBlock.style.scrollBehavior = speakerBehavior;
-        };
-
-        setBadge('▶ ПРОБЕЛ / КЛИК — старт', '#4a5568');
+        // Автозапуск со ссылки
+        const params = new URLSearchParams(location.search);
+        if (params.get(AUTOSTART_PARAM) === '1') {
+            params.delete(AUTOSTART_PARAM);
+            const clean = location.pathname + (params.toString() ? '?' + params.toString() : '') + location.hash;
+            history.replaceState(null, '', clean);
+            setTimeout(startOrResume, 500); // Ждем загрузки страницы
+        } else {
+            setBadge('▶ ПРОБЕЛ / КЛИК — старт', '#4a5568');
+        }
     }
 
+    // Запускаем скролл после загрузки страницы
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init, { once: true });
+        document.addEventListener('DOMContentLoaded', initScroll, { once: true });
     } else {
-        init();
+        initScroll();
     }
 })();
 </script>
-</dody>
+
+</body>
 </html>
